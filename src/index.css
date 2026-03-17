@@ -1,0 +1,56 @@
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background: #080810;
+  color: #e2e8f0;
+  font-family: "DM Mono", monospace;
+  min-height: 100vh;
+}
+
+input[type="number"]::-webkit-inner-spin-button {
+  opacity: 0.2;
+}
+
+input[type="date"]::-webkit-calendar-picker-indicator {
+  filter: invert(0.4);
+}
+
+textarea {
+  resize: none;
+}
+
+::-webkit-scrollbar {
+  width: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #1e2030;
+  border-radius: 2px;
+}
+
+.card {
+  background: #0e0e1a;
+  border: 1px solid #1a1a2a;
+  border-radius: 12px;
+}
+
+.nbtn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-family: inherit;
+}
+
+@keyframes slideDown {
+  from { opacity: 0; transform: translateY(-6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.2; }
+}
