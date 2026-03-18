@@ -1,32 +1,120 @@
-/**
- * Capa de persistencia en localStorage.
- */
+import {
+  collection,
+  doc,
+  getDocs,
+  getDoc,
+  setDoc,
+  updateDoc,
+  deleteDoc,
+  arrayUnion,
+  arrayRemove,
+} from "firebase/firestore";
+import { db } from "./firebase";
+import { DAY_ORDER } from "../data/routine";
 
-const STORAGE_KEY = "gym_logs_v2";
+export function getSessionKey(day, date) { return `${day}__${date}`; }
+export function todayStr() { return new Date().toISOString().split("T")[0]; }
 
-export function loadLogs() {
+function logsCol(uid)         { return collection(db, "users", uid, "gym_logs"); }
+function logDoc(uid, key)     { return doc(db, "users", uid, "gym_logs", key); }
+function routineDoc(uid, day) { return doc(db, "users", uid, "gym_routine", day); }
+function localLogsKey(uid)    { return `gym_logs_${uid}`; }
+function localRoutineKey(uid) { return `gym_routine_${uid}`; }
+
+// ─── LOGS ─────────────────────────────────────────────────────────────────────
+export async function loadLogs(uid) {
   try {
-    return JSON.parse(localStorage.getItem(STORAGE_KEY) || "{}");
-  } catch {
-    return {};
+    const snapshot = await getDocs(logsCol(uid));
+    const logs = {};
+    snapshot.forEach((d) => { logs[d.id] = d.data(); });
+    localStorage.setItem(localLogsKey(uid), JSON.stringify(logs));
+    return logs;
+  } catch (err) {
+    console.warn("Firestore offline:", err.message);
+    return loadLogsLocal(uid);
   }
 }
 
-export function saveLogs(logs) {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(logs));
+export async function saveLog(uid, key, session) {
+  try { await setDoc(logDoc(uid, key), session); }
+  catch (err) { console.warn("saveLog error:", err.message); }
+  const local = loadLogsLocal(uid);
+  localStorage.setItem(localLogsKey(uid), JSON.stringify({ ...local, [key]: session }));
+}
+
+export async function deleteLog(uid, key) {
+  try { await deleteDoc(logDoc(uid, key)); }
+  catch (err) { console.warn("deleteLog error:", err.message); }
+  const local = loadLogsLocal(uid);
+  delete local[key];
+  localStorage.setItem(localLogsKey(uid), JSON.stringify(local));
+}
+
+function loadLogsLocal(uid) {
+  try { return JSON.parse(localStorage.getItem(localLogsKey(uid)) || "{}"); }
+  catch { return {}; }
+}
+
+// ─── RUTINA ───────────────────────────────────────────────────────────────────
+
+/**
+ * Carga la rutina del usuario desde Firestore.
+ * Retorna null si el usuario no tiene rutina creada aún.
+ */
+export async function loadRoutine(uid) {
+  try {
+    const result = {};
+    let hasAny = false;
+    // Intentar cargar por días predefinidos Y por días custom
+    const snap = await getDocs(collection(db, "users", uid, "gym_routine"));
+    snap.forEach((d) => {
+      result[d.id] = d.data();
+      hasAny = true;
+    });
+    if (!hasAny) return null; // usuario nuevo sin rutina
+    localStorage.setItem(localRoutineKey(uid), JSON.stringify(result));
+    return result;
+  } catch (err) {
+    console.warn("loadRoutine error:", err.message);
+    return loadRoutineLocal(uid);
+  }
 }
 
 /**
- * Genera la key única de una sesión.
- * Formato: "Upper A__2026-03-17"
+ * Guarda la rutina completa de un usuario (onboarding).
+ * routine = { "Upper A": { exercises: [...] }, ... }
  */
-export function getSessionKey(day, date) {
-  return `${day}__${date}`;
+export async function saveFullRoutine(uid, routine) {
+  for (const [day, data] of Object.entries(routine)) {
+    await setDoc(routineDoc(uid, day), data);
+  }
+  localStorage.setItem(localRoutineKey(uid), JSON.stringify(routine));
 }
 
-/**
- * Fecha de hoy en formato ISO (YYYY-MM-DD).
- */
-export function todayStr() {
-  return new Date().toISOString().split("T")[0];
+export async function addExerciseToRoutine(uid, day, exercise) {
+  try { await updateDoc(routineDoc(uid, day), { exercises: arrayUnion(exercise) }); }
+  catch (err) { console.warn("addExercise error:", err.message); }
+  const local = loadRoutineLocal(uid) || {};
+  const dayData = local[day] || { exercises: [] };
+  localStorage.setItem(localRoutineKey(uid), JSON.stringify({
+    ...local, [day]: { exercises: [...dayData.exercises, exercise] },
+  }));
+}
+
+export async function removeExerciseFromRoutine(uid, day, exercise) {
+  try { await updateDoc(routineDoc(uid, day), { exercises: arrayRemove(exercise) }); }
+  catch (err) { console.warn("removeExercise error:", err.message); }
+  const local = loadRoutineLocal(uid) || {};
+  if (local[day]) {
+    localStorage.setItem(localRoutineKey(uid), JSON.stringify({
+      ...local, [day]: { exercises: local[day].exercises.filter(e => e.name !== exercise.name) },
+    }));
+  }
+}
+
+function loadRoutineLocal(uid) {
+  try {
+    const cached = JSON.parse(localStorage.getItem(localRoutineKey(uid)) || "{}");
+    return Object.keys(cached).length ? cached : null;
+  } catch { return null; }
 }
