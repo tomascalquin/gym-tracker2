@@ -13,9 +13,12 @@ import ExerciseChart from "./ExerciseChart";
  * @param {string}   accent        - Color hex del día
  * @param {string}   dayName       - Nombre del día para el gráfico
  * @param {Object}   logs          - Historial para el gráfico
+ * @param {Object}   routine       - Rutina completa desde Firestore
  * @param {Function} onUpdateSet   - (ei, si, field, value) => void
  * @param {Function} onToggleSet   - (ei, si) => void
  * @param {Function} onAddSet      - (ei) => void
+ * @param {boolean}  isCustom      - Si es un ejercicio agregado por el usuario
+ * @param {Function} onRemove      - () => void — solo presente si isCustom
  */
 export default function ExerciseCard({
   exercise,
@@ -25,9 +28,12 @@ export default function ExerciseCard({
   accent,
   dayName,
   logs,
+  routine,
+  isCustom,
   onUpdateSet,
   onToggleSet,
   onAddSet,
+  onRemove,
 }) {
   const [chartOpen, setChartOpen] = useState(false);
 
@@ -43,16 +49,23 @@ export default function ExerciseCard({
           alignItems: "center",
         }}
       >
-        <span style={{ fontSize: 13, fontWeight: 400, color: "#f1f5f9" }}>
-          {exercise.name}
-        </span>
-        <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
-          <span style={{ fontSize: 9, color: "#2a2a3e" }}>{sets.length}s</span>
+        <div style={{ display: "flex", alignItems: "center", gap: 7 }}>
+          <span style={{ fontSize: 15, fontWeight: 400, color: "#f1f5f9" }}>
+            {exercise.name}
+          </span>
+          {isCustom && (
+            <span style={{ fontSize: 12, background: accent + "22", color: accent, padding: "2px 6px", borderRadius: 8, letterSpacing: 1 }}>
+              CUSTOM
+            </span>
+          )}
+        </div>
+        <div style={{ display: "flex", gap: 6, alignItems: "center" }}>
+          <span style={{ fontSize: 12, color: "#64748b" }}>{sets.length}s</span>
           <button
             onClick={() => setChartOpen((v) => !v)}
             className="nbtn"
             style={{
-              fontSize: 9,
+              fontSize: 12,
               color: chartOpen ? accent : "#334155",
               border: `1px solid ${chartOpen ? accent + "55" : "#1a1a2a"}`,
               padding: "3px 8px",
@@ -62,6 +75,19 @@ export default function ExerciseCard({
           >
             {chartOpen ? "▲" : "▼ CHART"}
           </button>
+          {isCustom && onRemove && (
+            <button
+              onClick={onRemove}
+              className="nbtn"
+              title="Eliminar ejercicio"
+              style={{
+                fontSize: 13, color: "#ef4444",
+                border: "1px solid #3f1010",
+                width: 22, height: 22, borderRadius: 5,
+                display: "flex", alignItems: "center", justifyContent: "center",
+              }}
+            >✕</button>
+          )}
         </div>
       </div>
 
@@ -77,9 +103,9 @@ export default function ExerciseCard({
           }}
         >
           <span />
-          <span style={{ fontSize: 8, color: "#2a2a3e", letterSpacing: 1 }}>NOTA</span>
-          <span style={{ fontSize: 8, color: "#2a2a3e", letterSpacing: 1, textAlign: "center" }}>KG</span>
-          <span style={{ fontSize: 8, color: "#2a2a3e", letterSpacing: 1, textAlign: "center" }}>REPS</span>
+          <span style={{ fontSize: 12, color: "#64748b", letterSpacing: 1 }}>NOTA</span>
+          <span style={{ fontSize: 12, color: "#64748b", letterSpacing: 1, textAlign: "center" }}>KG</span>
+          <span style={{ fontSize: 12, color: "#64748b", letterSpacing: 1, textAlign: "center" }}>REPS</span>
           <span />
         </div>
 
@@ -102,10 +128,10 @@ export default function ExerciseCard({
             marginTop: 2,
             width: "100%",
             border: "1px dashed #1a1a2a",
-            color: "#2a2a3e",
+            color: "#64748b",
             padding: "5px",
             borderRadius: 6,
-            fontSize: 9,
+            fontSize: 12,
             letterSpacing: 1,
           }}
         >
@@ -124,7 +150,7 @@ export default function ExerciseCard({
         >
           <div
             style={{
-              fontSize: 9,
+              fontSize: 12,
               color: accent,
               marginBottom: 10,
               letterSpacing: 2,
@@ -137,6 +163,7 @@ export default function ExerciseCard({
             dayName={dayName}
             logs={logs}
             accent={accent}
+            routine={routine}
           />
         </div>
       )}

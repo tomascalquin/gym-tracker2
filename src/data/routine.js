@@ -61,3 +61,20 @@ export const DAY_META = {
   "Lower A": { accent: "#34d399", dim: "#064e3b", tag: "LOWER" },
   "Lower B": { accent: "#fb923c", dim: "#431407", tag: "LOWER" },
 };
+
+/**
+ * Devuelve la rutina base mergeada con los ejercicios custom del usuario.
+ * Los ejercicios custom se agregan al final de cada día.
+ *
+ * @param {Object} customExercises - { [day]: [{ name, sets }] }
+ * @returns {Object} Rutina completa por día
+ */
+export function getMergedRoutine(customExercises = {}) {
+  const merged = {};
+  DAY_ORDER.forEach((day) => {
+    const base = ROUTINE[day].exercises;
+    const custom = (customExercises[day] || []).map((ex) => ({ ...ex, custom: true }));
+    merged[day] = { exercises: [...base, ...custom] };
+  });
+  return merged;
+}

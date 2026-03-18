@@ -8,7 +8,16 @@ body {
   background: #080810;
   color: #e2e8f0;
   font-family: "DM Mono", monospace;
+  font-size: 15px;        /* base subida de ~12 a 15px */
+  font-weight: 400;       /* peso base explícito */
   min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Todos los inputs y textareas heredan la fuente y no se ven chicos */
+input, textarea, select, button {
+  font-family: inherit;
+  font-weight: 400;
 }
 
 input[type="number"]::-webkit-inner-spin-button {
@@ -32,6 +41,16 @@ textarea {
   border-radius: 2px;
 }
 
+/* ── Helpers de texto ── */
+/* Labels tipo "FECHA", "NOTA DE SESIÓN", etc. */
+.label {
+  font-size: 11px;
+  letter-spacing: 2px;
+  color: #475569;
+  margin-bottom: 6px;
+  display: block;
+}
+
 .card {
   background: #0e0e1a;
   border: 1px solid #1a1a2a;
@@ -43,6 +62,7 @@ textarea {
   border: none;
   cursor: pointer;
   font-family: inherit;
+  font-size: inherit;
 }
 
 @keyframes slideDown {
@@ -53,4 +73,9 @@ textarea {
 @keyframes blink {
   0%, 100% { opacity: 1; }
   50%       { opacity: 0.2; }
+}
+
+@keyframes slideUp {
+  from { transform: translateX(-50%) translateY(40px); opacity: 0; }
+  to   { transform: translateX(-50%) translateY(0);    opacity: 1; }
 }

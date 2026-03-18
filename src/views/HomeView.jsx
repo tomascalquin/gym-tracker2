@@ -6,23 +6,31 @@ import { exportToExcel } from "../utils/xlsx";
 /**
  * Vista principal: selector de día, stats y navegación.
  */
-export default function HomeView({ logs, sessionDate, setSessionDate, onStartSession, onNavigate }) {
+export default function HomeView({ logs, user, sessionDate, setSessionDate, onStartSession, onNavigate, onLogout }) {
   const today = todayStr();
+  const firstName = (user?.displayName || user?.email || "Atleta").split(" ")[0];
 
   return (
     <div style={{ maxWidth: 440, margin: "0 auto", padding: "28px 18px" }}>
       {/* Header */}
       <div style={{ marginBottom: 26 }}>
-        <div style={{ fontSize: 9, letterSpacing: 4, color: "#1e1e2e", marginBottom: 4 }}>
+        <div style={{ fontSize: 12, letterSpacing: 4, color: "#475569", marginBottom: 4 }}>
           HYPERTROPHY TRACKER
         </div>
-        <div style={{ display: "flex", alignItems: "baseline", gap: 4 }}>
-          <h1 style={{ fontSize: 28, fontWeight: 400, letterSpacing: -1, color: "#f8fafc" }}>
-            Tomás
-          </h1>
-          <span style={{ color: "#60a5fa", fontSize: 28, animation: "blink 1.4s infinite" }}>_</span>
+        <div style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between" }}>
+          <div style={{ display: "flex", alignItems: "baseline", gap: 4 }}>
+            <h1 style={{ fontSize: 28, fontWeight: 400, letterSpacing: -1, color: "#f8fafc" }}>
+              {firstName}
+            </h1>
+            <span style={{ color: "#60a5fa", fontSize: 28, animation: "blink 1.4s infinite" }}>_</span>
+          </div>
+          <button onClick={onLogout} style={{
+            background: "none", border: "1px solid #1a1a2a", color: "#475569",
+            padding: "5px 12px", borderRadius: 6, cursor: "pointer",
+            fontSize: 11, letterSpacing: 1, fontFamily: "inherit",
+          }}>SALIR</button>
         </div>
-        <div style={{ fontSize: 11, color: "#2a2a3e", marginTop: 2 }}>
+        <div style={{ fontSize: 14, color: "#64748b", marginTop: 2 }}>
           {Object.keys(logs).length} sesiones · semana {getWeekNumber()}
         </div>
       </div>
@@ -35,7 +43,7 @@ export default function HomeView({ logs, sessionDate, setSessionDate, onStartSes
           return (
             <div key={d} className="card" style={{ padding: "10px 6px", textAlign: "center", borderLeft: `2px solid ${c.accent}` }}>
               <div style={{ fontSize: 20, fontWeight: 400, color: c.accent }}>{n}</div>
-              <div style={{ fontSize: 8, color: "#2a2a3e", letterSpacing: 1, marginTop: 2 }}>{d}</div>
+              <div style={{ fontSize: 12, color: "#64748b", letterSpacing: 1, marginTop: 2 }}>{d}</div>
             </div>
           );
         })}
@@ -43,14 +51,14 @@ export default function HomeView({ logs, sessionDate, setSessionDate, onStartSes
 
       {/* Selector de fecha */}
       <div style={{ marginBottom: 16 }}>
-        <div style={{ fontSize: 9, letterSpacing: 3, color: "#2a2a3e", marginBottom: 5 }}>FECHA</div>
+        <div style={{ fontSize: 12, letterSpacing: 3, color: "#64748b", marginBottom: 5 }}>FECHA</div>
         <input
           type="date"
           value={sessionDate}
           onChange={(e) => setSessionDate(e.target.value)}
           style={{
             background: "#0e0e1a", border: "1px solid #1a1a2a", color: "#94a3b8",
-            padding: "9px 12px", borderRadius: 8, fontSize: 12,
+            padding: "9px 12px", borderRadius: 8, fontSize: 15,
             width: "100%", fontFamily: "inherit", outline: "none",
           }}
         />
@@ -83,15 +91,15 @@ export default function HomeView({ logs, sessionDate, setSessionDate, onStartSes
           >
             <div>
               <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 3 }}>
-                <span style={{ fontSize: 9, letterSpacing: 2, color: c.accent }}>{c.tag}</span>
-                <span style={{ fontSize: 14, fontWeight: 400, color: "#f1f5f9" }}>{day}</span>
+                <span style={{ fontSize: 12, letterSpacing: 2, color: c.accent }}>{c.tag}</span>
+                <span style={{ fontSize: 16, fontWeight: 400, color: "#f1f5f9" }}>{day}</span>
                 {hasLog && (
-                  <span style={{ fontSize: 8, background: c.accent + "22", color: c.accent, padding: "2px 7px", borderRadius: 10 }}>
+                  <span style={{ fontSize: 12, background: c.accent + "22", color: c.accent, padding: "2px 7px", borderRadius: 10 }}>
                     LOGGED
                   </span>
                 )}
               </div>
-              <div style={{ fontSize: 10, color: "#2a2a3e" }}>
+              <div style={{ fontSize: 13, color: "#64748b" }}>
                 {exCount} ejercicios · {setCount} series
               </div>
             </div>
@@ -102,17 +110,23 @@ export default function HomeView({ logs, sessionDate, setSessionDate, onStartSes
 
       {/* Nav */}
       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8, marginTop: 10 }}>
-        <button onClick={() => onNavigate("history")} className="nbtn" style={{ border: "1px solid #1a1a2a", color: "#475569", padding: "10px", borderRadius: 8, fontSize: 9, letterSpacing: 2 }}>
+        <button onClick={() => onNavigate("history")} className="nbtn" style={{ border: "1px solid #1a1a2a", color: "#475569", padding: "10px", borderRadius: 8, fontSize: 12, letterSpacing: 2 }}>
           HISTORIAL
         </button>
-        <button onClick={() => onNavigate("progress")} className="nbtn" style={{ border: "1px solid #1a1a2a", color: "#475569", padding: "10px", borderRadius: 8, fontSize: 9, letterSpacing: 2 }}>
+        <button onClick={() => onNavigate("progress")} className="nbtn" style={{ border: "1px solid #1a1a2a", color: "#475569", padding: "10px", borderRadius: 8, fontSize: 12, letterSpacing: 2 }}>
           PROGRESO
         </button>
       </div>
+      <button onClick={() => onNavigate("friends")} className="nbtn" style={{
+        marginTop: 8, width: "100%", border: "1px solid #1e3a5f", color: "#60a5fa",
+        padding: "10px", borderRadius: 8, fontSize: 12, letterSpacing: 2,
+      }}>
+        👥 AMIGOS
+      </button>
       <button
         onClick={() => exportToExcel(logs)}
         className="nbtn"
-        style={{ marginTop: 8, width: "100%", border: "1px solid #1a3a1a", color: "#22c55e", padding: "10px", borderRadius: 8, fontSize: 9, letterSpacing: 2 }}
+        style={{ marginTop: 8, width: "100%", border: "1px solid #1a3a1a", color: "#22c55e", padding: "10px", borderRadius: 8, fontSize: 12, letterSpacing: 2 }}
       >
         ↓ EXPORTAR EXCEL
       </button>

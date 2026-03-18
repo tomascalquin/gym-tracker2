@@ -16,7 +16,7 @@ export default function Toast({ message }) {
         border: "1px solid #22c55e",
         padding: "8px 18px",
         borderRadius: 8,
-        fontSize: 11,
+        fontSize: 14,
         letterSpacing: 1,
         animation: "slideDown 0.2s ease",
         whiteSpace: "nowrap",

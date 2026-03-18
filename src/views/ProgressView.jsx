@@ -1,19 +1,23 @@
 import { useState } from "react";
-import { DAY_ORDER, DAY_META, ROUTINE } from "../data/routine";
+import { DAY_ORDER, DAY_META } from "../data/routine";
 import { calc1RM, bestSet } from "../utils/fitness";
 import ExerciseChart from "../components/ExerciseChart";
 
 /**
  * Vista de progreso: gráfico + tabla de PRs por ejercicio y día.
  */
-export default function ProgressView({ logs, onBack }) {
+export default function ProgressView({ logs, routine, onBack }) {
   const [progressDay, setProgressDay] = useState("Upper A");
-  const [progressEx, setProgressEx] = useState(ROUTINE["Upper A"].exercises[0].name);
+  const [progressEx, setProgressEx] = useState(
+    routine?.["Upper A"]?.exercises?.[0]?.name || ""
+  );
 
   function handleDayChange(day) {
     setProgressDay(day);
-    setProgressEx(ROUTINE[day].exercises[0].name);
+    setProgressEx(routine?.[day]?.exercises?.[0]?.name || "");
   }
+
+  const exercises = routine?.[progressDay]?.exercises || [];
 
   // Construir tabla de PRs
   const prRows = Object.values(logs)
@@ -35,10 +39,10 @@ export default function ProgressView({ logs, onBack }) {
     <div style={{ maxWidth: 440, margin: "0 auto", padding: "24px 18px" }}>
       {/* Header */}
       <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 20 }}>
-        <button onClick={onBack} className="nbtn" style={{ color: "#475569", fontSize: 11, letterSpacing: 1 }}>
+        <button onClick={onBack} className="nbtn" style={{ color: "#475569", fontSize: 14, letterSpacing: 1 }}>
           ← HOME
         </button>
-        <h2 style={{ margin: 0, fontSize: 13, fontWeight: 400, letterSpacing: 2, color: "#f1f5f9" }}>
+        <h2 style={{ margin: 0, fontSize: 15, fontWeight: 400, letterSpacing: 2, color: "#f1f5f9" }}>
           PROGRESO
         </h2>
       </div>
@@ -57,7 +61,7 @@ export default function ProgressView({ logs, onBack }) {
                 border: `1px solid ${active ? c.accent : "#1a1a2a"}`,
                 color: active ? c.accent : "#334155",
                 padding: "8px 4px", borderRadius: 8, cursor: "pointer",
-                fontSize: 9, letterSpacing: 1, fontFamily: "inherit",
+                fontSize: 12, letterSpacing: 1, fontFamily: "inherit",
               }}
             >
               {d}
@@ -73,21 +77,21 @@ export default function ProgressView({ logs, onBack }) {
         style={{
           width: "100%", background: "#0e0e1a", border: "1px solid #1a1a2a",
           color: "#94a3b8", padding: "9px 12px", borderRadius: 8,
-          fontSize: 12, fontFamily: "inherit", outline: "none", marginBottom: 14,
+          fontSize: 15, fontFamily: "inherit", outline: "none", marginBottom: 14,
         }}
       >
-        {ROUTINE[progressDay].exercises.map((ex) => (
+        {exercises.map((ex) => (
           <option key={ex.name} value={ex.name}>{ex.name}</option>
         ))}
       </select>
 
       {/* Gráfico */}
       <div className="card" style={{ padding: "16px" }}>
-        <div style={{ fontSize: 10, color: accent, marginBottom: 12, letterSpacing: 1 }}>
+        <div style={{ fontSize: 13, color: accent, marginBottom: 12, letterSpacing: 1 }}>
           {progressEx}
         </div>
-        <ExerciseChart exName={progressEx} dayName={progressDay} logs={logs} accent={accent} />
-        <div style={{ fontSize: 8, color: "#2a2a3e", marginTop: 8, textAlign: "center" }}>
+        <ExerciseChart exName={progressEx} dayName={progressDay} logs={logs} accent={accent} routine={routine} />
+        <div style={{ fontSize: 12, color: "#64748b", marginTop: 8, textAlign: "center" }}>
           — — peso real &nbsp;·&nbsp; —— 1RM Epley
         </div>
       </div>
@@ -95,14 +99,14 @@ export default function ProgressView({ logs, onBack }) {
       {/* Tabla de PRs */}
       {prRows.length > 0 && (
         <div className="card" style={{ marginTop: 10, padding: "14px 16px" }}>
-          <div style={{ fontSize: 9, letterSpacing: 2, color: "#2a2a3e", marginBottom: 10 }}>
+          <div style={{ fontSize: 12, letterSpacing: 2, color: "#64748b", marginBottom: 10 }}>
             HISTORIAL SETS
           </div>
           {prRows.map((r, i) => (
             <div key={i} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 7 }}>
-              <span style={{ fontSize: 10, color: "#334155" }}>{r.date}</span>
-              <span style={{ fontSize: 11, color: "#94a3b8" }}>{r.weight}kg × {r.reps}</span>
-              <span style={{ fontSize: 11, color: r.rm === maxRM ? "#fbbf24" : accent, fontWeight: r.rm === maxRM ? 700 : 400 }}>
+              <span style={{ fontSize: 13, color: "#334155" }}>{r.date}</span>
+              <span style={{ fontSize: 14, color: "#94a3b8" }}>{r.weight}kg × {r.reps}</span>
+              <span style={{ fontSize: 14, color: r.rm === maxRM ? "#fbbf24" : accent, fontWeight: r.rm === maxRM ? 700 : 400 }}>
                 {r.rm} {r.rm === maxRM ? "🏆" : ""}
               </span>
             </div>

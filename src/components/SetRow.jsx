@@ -23,7 +23,7 @@ export default function SetRow({ index, set, done, accent, onChange, onToggle })
       }}
     >
       {/* Número de serie */}
-      <div style={{ fontSize: 9, color: "#2a2a3e", textAlign: "center" }}>
+      <div style={{ fontSize: 12, color: "#64748b", textAlign: "center" }}>
         {index + 1}
       </div>
 
@@ -38,7 +38,7 @@ export default function SetRow({ index, set, done, accent, onChange, onToggle })
           color: "#475569",
           padding: "5px 7px",
           borderRadius: 5,
-          fontSize: 10,
+          fontSize: 13,
           fontFamily: "inherit",
           width: "100%",
           outline: "none",
@@ -56,7 +56,7 @@ export default function SetRow({ index, set, done, accent, onChange, onToggle })
           color: accent,
           padding: "6px 4px",
           borderRadius: 5,
-          fontSize: 14,
+          fontSize: 16,
           fontWeight: 500,
           textAlign: "center",
           fontFamily: "inherit",
@@ -76,7 +76,7 @@ export default function SetRow({ index, set, done, accent, onChange, onToggle })
           color: "#f1f5f9",
           padding: "6px 4px",
           borderRadius: 5,
-          fontSize: 14,
+          fontSize: 16,
           fontWeight: 500,
           textAlign: "center",
           fontFamily: "inherit",
@@ -94,9 +94,9 @@ export default function SetRow({ index, set, done, accent, onChange, onToggle })
           borderRadius: 5,
           background: done ? "#14532d" : "#0e0e1a",
           border: `1px solid ${done ? "#22c55e" : "#1a1a2a"}`,
-          color: done ? "#22c55e" : "#2a2a3e",
+          color: done ? "#22c55e" : "#64748b",
           cursor: "pointer",
-          fontSize: 11,
+          fontSize: 14,
           padding: 0,
           display: "flex",
           alignItems: "center",
