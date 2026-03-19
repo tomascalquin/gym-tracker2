@@ -164,6 +164,10 @@ export default function HomeView({ logs, user, myProfile, routine, userXP, sessi
           PROGRESO
         </button>
       </div>
+      <button onClick={() => onNavigate("editRoutine")} className="nbtn" style={{
+        marginTop: 8, width: "100%", border: "1px solid #1a2a1a", color: "#34d399",
+        padding: "10px", borderRadius: 8, fontSize: 11, letterSpacing: 2,
+      }}>✏️ EDITAR RUTINA</button>
       <button onClick={() => onNavigate("friends")} className="nbtn" style={{
         marginTop: 8, width: "100%", border: "1px solid #1e3a5f", color: "#60a5fa",
         padding: "10px", borderRadius: 8, fontSize: 11, letterSpacing: 2,

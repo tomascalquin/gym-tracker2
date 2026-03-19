@@ -12,6 +12,7 @@ import { calcStreak } from "./utils/streak";
 import AuthScreen from "./components/AuthScreen";
 import Toast from "./components/Toast";
 import RankUpModal from "./components/RankUpModal";
+import RestTimer from "./components/RestTimer";
 import HomeView from "./views/HomeView";
 import SessionView from "./views/SessionView";
 import HistoryView from "./views/HistoryView";
@@ -20,6 +21,7 @@ import FriendsView from "./views/friends/FriendsView";
 import GroupsView from "./views/groups/GroupsView";
 import ChallengesView from "./views/ChallengesView";
 import LeaderboardView from "./views/LeaderboardView";
+import EditRoutineView from "./views/EditRoutineView";
 import OnboardingView from "./views/OnboardingView";
 
 export default function App() {
@@ -37,7 +39,10 @@ export default function App() {
   const [toastMsg, setToastMsg]             = useState(null);
   const [dataLoading, setDataLoading]       = useState(false);
   const [userXP, setUserXP]                 = useState(0);
-  const [rankUpData, setRankUpData]         = useState(null); // { oldRank, newRank, xpGained, prs }
+  const [rankUpData, setRankUpData]         = useState(null);
+  const [timerOpen, setTimerOpen]           = useState(false);
+  const [timerVisible, setTimerVisible]     = useState(false);
+  const [timerState, setTimerState]         = useState({ selected: 90, timeLeft: null, running: false, endTime: null }); // { oldRank, newRank, xpGained, prs }
 
   useEffect(() => {
     const unsub = onAuthChange(fb => { setUser(fb); setAuthReady(true); });
@@ -194,6 +199,9 @@ export default function App() {
         />
       )}
 
+      {/* Timer flotante global */}
+      {timerOpen && <RestTimer onClose={() => setTimerOpen(false)} />}
+
       {view === "home" && (
         <HomeView logs={logs} user={user} myProfile={myProfile} routine={routine} userXP={userXP}
           sessionDate={sessionDate} setSessionDate={setSessionDate}
@@ -208,6 +216,7 @@ export default function App() {
           onToggleSet={toggleSet} onAddSet={addSet} onRemoveSet={removeSet} onChangeNote={setSessionNote}
           onSave={saveSession} onAddExercise={handleAddExercise}
           onRemoveExercise={handleRemoveExercise}
+          onOpenTimer={() => setTimerOpen(true)}
         />
       )}
       {view === "history" && (
@@ -220,6 +229,14 @@ export default function App() {
       {view === "groups"      && <GroupsView user={user} onBack={() => setView("home")} />}
       {view === "challenges"  && <ChallengesView user={user} myLogs={logs} myRoutine={routine} onBack={() => setView("home")} />}
       {view === "leaderboard" && <LeaderboardView user={user} myXP={userXP} onBack={() => setView("home")} />}
+      {view === "editRoutine" && (
+        <EditRoutineView
+          user={user}
+          routine={routine}
+          onBack={() => setView("home")}
+          onRoutineUpdated={(updated) => { setRoutine(updated); setView("home"); }}
+        />
+      )}
     </>
   );
 }

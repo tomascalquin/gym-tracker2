@@ -27,8 +27,8 @@ export default function SessionView({
   onRemoveSet,
 }) {
   const [modalOpen, setModalOpen] = useState(false);
-  const [timerOpen, setTimerOpen]   = useState(false);
-  const accent = DAY_META[activeDay]?.accent || "#60a5fa";
+  const [timerOpen, setTimerOpen] = useState(false);
+  const accent    = DAY_META[activeDay]?.accent || "#60a5fa";
   const exercises = routine[activeDay]?.exercises || [];
 
   const progress = (() => {
