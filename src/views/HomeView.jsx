@@ -52,11 +52,18 @@ export default function HomeView({ logs, user, myProfile, routine, userXP, theme
             padding: "4px 10px", borderRadius: 6, cursor: "pointer",
             fontSize: 11, letterSpacing: 1, fontFamily: "inherit",
           }}>👤</button>
+          <div style={{ display: "flex", gap: 8 }}>
+          <button onClick={() => onNavigate("profile")} style={{
+            background: "none", border: "1px solid var(--border)", color: "var(--text3)",
+            padding: "4px 10px", borderRadius: 6, cursor: "pointer",
+            fontSize: 11, letterSpacing: 1, fontFamily: "inherit",
+          }}>👤</button>
           <button onClick={onLogout} style={{
             background: "none", border: "1px solid #1a1a2a", color: "#475569",
             padding: "4px 10px", borderRadius: 6, cursor: "pointer",
             fontSize: 11, letterSpacing: 1, fontFamily: "inherit",
           }}>SALIR</button>
+          </div>
           </div>
         </div>
         <div style={{ fontSize: 12, color: "#334155", marginTop: 3 }}>

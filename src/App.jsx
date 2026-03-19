@@ -23,6 +23,8 @@ import FriendsView from "./views/friends/FriendsView";
 import GroupsView from "./views/groups/GroupsView";
 import ChallengesView from "./views/ChallengesView";
 import LeaderboardView from "./views/LeaderboardView";
+import ProfileView from "./views/ProfileView";
+import { applyTheme, getTheme } from "./utils/theme";
 import EditRoutineView from "./views/EditRoutineView";
 import ProfileView from "./views/ProfileView";
 import OnboardingView from "./views/OnboardingView";
@@ -53,6 +55,7 @@ export default function App() {
     checkRedirectResult().catch(console.error);
     // Registrar service worker para modo offline
     registerServiceWorker();
+    applyTheme(getTheme()); // aplicar tema guardado
     // Aplicar tema guardado al body
     const savedTheme = loadTheme();
     document.body.style.background = savedTheme === "light" ? "#f1f5f9" : "#080810";
@@ -87,6 +90,10 @@ export default function App() {
     saveTheme(next);
     // Aplicar clase al body
     document.body.style.background = next === "light" ? "#f1f5f9" : "#080810";
+  }
+
+  function handleProfileUpdated(updated) {
+    setMyProfile(updated);
   }
 
   async function handleLogout() {
@@ -248,6 +255,11 @@ export default function App() {
       {view === "groups"      && <GroupsView user={user} onBack={() => setView("home")} />}
       {view === "challenges"  && <ChallengesView user={user} myLogs={logs} myRoutine={routine} onBack={() => setView("home")} />}
       {view === "leaderboard" && <LeaderboardView user={user} myXP={userXP} onBack={() => setView("home")} />}
+      {view === "profile" && (
+        <ProfileView user={user} myProfile={myProfile} userXP={userXP} logs={logs}
+          onBack={() => setView("home")} onProfileUpdated={handleProfileUpdated}
+        />
+      )}
       {view === "profile" && (
         <ProfileView
           user={user}

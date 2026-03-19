@@ -1,77 +1,40 @@
 /**
- * Calcula series de aproximamiento (warm-up) para un peso de trabajo.
- *
- * Protocolo estándar de powerlifting:
- * - Serie 1: 40% × 8 reps (barra / muy ligero)
- * - Serie 2: 55% × 5 reps
- * - Serie 3: 70% × 3 reps
- * - Serie 4: 85% × 1-2 reps
- * - Serie 5 (opcional): 92% × 1 rep si el peso de trabajo es > 100kg
- *
- * El objetivo es llegar al peso de trabajo con el sistema nervioso activado
- * sin acumular fatiga.
- *
- * @param {number} workingWeight - Peso de trabajo en kg
- * @param {number} workingReps   - Reps de trabajo (afecta si necesitas más aproximamiento)
- * @returns {Array<{ pct, weight, reps, note }>}
+ * Calcula series de aproximamiento basadas en el peso de trabajo.
+ * Protocolo estándar de powerlifting con redondeo a múltiplos de 2.5kg.
  */
-export function calcWarmupSets(workingWeight, workingReps = 5) {
-  if (!workingWeight || workingWeight <= 20) return [];
+export function calcWarmup(workingWeight, workingReps) {
+  if (!workingWeight || workingWeight <= 0) return [];
 
-  const sets = [];
+  const est1RM = workingReps === 1
+    ? workingWeight
+    : Math.round(workingWeight * (1 + workingReps / 30));
 
-  // Definir porcentajes según el peso de trabajo
   let protocol;
-  if (workingWeight < 60) {
+  if (workingWeight < 40) {
     protocol = [
-      { pct: 40, reps: 8 },
-      { pct: 65, reps: 5 },
-      { pct: 80, reps: 3 },
+      { pct: 0.50, reps: 8, label: "Activación" },
+      { pct: 0.70, reps: 5, label: "Técnica" },
     ];
-  } else if (workingWeight < 100) {
+  } else if (workingWeight < 80) {
     protocol = [
-      { pct: 40, reps: 8,  note: "barra / muy ligero" },
-      { pct: 55, reps: 5 },
-      { pct: 70, reps: 3 },
-      { pct: 85, reps: 2 },
+      { pct: 0.40, reps: 8, label: "Activación" },
+      { pct: 0.60, reps: 5, label: "Técnica" },
+      { pct: 0.75, reps: 3, label: "Potenciación" },
     ];
   } else {
     protocol = [
-      { pct: 40, reps: 8,  note: "solo barra" },
-      { pct: 55, reps: 5 },
-      { pct: 70, reps: 3 },
-      { pct: 82, reps: 2 },
-      { pct: 92, reps: 1,  note: "potenciador" },
+      { pct: 0.40, reps: 8, label: "Activación" },
+      { pct: 0.55, reps: 5, label: "Técnica" },
+      { pct: 0.70, reps: 3, label: "Potenciación" },
+      { pct: 0.85, reps: 1, label: "Específica" },
     ];
   }
 
-  // Si las reps de trabajo son altas (≥8), reducir aproximamiento
-  if (workingReps >= 8) {
-    protocol = protocol.slice(0, -1); // quitar última serie
-  }
-
-  protocol.forEach(({ pct, reps, note }) => {
-    const raw    = workingWeight * (pct / 100);
-    const weight = roundToPlate(raw);
-    if (weight >= 20) { // no sugerir menos de barra vacía
-      sets.push({ pct, weight, reps, note: note || "" });
-    }
-  });
-
-  return sets;
-}
-
-/**
- * Redondea al múltiplo de 2.5 más cercano (discos estándar).
- */
-function roundToPlate(weight) {
-  return Math.round(weight / 2.5) * 2.5;
-}
-
-/**
- * Tiempo total estimado de warm-up en minutos.
- */
-export function warmupTime(sets) {
-  // ~45s por serie + 60s de descanso entre series
-  return Math.ceil((sets.length * 1.75));
+  return protocol.map((step, i) => ({
+    series: i + 1,
+    weight: Math.max(Math.round((est1RM * step.pct) / 2.5) * 2.5, 20),
+    reps:   step.reps,
+    pct:    Math.round(step.pct * 100),
+    label:  step.label,
+  }));
 }

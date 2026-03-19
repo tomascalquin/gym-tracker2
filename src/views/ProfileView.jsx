@@ -1,225 +1,152 @@
-import { useState } from "react";
-import { updateProfilePhoto, updateDisplayName } from "../utils/profile";
-import { getRank, xpToNextRank } from "../utils/ranks";
+import { useState, useRef } from "react";
+import { uploadProfilePhoto } from "../utils/profile";
+import { getRank, xpToNextRank, RANKS } from "../utils/ranks";
 import { calcStreak, streakEmoji } from "../utils/streak";
-import { THEMES } from "../utils/theme";
+import { toggleTheme, getTheme } from "../utils/theme";
+import { sessionVolume } from "../utils/fitness";
 
-export default function ProfileView({ user, myProfile, userXP, logs, theme, onToggleTheme, onBack, onProfileUpdated }) {
-  const T = THEMES[theme];
-
-  const [editingName, setEditingName]   = useState(false);
-  const [editingPhoto, setEditingPhoto] = useState(false);
-  const [nameVal, setNameVal]           = useState(user.displayName || "");
-  const [photoVal, setPhotoVal]         = useState(user.photoURL || "");
-  const [saving, setSaving]             = useState(false);
-  const [toast, setToast]               = useState("");
+export default function ProfileView({ user, myProfile, userXP, logs, onBack, onProfileUpdated }) {
+  const [photo, setPhoto]         = useState(myProfile?.photoURL || null);
+  const [uploading, setUploading] = useState(false);
+  const [theme, setThemeState]    = useState(getTheme());
+  const fileRef = useRef();
 
   const rank      = getRank(userXP);
   const progress  = xpToNextRank(userXP);
   const streak    = calcStreak(logs);
-  const totalSess = Object.keys(logs).length;
+  const totalSessions = Object.keys(logs).length;
+  const totalVolume   = Object.values(logs).reduce((a, s) => a + sessionVolume(s.sets), 0);
+  const now    = new Date();
+  const monday = new Date(now);
+  monday.setDate(now.getDate() - ((now.getDay() + 6) % 7));
+  monday.setHours(0, 0, 0, 0);
+  const weekSessions = Object.values(logs).filter(s => new Date(s.date) >= monday).length;
 
-  function showToast(msg) { setToast(msg); setTimeout(() => setToast(""), 2000); }
-
-  async function saveName() {
-    setSaving(true);
+  async function handlePhotoChange(e) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setUploading(true);
     try {
-      await updateDisplayName(user.uid, nameVal.trim());
-      onProfileUpdated({ displayName: nameVal.trim() });
-      setEditingName(false);
-      showToast("Nombre actualizado ✓");
-    } catch { showToast("Error al guardar."); }
-    finally { setSaving(false); }
+      const base64 = await uploadProfilePhoto(user.uid, file);
+      setPhoto(base64);
+      onProfileUpdated({ ...myProfile, photoURL: base64 });
+    } catch (err) { console.warn(err.message); }
+    finally { setUploading(false); }
   }
 
-  async function savePhoto() {
-    if (!photoVal.trim()) return;
-    setSaving(true);
-    try {
-      await updateProfilePhoto(user.uid, photoVal.trim());
-      onProfileUpdated({ photoURL: photoVal.trim() });
-      setEditingPhoto(false);
-      showToast("Foto actualizada ✓");
-    } catch { showToast("Error al guardar."); }
-    finally { setSaving(false); }
+  function handleToggleTheme() {
+    const next = toggleTheme();
+    setThemeState(next);
   }
 
-  const photoURL = user.photoURL || myProfile?.photoURL;
+  const initial = (user.displayName || user.email || "?")[0].toUpperCase();
+  const isLight = theme === "light";
+  const nextRank = RANKS[RANKS.findIndex(r => r.name === rank.name) + 1];
 
   return (
-    <div style={{
-      maxWidth: 440, margin: "0 auto", padding: "24px 18px",
-      fontFamily: "DM Mono, monospace",
-      background: T.bg, minHeight: "100vh", color: T.text,
-    }}>
-
-      {/* Toast */}
-      {toast && (
-        <div style={{
-          position: "fixed", top: 14, left: "50%", transform: "translateX(-50%)",
-          background: "#14532d", border: "1px solid #22c55e", color: "#fff",
-          padding: "8px 18px", borderRadius: 8, fontSize: 12, zIndex: 999,
-          whiteSpace: "nowrap",
-        }}>{toast}</div>
-      )}
+    <div style={{ maxWidth: 440, margin: "0 auto", padding: "24px 18px", fontFamily: "DM Mono, monospace" }}>
 
       {/* Header */}
       <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 24 }}>
-        <button onClick={onBack} className="nbtn" style={{ color: T.textMuted, fontSize: 13 }}>← HOME</button>
-        <h2 style={{ margin: 0, fontSize: 15, fontWeight: 400, letterSpacing: 2, color: T.text }}>MI PERFIL</h2>
-        {/* Toggle tema */}
-        <button onClick={onToggleTheme} style={{
-          marginLeft: "auto",
-          background: T.bgCard, border: `1px solid ${T.border}`,
-          borderRadius: 20, padding: "5px 12px", cursor: "pointer",
-          fontSize: 13, fontFamily: "inherit", color: T.textSub,
+        <button onClick={onBack} className="nbtn" style={{ color: "var(--text3)", fontSize: 13 }}>← HOME</button>
+        <h2 style={{ margin: 0, fontSize: 15, fontWeight: 400, letterSpacing: 2, color: "var(--text)" }}>MI PERFIL</h2>
+        <button onClick={handleToggleTheme} style={{
+          marginLeft: "auto", background: "var(--bg2)",
+          border: "1px solid var(--border)", borderRadius: 20,
+          padding: "5px 12px", cursor: "pointer", fontSize: 13,
+          fontFamily: "inherit", color: "var(--text2)",
           display: "flex", alignItems: "center", gap: 6,
         }}>
-          {theme === "dark" ? "☀️" : "🌙"} {theme === "dark" ? "Claro" : "Oscuro"}
+          {isLight ? "🌙" : "☀️"}
+          <span style={{ fontSize: 10, letterSpacing: 1 }}>{isLight ? "DARK" : "LIGHT"}</span>
         </button>
       </div>
 
       {/* Avatar + nombre */}
-      <div style={{ display: "flex", flexDirection: "column", alignItems: "center", marginBottom: 24 }}>
-        {/* Foto */}
-        <div style={{ position: "relative", marginBottom: 12 }}>
-          <div style={{
-            width: 88, height: 88, borderRadius: "50%",
+      <div style={{ display: "flex", alignItems: "center", gap: 18, marginBottom: 24 }}>
+        <div style={{ position: "relative", flexShrink: 0 }}>
+          <div onClick={() => fileRef.current.click()} style={{
+            width: 72, height: 72, borderRadius: "50%",
             background: rank.dim, border: `3px solid ${rank.color}`,
             display: "flex", alignItems: "center", justifyContent: "center",
-            fontSize: 36, overflow: "hidden",
+            cursor: "pointer", overflow: "hidden", position: "relative",
           }}>
-            {photoURL
-              ? <img src={photoURL} alt="foto" style={{ width: "100%", height: "100%", objectFit: "cover" }} onError={e => e.target.style.display = "none"} />
-              : <span>{rank.emoji}</span>
+            {photo
+              ? <img src={photo} alt="perfil" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+              : <span style={{ fontSize: 28, color: rank.color }}>{initial}</span>
             }
+            <div style={{
+              position: "absolute", inset: 0, background: "#00000066",
+              display: "flex", alignItems: "center", justifyContent: "center",
+              opacity: uploading ? 1 : 0, transition: "opacity 0.2s", fontSize: 18,
+            }}>{uploading ? "⏳" : "📷"}</div>
           </div>
-          <button onClick={() => setEditingPhoto(v => !v)} style={{
+          <div style={{
             position: "absolute", bottom: 0, right: 0,
-            background: rank.color, border: "none", borderRadius: "50%",
-            width: 26, height: 26, cursor: "pointer", fontSize: 13,
+            background: rank.color, borderRadius: "50%", width: 22, height: 22,
             display: "flex", alignItems: "center", justifyContent: "center",
-          }}>✏️</button>
+            fontSize: 12, cursor: "pointer", border: "2px solid var(--bg)",
+          }} onClick={() => fileRef.current.click()}>✏️</div>
+          <input ref={fileRef} type="file" accept="image/*" onChange={handlePhotoChange} style={{ display: "none" }} />
         </div>
 
-        {/* Input foto */}
-        {editingPhoto && (
-          <div style={{ width: "100%", marginBottom: 10 }}>
-            <input
-              value={photoVal}
-              onChange={e => setPhotoVal(e.target.value)}
-              placeholder="Pega una URL de imagen (https://...)"
-              style={{
-                width: "100%", background: T.bgInput, border: `1px solid ${T.border}`,
-                color: T.text, padding: "8px 12px", borderRadius: 8,
-                fontSize: 12, fontFamily: "inherit", outline: "none",
-                boxSizing: "border-box", marginBottom: 6,
-              }}
-            />
-            <div style={{ display: "flex", gap: 6 }}>
-              <button onClick={savePhoto} disabled={saving} style={{
-                flex: 1, background: rank.color, border: "none", color: "#000",
-                padding: "7px", borderRadius: 7, cursor: "pointer",
-                fontSize: 11, fontWeight: 700, fontFamily: "inherit",
-              }}>GUARDAR</button>
-              <button onClick={() => setEditingPhoto(false)} className="nbtn" style={{
-                border: `1px solid ${T.border}`, color: T.textMuted,
-                padding: "7px 12px", borderRadius: 7, fontSize: 11,
-              }}>✕</button>
-            </div>
+        <div>
+          <div style={{ fontSize: 20, color: "var(--text)", fontWeight: 400 }}>
+            {user.displayName || user.email.split("@")[0]}
           </div>
-        )}
-
-        {/* Nombre */}
-        {!editingName ? (
-          <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-            <div style={{ fontSize: 20, color: T.text, fontWeight: 400 }}>
-              {user.displayName || user.email?.split("@")[0]}
-            </div>
-            <button onClick={() => setEditingName(true)} className="nbtn" style={{
-              fontSize: 10, color: rank.color, border: `1px solid ${rank.color}44`,
-              padding: "2px 8px", borderRadius: 5,
-            }}>✏️</button>
+          <div style={{ fontSize: 12, color: "var(--text3)", marginTop: 2 }}>{user.email}</div>
+          <div style={{ display: "flex", alignItems: "center", gap: 6, marginTop: 4 }}>
+            <span style={{ fontSize: 18 }}>{rank.emoji}</span>
+            <span style={{ fontSize: 12, color: rank.color }}>{rank.name}</span>
           </div>
-        ) : (
-          <div style={{ display: "flex", gap: 6, alignItems: "center" }}>
-            <input value={nameVal} onChange={e => setNameVal(e.target.value)}
-              onKeyDown={e => e.key === "Enter" && saveName()}
-              autoFocus style={{
-                background: T.bgInput, border: `1px solid ${rank.color}44`,
-                color: T.text, padding: "6px 10px", borderRadius: 7,
-                fontSize: 15, fontFamily: "inherit", outline: "none",
-              }}
-            />
-            <button onClick={saveName} disabled={saving} style={{
-              background: rank.color, border: "none", color: "#000",
-              padding: "6px 12px", borderRadius: 7, cursor: "pointer",
-              fontSize: 11, fontWeight: 700, fontFamily: "inherit",
-            }}>OK</button>
-            <button onClick={() => setEditingName(false)} className="nbtn" style={{ color: T.textMuted, fontSize: 13 }}>✕</button>
-          </div>
-        )}
-
-        <div style={{ fontSize: 12, color: T.textMuted, marginTop: 4 }}>{user.email}</div>
+        </div>
       </div>
 
-      {/* Rango */}
-      <div style={{
-        background: rank.dim, border: `1px solid ${rank.color}44`,
-        borderLeft: `3px solid ${rank.color}`,
-        borderRadius: 10, padding: "14px 16px", marginBottom: 12,
-      }}>
-        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 8 }}>
-          <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-            <span style={{ fontSize: 32 }}>{rank.emoji}</span>
-            <div>
-              <div style={{ fontSize: 14, color: rank.color, letterSpacing: 1 }}>{rank.name.toUpperCase()}</div>
-              <div style={{ fontSize: 11, color: T.textMuted }}>{userXP.toLocaleString()} XP</div>
-            </div>
-          </div>
+      {/* XP */}
+      <div className="card" style={{ padding: "14px 16px", marginBottom: 12, borderLeft: `3px solid ${rank.color}` }}>
+        <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 8 }}>
+          <span style={{ fontSize: 13, color: "var(--text)" }}>{userXP.toLocaleString()} XP</span>
+          {nextRank && progress && (
+            <span style={{ fontSize: 11, color: "var(--text3)" }}>-{progress.needed} para {nextRank.name} {nextRank.emoji}</span>
+          )}
         </div>
         {progress && (
           <>
-            <div style={{ background: T.border, borderRadius: 4, height: 6 }}>
-              <div style={{ height: 6, borderRadius: 4, background: rank.color, width: `${progress.pct}%` }} />
+            <div style={{ background: "var(--border)", borderRadius: 4, height: 6 }}>
+              <div style={{ height: 6, borderRadius: 4, background: rank.color, width: `${progress.pct}%`, transition: "width 0.5s" }} />
             </div>
-            <div style={{ fontSize: 10, color: T.textDim, marginTop: 4, textAlign: "right" }}>
-              {progress.needed.toLocaleString()} XP para {rank.name}
-            </div>
+            <div style={{ fontSize: 10, color: "var(--text3)", textAlign: "right", marginTop: 3 }}>{progress.pct}%</div>
           </>
         )}
+        {!nextRank && <div style={{ fontSize: 12, color: rank.color }}>RANGO MÁXIMO 👑</div>}
       </div>
 
       {/* Stats */}
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 8, marginBottom: 16 }}>
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8, marginBottom: 12 }}>
         {[
-          { label: "SESIONES", value: totalSess, color: "#60a5fa" },
-          { label: "RACHA",    value: `${streak}d ${streakEmoji(streak)}`, color: streak >= 7 ? "#f59e0b" : "#fb923c" },
-          { label: "CÓDIGO",   value: myProfile?.friendCode || "—", color: "#a78bfa" },
+          { label: "SESIONES",    value: totalSessions,   accent: "#60a5fa" },
+          { label: "ESTA SEMANA", value: weekSessions,    accent: "#34d399" },
+          { label: "RACHA",       value: `${streak}d ${streakEmoji(streak) || "🔥"}`, accent: "#fb923c" },
+          { label: "VOLUMEN",     value: `${(totalVolume/1000).toFixed(1)}k kg`, accent: "#a78bfa" },
         ].map(s => (
-          <div key={s.label} style={{
-            background: T.bgCard, border: `1px solid ${T.border}`,
-            borderRadius: 10, padding: "12px 8px", textAlign: "center",
-          }}>
-            <div style={{ fontSize: 16, color: s.color, fontWeight: 500 }}>{s.value}</div>
-            <div style={{ fontSize: 9, color: T.textDim, letterSpacing: 1, marginTop: 3 }}>{s.label}</div>
+          <div key={s.label} className="card" style={{ padding: "12px 14px", borderLeft: `2px solid ${s.accent}` }}>
+            <div style={{ fontSize: 18, color: s.accent, fontWeight: 500 }}>{s.value}</div>
+            <div style={{ fontSize: 9, color: "var(--text3)", letterSpacing: 1, marginTop: 2 }}>{s.label}</div>
           </div>
         ))}
       </div>
 
-      {/* Código de amigo */}
-      <div style={{
-        background: T.bgCard, border: `1px solid ${T.border}`,
-        borderLeft: "3px solid #a78bfa", borderRadius: 10,
-        padding: "12px 16px",
-      }}>
-        <div style={{ fontSize: 10, color: T.textDim, letterSpacing: 2, marginBottom: 6 }}>TU CÓDIGO DE AMIGO</div>
-        <div style={{ fontSize: 24, color: "#a78bfa", letterSpacing: 4, fontWeight: 500 }}>
+      {/* Código amigo */}
+      <div className="card" style={{ padding: "14px 16px", borderLeft: "3px solid #60a5fa" }}>
+        <div style={{ fontSize: 10, color: "var(--text3)", letterSpacing: 2, marginBottom: 6 }}>TU CÓDIGO DE AMIGO</div>
+        <div style={{ fontSize: 24, fontWeight: 500, color: "#60a5fa", letterSpacing: 4 }}>
           {myProfile?.friendCode || "—"}
         </div>
-        <div style={{ fontSize: 11, color: T.textMuted, marginTop: 4 }}>
-          Compártelo para que te agreguen
-        </div>
+        <div style={{ fontSize: 11, color: "var(--text3)", marginTop: 4 }}>Compártelo para que te agreguen</div>
+      </div>
+
+      <div style={{ fontSize: 10, color: "var(--text3)", textAlign: "center", marginTop: 12 }}>
+        Toca la foto para cambiarla desde tu galería
       </div>
     </div>
   );

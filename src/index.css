@@ -1,59 +1,40 @@
-* {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg:     #080810;
+  --bg2:    #0e0e1a;
+  --bg3:    #0a0a14;
+  --border: #1a1a2a;
+  --text:   #f1f5f9;
+  --text2:  #94a3b8;
+  --text3:  #475569;
+  --accent: #60a5fa;
+  --green:  #22c55e;
+  --red:    #ef4444;
+  --yellow: #fbbf24;
 }
 
 body {
-  background: #080810;
-  color: #e2e8f0;
+  background: var(--bg);
+  color: var(--text);
   font-family: "DM Mono", monospace;
-  font-size: 15px;        /* base subida de ~12 a 15px */
-  font-weight: 400;       /* peso base explícito */
+  font-size: 15px;
+  font-weight: 400;
   min-height: 100vh;
   -webkit-font-smoothing: antialiased;
+  transition: background 0.2s, color 0.2s;
 }
 
-/* Todos los inputs y textareas heredan la fuente y no se ven chicos */
-input, textarea, select, button {
-  font-family: inherit;
-  font-weight: 400;
-}
-
-input[type="number"]::-webkit-inner-spin-button {
-  opacity: 0.2;
-}
-
-input[type="date"]::-webkit-calendar-picker-indicator {
-  filter: invert(0.4);
-}
-
-textarea {
-  resize: none;
-}
-
-::-webkit-scrollbar {
-  width: 4px;
-}
-
-::-webkit-scrollbar-thumb {
-  background: #1e2030;
-  border-radius: 2px;
-}
-
-/* ── Helpers de texto ── */
-/* Labels tipo "FECHA", "NOTA DE SESIÓN", etc. */
-.label {
-  font-size: 11px;
-  letter-spacing: 2px;
-  color: #475569;
-  margin-bottom: 6px;
-  display: block;
-}
+input, textarea, select, button { font-family: inherit; font-weight: 400; }
+input[type="number"]::-webkit-inner-spin-button { opacity: 0.2; }
+input[type="date"]::-webkit-calendar-picker-indicator { filter: invert(0.4); }
+textarea { resize: none; }
+::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
 
 .card {
-  background: #0e0e1a;
-  border: 1px solid #1a1a2a;
+  background: var(--bg2);
+  border: 1px solid var(--border);
   border-radius: 12px;
 }
 
@@ -65,17 +46,6 @@ textarea {
   font-size: inherit;
 }
 
-@keyframes slideDown {
-  from { opacity: 0; transform: translateY(-6px); }
-  to   { opacity: 1; transform: translateY(0); }
-}
-
-@keyframes blink {
-  0%, 100% { opacity: 1; }
-  50%       { opacity: 0.2; }
-}
-
-@keyframes slideUp {
-  from { transform: translateX(-50%) translateY(40px); opacity: 0; }
-  to   { transform: translateX(-50%) translateY(0);    opacity: 1; }
-}
+@keyframes slideDown { from { opacity:0; transform:translateY(-6px); } to { opacity:1; transform:translateY(0); } }
+@keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.2} }
+@keyframes slideUp { from { transform:translateX(-50%) translateY(40px); opacity:0; } to { transform:translateX(-50%) translateY(0); opacity:1; } }
