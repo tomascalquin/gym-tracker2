@@ -9,6 +9,7 @@ import { onAuthChange, logout, checkRedirectResult } from "./utils/auth";
 import { initPublicProfile } from "./utils/friends";
 import { loadUserXP, addXP, calcSessionXP, getRank } from "./utils/ranks";
 import { calcStreak } from "./utils/streak";
+import { registerServiceWorker, showLocalNotification } from "./utils/notifications";
 import AuthScreen from "./components/AuthScreen";
 import Toast from "./components/Toast";
 import RankUpModal from "./components/RankUpModal";
@@ -47,6 +48,8 @@ export default function App() {
   useEffect(() => {
     const unsub = onAuthChange(fb => { setUser(fb); setAuthReady(true); });
     checkRedirectResult().catch(console.error);
+    // Registrar service worker para modo offline
+    registerServiceWorker();
     return unsub;
   }, []);
 
@@ -125,8 +128,10 @@ export default function App() {
     // Mostrar modal si subió de rango
     if (result.rankUp) {
       setRankUpData({ oldRank: result.oldRank, newRank: result.newRank, xpGained: xpEarned, prs });
+      showLocalNotification("¡Subiste de rango! 🎉", `Ahora eres ${result.newRank.emoji} ${result.newRank.name}`);
     } else {
       toast(`+${xpEarned} XP 💪${prs.length ? ` · 🏆 PR en ${prs[0]}` : ""}`);
+      if (prs.length) showLocalNotification("🏆 Nuevo PR", `${prs[0]} — ${xpEarned} XP ganados`);
     }
   }
 
