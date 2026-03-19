@@ -17,6 +17,7 @@ import ExerciseChart from "./ExerciseChart";
  * @param {Function} onUpdateSet   - (ei, si, field, value) => void
  * @param {Function} onToggleSet   - (ei, si) => void
  * @param {Function} onAddSet      - (ei) => void
+ * @param {Function} onRemoveSet  - (ei, si) => void
  * @param {boolean}  isCustom      - Si es un ejercicio agregado por el usuario
  * @param {Function} onRemove      - () => void — solo presente si isCustom
  */
@@ -33,6 +34,7 @@ export default function ExerciseCard({
   onUpdateSet,
   onToggleSet,
   onAddSet,
+  onRemoveSet,
   onRemove,
 }) {
   const [chartOpen, setChartOpen] = useState(false);
@@ -118,6 +120,8 @@ export default function ExerciseCard({
             accent={accent}
             onChange={(field, val) => onUpdateSet(exIndex, si, field, val)}
             onToggle={() => onToggleSet(exIndex, si)}
+            onDelete={() => onRemoveSet(exIndex, si)}
+            canDelete={sets.length > 1}
           />
         ))}
 

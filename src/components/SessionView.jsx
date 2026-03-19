@@ -2,6 +2,7 @@ import { useState } from "react";
 import { DAY_META } from "../data/routine";
 import ExerciseCard from "../components/ExerciseCard";
 import AddExerciseModal from "../components/AddExerciseModal";
+import RestTimer from "../components/RestTimer";
 
 /**
  * Vista de entrenamiento activo.
@@ -25,7 +26,8 @@ export default function SessionView({
   onRemoveExercise,
 }) {
   const [modalOpen, setModalOpen] = useState(false);
-  const accent = DAY_META[activeDay].accent;
+  const [timerOpen, setTimerOpen]   = useState(false);
+  const accent = DAY_META[activeDay]?.accent || "#60a5fa";
   const exercises = routine[activeDay]?.exercises || [];
 
   const progress = (() => {
@@ -130,6 +132,21 @@ export default function SessionView({
           }}>GUARDAR SESIÓN</button>
         </div>
       </div>
+
+      {/* Botón temporizador flotante */}
+      <button
+        onClick={() => setTimerOpen(true)}
+        style={{
+          position: "fixed", bottom: 24, right: 20, zIndex: 50,
+          background: accent, border: "none", borderRadius: "50%",
+          width: 52, height: 52, cursor: "pointer",
+          fontSize: 22, display: "flex", alignItems: "center", justifyContent: "center",
+          boxShadow: `0 4px 20px ${accent}66`,
+        }}
+        title="Temporizador de descanso"
+      >⏱️</button>
+
+      {timerOpen && <RestTimer onClose={() => setTimerOpen(false)} />}
 
       {modalOpen && (
         <AddExerciseModal

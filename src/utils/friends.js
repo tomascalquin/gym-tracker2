@@ -91,16 +91,26 @@ export async function sendFriendRequest(fromUid, toUid) {
  * Acepta una solicitud de amistad.
  */
 export async function acceptFriendRequest(myUid, fromUid) {
-  // Agregar amigo en ambos lados
+  // Agregar en mi lado (tengo permiso seguro)
   await setDoc(doc(db, "friendships", myUid, "friends", fromUid), {
     uid: fromUid, addedAt: serverTimestamp(),
   });
-  await setDoc(doc(db, "friendships", fromUid, "friends", myUid), {
-    uid: myUid, addedAt: serverTimestamp(),
-  });
-  // Eliminar solicitud
+  // Agregar en el lado del que envió (puede fallar por Rules)
+  try {
+    await setDoc(doc(db, "friendships", fromUid, "friends", myUid), {
+      uid: myUid, addedAt: serverTimestamp(),
+    });
+  } catch (e) {
+    console.warn("No se pudo escribir en el lado del remitente:", e.message);
+  }
+  // Eliminar solicitud de mi lado
   await deleteDoc(doc(db, "friendships", myUid, "requests", fromUid));
-  await deleteDoc(doc(db, "friendships", fromUid, "sent", myUid));
+  // Eliminar sent del lado del remitente
+  try {
+    await deleteDoc(doc(db, "friendships", fromUid, "sent", myUid));
+  } catch (e) {
+    console.warn("No se pudo borrar sent:", e.message);
+  }
 }
 
 /**
@@ -115,8 +125,14 @@ export async function rejectFriendRequest(myUid, fromUid) {
  * Elimina un amigo.
  */
 export async function removeFriend(myUid, friendUid) {
+  // Borrar mi lado (tengo permiso)
   await deleteDoc(doc(db, "friendships", myUid, "friends", friendUid));
-  await deleteDoc(doc(db, "friendships", friendUid, "friends", myUid));
+  // Intentar borrar el lado del amigo (puede fallar por Rules, no es crítico)
+  try {
+    await deleteDoc(doc(db, "friendships", friendUid, "friends", myUid));
+  } catch (e) {
+    console.warn("No se pudo borrar el lado del amigo:", e.message);
+  }
 }
 
 /**
@@ -124,11 +140,16 @@ export async function removeFriend(myUid, friendUid) {
  * Retorna array de perfiles públicos.
  */
 export async function loadFriends(uid) {
-  const snap = await getDocs(collection(db, "friendships", uid, "friends"));
   const friends = [];
-  for (const d of snap.docs) {
-    const profile = await getPublicProfile(d.data().uid);
-    if (profile) friends.push(profile);
+  try {
+    const snap = await getDocs(collection(db, "friendships", uid, "friends"));
+    const profilePromises = snap.docs.map(d =>
+      getPublicProfile(d.data().uid).catch(() => null)
+    );
+    const profiles = await Promise.all(profilePromises);
+    profiles.forEach(p => { if (p) friends.push(p); });
+  } catch (err) {
+    console.warn("loadFriends error:", err.message);
   }
   return friends;
 }
@@ -137,11 +158,18 @@ export async function loadFriends(uid) {
  * Carga solicitudes pendientes recibidas.
  */
 export async function loadFriendRequests(uid) {
-  const snap = await getDocs(collection(db, "friendships", uid, "requests"));
   const requests = [];
-  for (const d of snap.docs) {
-    const profile = await getPublicProfile(d.data().fromUid);
-    if (profile) requests.push({ ...profile, requestId: d.id });
+  try {
+    const snap = await getDocs(collection(db, "friendships", uid, "requests"));
+    const profilePromises = snap.docs.map(d =>
+      getPublicProfile(d.data().fromUid)
+        .then(profile => profile ? { ...profile, requestId: d.id } : null)
+        .catch(() => null)
+    );
+    const profiles = await Promise.all(profilePromises);
+    profiles.forEach(p => { if (p) requests.push(p); });
+  } catch (err) {
+    console.warn("loadFriendRequests error:", err.message);
   }
   return requests;
 }
@@ -175,9 +203,12 @@ export async function loadFriendWeeklyLogs(friendUid) {
  */
 export async function loadFriendRoutine(friendUid) {
   const result = {};
-  for (const day of DAY_ORDER) {
-    const snap = await getDoc(doc(db, "users", friendUid, "gym_routine", day));
-    if (snap.exists()) result[day] = snap.data();
+  try {
+    // Cargar todos los documentos de la subcolección gym_routine
+    const snap = await getDocs(collection(db, "users", friendUid, "gym_routine"));
+    snap.forEach(d => { result[d.id] = d.data(); });
+  } catch (err) {
+    console.warn("loadFriendRoutine error:", err.message);
   }
   return result;
 }
@@ -186,8 +217,12 @@ export async function loadFriendRoutine(friendUid) {
  * Carga todos los logs de un amigo (para comparar pesos/reps).
  */
 export async function loadFriendAllLogs(friendUid) {
-  const snap = await getDocs(collection(db, "users", friendUid, "gym_logs"));
   const logs = {};
-  snap.forEach((d) => { logs[d.id] = d.data(); });
+  try {
+    const snap = await getDocs(collection(db, "users", friendUid, "gym_logs"));
+    snap.forEach((d) => { logs[d.id] = d.data(); });
+  } catch (err) {
+    console.warn("loadFriendAllLogs error:", err.message);
+  }
   return logs;
 }

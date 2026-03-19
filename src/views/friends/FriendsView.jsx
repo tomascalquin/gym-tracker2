@@ -5,6 +5,8 @@ import {
   sendFriendRequest, acceptFriendRequest,
   rejectFriendRequest, removeFriend,
 } from "../../utils/friends";
+import { collection, getDocs } from "firebase/firestore";
+import { db } from "../../utils/firebase";
 import FriendProfile from "./FriendProfile";
 
 const ACCENT = "#60a5fa";
@@ -26,13 +28,17 @@ export default function FriendsView({ user, myProfile, onBack }) {
   useEffect(() => {
     async function load() {
       setLoading(true);
-      const [f, r] = await Promise.all([
+      const [f, r, sentSnap] = await Promise.all([
         loadFriends(user.uid),
         loadFriendRequests(user.uid),
+        getDocs(collection(db, "friendships", user.uid, "sent")),
       ]);
       setFriends(f);
       setRequests(r);
+      // Pre-cargar uids a los que ya envié solicitud
+      const sentUids = new Set(sentSnap.docs.map(d => d.id));
       setLoading(false);
+      return sentUids;
     }
     load();
   }, [user.uid]);
@@ -52,6 +58,14 @@ export default function FriendsView({ user, myProfile, onBack }) {
       if (!result) { setSearchError("Usuario no encontrado."); return; }
       if (result.uid === user.uid) { setSearchError("Ese eres tú 😄"); return; }
       if (friends.find(f => f.uid === result.uid)) { setSearchError("Ya son amigos."); return; }
+
+      // Verificar si ya envié solicitud a este usuario
+      try {
+        const sentSnap = await getDocs(collection(db, "friendships", user.uid, "sent"));
+        const alreadySent = sentSnap.docs.some(d => d.id === result.uid);
+        if (alreadySent) { setSearchError("Ya le enviaste una solicitud."); return; }
+      } catch {}
+
       setSearchResult(result);
     } catch { setSearchError("Error al buscar. Intenta de nuevo."); }
     finally { setSearching(false); }
@@ -63,16 +77,16 @@ export default function FriendsView({ user, myProfile, onBack }) {
     setRequestSent(true);
   }
 
-  async function handleAccept(fromUid) {
-    await acceptFriendRequest(user.uid, fromUid);
-    const accepted = requests.find(r => r.uid === fromUid);
-    setRequests(prev => prev.filter(r => r.uid !== fromUid));
+  async function handleAccept(fromUid, requestId) {
+    await acceptFriendRequest(user.uid, requestId);
+    const accepted = requests.find(r => r.requestId === requestId);
+    setRequests(prev => prev.filter(r => r.requestId !== requestId));
     if (accepted) setFriends(prev => [...prev, accepted]);
   }
 
-  async function handleReject(fromUid) {
-    await rejectFriendRequest(user.uid, fromUid);
-    setRequests(prev => prev.filter(r => r.uid !== fromUid));
+  async function handleReject(fromUid, requestId) {
+    await rejectFriendRequest(user.uid, requestId);
+    setRequests(prev => prev.filter(r => r.requestId !== requestId));
   }
 
   async function handleRemove(friendUid) {
@@ -218,12 +232,12 @@ export default function FriendsView({ user, myProfile, onBack }) {
                     <div style={{ fontSize: 11, color: "#475569" }}>{r.email}</div>
                   </div>
                   <div style={{ display: "flex", gap: 6 }}>
-                    <button onClick={() => handleAccept(r.uid)} style={{
+                    <button onClick={() => handleAccept(r.uid, r.requestId)} style={{
                       background: "#14532d", border: "1px solid #22c55e", color: "#22c55e",
                       padding: "6px 12px", borderRadius: 6, cursor: "pointer",
                       fontSize: 11, fontFamily: "inherit",
                     }}>✓ ACEPTAR</button>
-                    <button onClick={() => handleReject(r.uid)} className="nbtn" style={{
+                    <button onClick={() => handleReject(r.uid, r.requestId)} className="nbtn" style={{
                       border: "1px solid #3f1010", color: "#ef4444",
                       padding: "6px 10px", borderRadius: 6, fontSize: 11,
                     }}>✕</button>

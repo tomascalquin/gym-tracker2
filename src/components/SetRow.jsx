@@ -1,47 +1,32 @@
 /**
  * Fila de una serie dentro de un ejercicio.
- * Contiene: número de serie, input de nota, input de peso, input de reps, botón check.
- *
- * @param {number}   index     - Índice de la serie (0-based)
- * @param {Object}   set       - { weight, reps, note }
- * @param {boolean}  done      - Si la serie está marcada como completada
- * @param {string}   accent    - Color hex del día
- * @param {Function} onChange  - (field, value) => void
- * @param {Function} onToggle  - () => void
+ * Contiene: número de serie, nota, peso, reps, check y eliminar.
  */
-export default function SetRow({ index, set, done, accent, onChange, onToggle }) {
+export default function SetRow({ index, set, done, accent, onChange, onToggle, onDelete, canDelete }) {
   return (
-    <div
-      style={{
-        display: "grid",
-        gridTemplateColumns: "18px 1fr 68px 68px 24px",
-        gap: 5,
-        alignItems: "center",
-        marginBottom: 5,
-        opacity: done ? 0.4 : 1,
-        transition: "opacity 0.2s",
-      }}
-    >
-      {/* Número de serie */}
+    <div style={{
+      display: "grid",
+      gridTemplateColumns: "18px 1fr 68px 68px 24px 24px",
+      gap: 5,
+      alignItems: "center",
+      marginBottom: 5,
+      opacity: done ? 0.4 : 1,
+      transition: "opacity 0.2s",
+    }}>
+      {/* Número */}
       <div style={{ fontSize: 12, color: "#64748b", textAlign: "center" }}>
         {index + 1}
       </div>
 
-      {/* Nota del set */}
+      {/* Nota */}
       <input
         value={set.note || ""}
-        onChange={(e) => onChange("note", e.target.value)}
+        onChange={e => onChange("note", e.target.value)}
         placeholder="—"
         style={{
-          background: "#0a0a14",
-          border: "1px solid #1a1a2a",
-          color: "#475569",
-          padding: "5px 7px",
-          borderRadius: 5,
-          fontSize: 13,
-          fontFamily: "inherit",
-          width: "100%",
-          outline: "none",
+          background: "#0a0a14", border: "1px solid #1a1a2a", color: "#475569",
+          padding: "5px 7px", borderRadius: 5, fontSize: 13,
+          fontFamily: "inherit", width: "100%", outline: "none",
         }}
       />
 
@@ -49,19 +34,11 @@ export default function SetRow({ index, set, done, accent, onChange, onToggle })
       <input
         type="number"
         value={set.weight}
-        onChange={(e) => onChange("weight", parseFloat(e.target.value) || 0)}
+        onChange={e => onChange("weight", parseFloat(e.target.value) || 0)}
         style={{
-          background: "#0a0a14",
-          border: "1px solid #1a1a2a",
-          color: accent,
-          padding: "6px 4px",
-          borderRadius: 5,
-          fontSize: 16,
-          fontWeight: 500,
-          textAlign: "center",
-          fontFamily: "inherit",
-          width: "100%",
-          outline: "none",
+          background: "#0a0a14", border: "1px solid #1a1a2a", color: accent,
+          padding: "6px 4px", borderRadius: 5, fontSize: 16, fontWeight: 500,
+          textAlign: "center", fontFamily: "inherit", width: "100%", outline: "none",
         }}
       />
 
@@ -69,42 +46,43 @@ export default function SetRow({ index, set, done, accent, onChange, onToggle })
       <input
         type="number"
         value={set.reps}
-        onChange={(e) => onChange("reps", parseInt(e.target.value) || 0)}
+        onChange={e => onChange("reps", parseInt(e.target.value) || 0)}
         style={{
-          background: "#0a0a14",
-          border: "1px solid #1a1a2a",
-          color: "#f1f5f9",
-          padding: "6px 4px",
-          borderRadius: 5,
-          fontSize: 16,
-          fontWeight: 500,
-          textAlign: "center",
-          fontFamily: "inherit",
-          width: "100%",
-          outline: "none",
+          background: "#0a0a14", border: "1px solid #1a1a2a", color: "#f1f5f9",
+          padding: "6px 4px", borderRadius: 5, fontSize: 16, fontWeight: 500,
+          textAlign: "center", fontFamily: "inherit", width: "100%", outline: "none",
         }}
       />
 
       {/* Check */}
+      <button onClick={onToggle} style={{
+        width: 22, height: 22, borderRadius: 5,
+        background: done ? "#14532d" : "#0e0e1a",
+        border: `1px solid ${done ? "#22c55e" : "#1a1a2a"}`,
+        color: done ? "#22c55e" : "#64748b",
+        cursor: "pointer", fontSize: 14, padding: 0,
+        display: "flex", alignItems: "center", justifyContent: "center",
+        fontFamily: "inherit",
+      }}>
+        {done ? "✓" : "○"}
+      </button>
+
+      {/* Eliminar serie — solo si hay más de 1 */}
       <button
-        onClick={onToggle}
+        onClick={onDelete}
+        disabled={!canDelete}
         style={{
-          width: 22,
-          height: 22,
-          borderRadius: 5,
-          background: done ? "#14532d" : "#0e0e1a",
-          border: `1px solid ${done ? "#22c55e" : "#1a1a2a"}`,
-          color: done ? "#22c55e" : "#64748b",
-          cursor: "pointer",
-          fontSize: 14,
-          padding: 0,
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
+          width: 22, height: 22, borderRadius: 5,
+          background: "transparent",
+          border: `1px solid ${canDelete ? "#3f1010" : "transparent"}`,
+          color: canDelete ? "#ef4444" : "transparent",
+          cursor: canDelete ? "pointer" : "default",
+          fontSize: 12, padding: 0,
+          display: "flex", alignItems: "center", justifyContent: "center",
           fontFamily: "inherit",
         }}
       >
-        {done ? "✓" : "○"}
+        ✕
       </button>
     </div>
   );
