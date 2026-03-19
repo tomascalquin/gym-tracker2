@@ -9,8 +9,10 @@ import { loadFriends } from "../utils/friends";
 import ActivityFeed from "../components/ActivityFeed";
 import XPBar from "../components/XPBar";
 import { registerPushNotifications, hasNotificationPermission } from "../utils/notifications";
+import { THEMES } from "../utils/theme";
 
-export default function HomeView({ logs, user, myProfile, routine, userXP, sessionDate, setSessionDate, onStartSession, onNavigate, onLogout }) {
+export default function HomeView({ logs, user, myProfile, routine, userXP, theme, sessionDate, setSessionDate, onStartSession, onNavigate, onLogout }) {
+  const T = THEMES[theme || "dark"];
   const firstName   = (user?.displayName || user?.email || "Atleta").split(" ")[0];
   const streak      = calcStreak(logs);
   const routineDays = Object.keys(routine || {});
@@ -34,7 +36,7 @@ export default function HomeView({ logs, user, myProfile, routine, userXP, sessi
   const totalSessions = Object.keys(logs).length;
 
   return (
-    <div style={{ maxWidth: 440, margin: "0 auto", padding: "24px 18px", fontFamily: "DM Mono, monospace" }}>
+    <div style={{ maxWidth: 440, margin: "0 auto", padding: "24px 18px", fontFamily: "DM Mono, monospace", background: T.bg, minHeight: "100vh", color: T.text }}>
 
       {/* Header */}
       <div style={{ marginBottom: 18 }}>
@@ -44,11 +46,18 @@ export default function HomeView({ logs, user, myProfile, routine, userXP, sessi
             <h1 style={{ fontSize: 26, fontWeight: 400, letterSpacing: -1, color: "#f8fafc", margin: 0 }}>{firstName}</h1>
             <span style={{ color: "#60a5fa", fontSize: 26, animation: "blink 1.4s infinite" }}>_</span>
           </div>
+          <div style={{ display: "flex", gap: 6 }}>
+          <button onClick={() => onNavigate("profile")} style={{
+            background: "none", border: "1px solid #1a1a2a", color: "#94a3b8",
+            padding: "4px 10px", borderRadius: 6, cursor: "pointer",
+            fontSize: 11, letterSpacing: 1, fontFamily: "inherit",
+          }}>👤</button>
           <button onClick={onLogout} style={{
             background: "none", border: "1px solid #1a1a2a", color: "#475569",
             padding: "4px 10px", borderRadius: 6, cursor: "pointer",
             fontSize: 11, letterSpacing: 1, fontFamily: "inherit",
           }}>SALIR</button>
+          </div>
         </div>
         <div style={{ fontSize: 12, color: "#334155", marginTop: 3 }}>
           {totalSessions} sesiones · semana {getWeekNumber()}

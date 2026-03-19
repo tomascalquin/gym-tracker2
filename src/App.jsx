@@ -10,6 +10,7 @@ import { initPublicProfile } from "./utils/friends";
 import { loadUserXP, addXP, calcSessionXP, getRank } from "./utils/ranks";
 import { calcStreak } from "./utils/streak";
 import { registerServiceWorker, showLocalNotification } from "./utils/notifications";
+import { loadTheme, saveTheme } from "./utils/theme";
 import AuthScreen from "./components/AuthScreen";
 import Toast from "./components/Toast";
 import RankUpModal from "./components/RankUpModal";
@@ -23,6 +24,7 @@ import GroupsView from "./views/groups/GroupsView";
 import ChallengesView from "./views/ChallengesView";
 import LeaderboardView from "./views/LeaderboardView";
 import EditRoutineView from "./views/EditRoutineView";
+import ProfileView from "./views/ProfileView";
 import OnboardingView from "./views/OnboardingView";
 
 export default function App() {
@@ -41,6 +43,7 @@ export default function App() {
   const [dataLoading, setDataLoading]       = useState(false);
   const [userXP, setUserXP]                 = useState(0);
   const [rankUpData, setRankUpData]         = useState(null);
+  const [theme, setTheme]                   = useState(loadTheme);
   const [timerOpen, setTimerOpen]           = useState(false);
   const [timerVisible, setTimerVisible]     = useState(false);
   const [timerState, setTimerState]         = useState({ selected: 90, timeLeft: null, running: false, endTime: null }); // { oldRank, newRank, xpGained, prs }
@@ -50,6 +53,9 @@ export default function App() {
     checkRedirectResult().catch(console.error);
     // Registrar service worker para modo offline
     registerServiceWorker();
+    // Aplicar tema guardado al body
+    const savedTheme = loadTheme();
+    document.body.style.background = savedTheme === "light" ? "#f1f5f9" : "#080810";
     return unsub;
   }, []);
 
@@ -74,6 +80,14 @@ export default function App() {
   }, [user?.uid]);
 
   function toast(msg) { setToastMsg(msg); setTimeout(() => setToastMsg(null), 2200); }
+
+  function handleToggleTheme() {
+    const next = theme === "dark" ? "light" : "dark";
+    setTheme(next);
+    saveTheme(next);
+    // Aplicar clase al body
+    document.body.style.background = next === "light" ? "#f1f5f9" : "#080810";
+  }
 
   async function handleLogout() {
     await logout();
@@ -208,7 +222,7 @@ export default function App() {
       {timerOpen && <RestTimer onClose={() => setTimerOpen(false)} />}
 
       {view === "home" && (
-        <HomeView logs={logs} user={user} myProfile={myProfile} routine={routine} userXP={userXP}
+        <HomeView logs={logs} user={user} myProfile={myProfile} routine={routine} userXP={userXP} theme={theme}
           sessionDate={sessionDate} setSessionDate={setSessionDate}
           onStartSession={startSession} onNavigate={setView} onLogout={handleLogout}
         />
@@ -234,6 +248,20 @@ export default function App() {
       {view === "groups"      && <GroupsView user={user} onBack={() => setView("home")} />}
       {view === "challenges"  && <ChallengesView user={user} myLogs={logs} myRoutine={routine} onBack={() => setView("home")} />}
       {view === "leaderboard" && <LeaderboardView user={user} myXP={userXP} onBack={() => setView("home")} />}
+      {view === "profile" && (
+        <ProfileView
+          user={user}
+          myProfile={myProfile}
+          userXP={userXP}
+          logs={logs}
+          theme={theme}
+          onToggleTheme={handleToggleTheme}
+          onBack={() => setView("home")}
+          onProfileUpdated={(updates) => {
+            if (updates.displayName) user.displayName = updates.displayName;
+          }}
+        />
+      )}
       {view === "editRoutine" && (
         <EditRoutineView
           user={user}

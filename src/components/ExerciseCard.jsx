@@ -1,6 +1,7 @@
 import { useState } from "react";
 import SetRow from "./SetRow";
 import ExerciseChart from "./ExerciseChart";
+import WarmupCard from "./WarmupCard";
 
 /**
  * Card de un ejercicio dentro de la vista de sesión.
@@ -95,6 +96,9 @@ export default function ExerciseCard({
 
       {/* Sets */}
       <div style={{ padding: "9px 14px 11px" }}>
+        {/* Warm-up sugerido */}
+        <WarmupCard sets={sets} accent={accent} />
+
         {/* Column labels */}
         <div
           style={{
