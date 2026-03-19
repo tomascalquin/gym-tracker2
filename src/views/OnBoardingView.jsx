@@ -1,15 +1,18 @@
 import { useState, useRef } from "react";
 import { downloadRoutineTemplate, parseRoutineExcel } from "../utils/routineTemplate";
+import AIRoutineBuilder from "./AIRoutineBuilder";
 
 const SPLITS = {
-  "Upper/Lower": ["Upper A", "Lower A", "Upper B", "Lower B"],
-  "PPL":         ["Push A", "Pull A", "Legs A", "Push B", "Pull B", "Legs B"],
-  "Bro Split":   ["Pecho", "Espalda", "Hombros", "Bíceps/Tríceps", "Piernas"],
-  "Full Body":   ["Full Body A", "Full Body B", "Full Body C"],
+  "Upper/Lower":       ["Upper A", "Lower A", "Upper B", "Lower B"],
+  "PPL":               ["Push A", "Pull A", "Legs A", "Push B", "Pull B", "Legs B"],
+  "Arnold Split (PPL)":["Pecho/Espalda", "Hombros/Brazos", "Piernas", "Pecho/Espalda", "Hombros/Brazos", "Piernas"],
+  "Bro Split":         ["Pecho", "Espalda", "Hombros", "Bíceps/Tríceps", "Piernas"],
+  "Full Body":         ["Full Body A", "Full Body B", "Full Body C"],
 };
 
 export default function OnboardingView({ user, onRoutineReady }) {
-  const [step, setStep]           = useState("choose"); // choose | manual | import
+  const [step, setStep]           = useState("choose");
+  const [showAI, setShowAI]         = useState(false); // choose | manual | import
   const [splitType, setSplitType] = useState(null);     // predefinido o "custom"
   const [days, setDays]           = useState([]);        // nombres de días
   const [customDayCount, setCustomDayCount] = useState(3);
@@ -120,6 +123,14 @@ export default function OnboardingView({ user, onRoutineReady }) {
   const accent = "#60a5fa";
 
   // ── RENDER ─────────────────────────────────────────────────────────────────
+
+  if (showAI) return (
+    <AIRoutineBuilder
+      onBack={() => setShowAI(false)}
+      onRoutineReady={onRoutineReady}
+    />
+  );
+
   return (
     <div style={{ maxWidth: 480, margin: "0 auto", padding: "28px 18px", fontFamily: "DM Mono, monospace", minHeight: "100vh", background: "#080810" }}>
 
@@ -145,6 +156,16 @@ export default function OnboardingView({ user, onRoutineReady }) {
           }}>
             <div style={{ fontSize: 14, color: "#f1f5f9", marginBottom: 3 }}>✏️ Crear manualmente</div>
             <div style={{ fontSize: 11, color: "#475569" }}>Elige una división y agrega tus ejercicios</div>
+          </button>
+
+          <button onClick={() => setShowAI(true)} style={{
+            width: "100%", background: "#0e0e1a", border: "1px solid #7c3aed44",
+            borderLeft: "3px solid #7c3aed", borderRadius: 10,
+            padding: "16px 18px", cursor: "pointer", textAlign: "left", marginBottom: 10,
+            fontFamily: "inherit",
+          }}>
+            <div style={{ fontSize: 14, color: "#f1f5f9", marginBottom: 3 }}>🤖 Crear con IA</div>
+            <div style={{ fontSize: 11, color: "#475569" }}>Pega tu rutina en texto y la IA la estructura</div>
           </button>
 
           <button onClick={() => setStep("import")} style={{

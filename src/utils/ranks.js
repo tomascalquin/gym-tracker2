@@ -171,6 +171,7 @@ export async function loadLeaderboard() {
       all.push({
         uid:         data.uid,
         displayName: data.displayName || data.email?.split("@")[0] || "Usuario",
+        photoURL:    data.photoURL || null,
         xp:          xpMap[data.uid] || 0,
       });
     });

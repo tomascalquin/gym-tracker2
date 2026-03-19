@@ -10,7 +10,7 @@ import { initPublicProfile } from "./utils/friends";
 import { loadUserXP, addXP, calcSessionXP, getRank } from "./utils/ranks";
 import { calcStreak } from "./utils/streak";
 import { registerServiceWorker, showLocalNotification } from "./utils/notifications";
-import { loadTheme, saveTheme } from "./utils/theme";
+import { applyTheme, getTheme } from "./utils/theme";
 import AuthScreen from "./components/AuthScreen";
 import Toast from "./components/Toast";
 import RankUpModal from "./components/RankUpModal";
@@ -24,9 +24,7 @@ import GroupsView from "./views/groups/GroupsView";
 import ChallengesView from "./views/ChallengesView";
 import LeaderboardView from "./views/LeaderboardView";
 import ProfileView from "./views/ProfileView";
-import { applyTheme, getTheme } from "./utils/theme";
 import EditRoutineView from "./views/EditRoutineView";
-import ProfileView from "./views/ProfileView";
 import OnboardingView from "./views/OnboardingView";
 
 export default function App() {
@@ -45,7 +43,7 @@ export default function App() {
   const [dataLoading, setDataLoading]       = useState(false);
   const [userXP, setUserXP]                 = useState(0);
   const [rankUpData, setRankUpData]         = useState(null);
-  const [theme, setTheme]                   = useState(loadTheme);
+  const [theme, setTheme]                   = useState(getTheme);
   const [timerOpen, setTimerOpen]           = useState(false);
   const [timerVisible, setTimerVisible]     = useState(false);
   const [timerState, setTimerState]         = useState({ selected: 90, timeLeft: null, running: false, endTime: null }); // { oldRank, newRank, xpGained, prs }
@@ -57,7 +55,7 @@ export default function App() {
     registerServiceWorker();
     applyTheme(getTheme()); // aplicar tema guardado
     // Aplicar tema guardado al body
-    const savedTheme = loadTheme();
+    const savedTheme = getTheme();
     document.body.style.background = savedTheme === "light" ? "#f1f5f9" : "#080810";
     return unsub;
   }, []);
@@ -87,7 +85,7 @@ export default function App() {
   function handleToggleTheme() {
     const next = theme === "dark" ? "light" : "dark";
     setTheme(next);
-    saveTheme(next);
+    // tema guardado en localStorage por setTheme
     // Aplicar clase al body
     document.body.style.background = next === "light" ? "#f1f5f9" : "#080810";
   }
@@ -260,20 +258,7 @@ export default function App() {
           onBack={() => setView("home")} onProfileUpdated={handleProfileUpdated}
         />
       )}
-      {view === "profile" && (
-        <ProfileView
-          user={user}
-          myProfile={myProfile}
-          userXP={userXP}
-          logs={logs}
-          theme={theme}
-          onToggleTheme={handleToggleTheme}
-          onBack={() => setView("home")}
-          onProfileUpdated={(updates) => {
-            if (updates.displayName) user.displayName = updates.displayName;
-          }}
-        />
-      )}
+      
       {view === "editRoutine" && (
         <EditRoutineView
           user={user}
