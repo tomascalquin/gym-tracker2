@@ -11,6 +11,9 @@ import { loadUserXP, addXP, calcSessionXP, getRank } from "./utils/ranks";
 import { calcStreak } from "./utils/streak";
 import { registerServiceWorker, showLocalNotification } from "./utils/notifications";
 import { applyTheme, getTheme } from "./utils/theme";
+import { checkInviteParam, processPendingInvite } from "./utils/invite";
+import ChatView from "./components/ChatView";
+import { getDMChatId, getGroupChatId } from "./utils/chat";
 import AuthScreen from "./components/AuthScreen";
 import Toast from "./components/Toast";
 import RankUpModal from "./components/RankUpModal";
@@ -24,6 +27,8 @@ import GroupsView from "./views/groups/GroupsView";
 import ChallengesView from "./views/ChallengesView";
 import LeaderboardView from "./views/LeaderboardView";
 import ProfileView from "./views/ProfileView";
+import ProgressionView from "./views/ProgressionView";
+import TabBar, { TAB_VIEWS } from "./components/TabBar";
 import EditRoutineView from "./views/EditRoutineView";
 import OnboardingView from "./views/OnboardingView";
 
@@ -43,6 +48,7 @@ export default function App() {
   const [dataLoading, setDataLoading]       = useState(false);
   const [userXP, setUserXP]                 = useState(0);
   const [rankUpData, setRankUpData]         = useState(null);
+  const [chatTarget, setChatTarget]         = useState(null); // { id, title, accent }
   const [theme, setTheme]                   = useState(getTheme);
   const [timerOpen, setTimerOpen]           = useState(false);
   const [timerVisible, setTimerVisible]     = useState(false);
@@ -51,10 +57,9 @@ export default function App() {
   useEffect(() => {
     const unsub = onAuthChange(fb => { setUser(fb); setAuthReady(true); });
     checkRedirectResult().catch(console.error);
-    // Registrar service worker para modo offline
     registerServiceWorker();
-    applyTheme(getTheme()); // aplicar tema guardado
-    // Aplicar tema guardado al body
+    applyTheme(getTheme());
+    checkInviteParam();
     const savedTheme = getTheme();
     document.body.style.background = savedTheme === "light" ? "#f1f5f9" : "#080810";
     return unsub;
@@ -75,6 +80,10 @@ export default function App() {
         setRoutine(routineData);
         setMyProfile(profile);
         setUserXP(xpData.xp || 0);
+        // Procesar invitación pendiente si existe
+        processPendingInvite(user.uid).then(inviter => {
+          if (inviter) toast(`✓ Solicitud enviada a ${inviter.displayName}`);
+        });
       })
       .catch(console.error)
       .finally(() => setDataLoading(false));
@@ -223,49 +232,63 @@ export default function App() {
         />
       )}
 
-      {/* Timer flotante global */}
       {timerOpen && <RestTimer onClose={() => setTimerOpen(false)} />}
 
-      {view === "home" && (
-        <HomeView logs={logs} user={user} myProfile={myProfile} routine={routine} userXP={userXP} theme={theme}
-          sessionDate={sessionDate} setSessionDate={setSessionDate}
-          onStartSession={startSession} onNavigate={setView} onLogout={handleLogout}
-        />
-      )}
-      {view === "session" && activeDay && (
-        <SessionView activeDay={activeDay} sessionDate={sessionDate}
-          sessionData={sessionData} completedSets={completedSets}
-          sessionNote={sessionNote} logs={logs} routine={routine}
-          onBack={() => setView("home")} onUpdateSet={updateSet}
-          onToggleSet={toggleSet} onAddSet={addSet} onRemoveSet={removeSet} onChangeNote={setSessionNote}
-          onSave={saveSession} onAddExercise={handleAddExercise}
-          onRemoveExercise={handleRemoveExercise}
-          onOpenTimer={() => setTimerOpen(true)}
-        />
-      )}
-      {view === "history" && (
-        <HistoryView logs={logs} user={user} onBack={() => setView("home")}
-          onViewSession={startSession} onDeleteSession={handleDeleteSession}
-        />
-      )}
-      {view === "progress"    && <ProgressView logs={logs} routine={routine} onBack={() => setView("home")} />}
-      {view === "friends"     && <FriendsView user={user} myProfile={myProfile} onBack={() => setView("home")} />}
-      {view === "groups"      && <GroupsView user={user} onBack={() => setView("home")} />}
-      {view === "challenges"  && <ChallengesView user={user} myLogs={logs} myRoutine={routine} onBack={() => setView("home")} />}
-      {view === "leaderboard" && <LeaderboardView user={user} myXP={userXP} onBack={() => setView("home")} />}
-      {view === "profile" && (
-        <ProfileView user={user} myProfile={myProfile} userXP={userXP} logs={logs}
-          onBack={() => setView("home")} onProfileUpdated={handleProfileUpdated}
-        />
-      )}
-      
-      {view === "editRoutine" && (
-        <EditRoutineView
-          user={user}
-          routine={routine}
-          onBack={() => setView("home")}
-          onRoutineUpdated={(updated) => { setRoutine(updated); setView("home"); }}
-        />
+      <div className="scroll-view">
+        {view === "home" && (
+          <HomeView logs={logs} user={user} myProfile={myProfile} routine={routine} userXP={userXP}
+            sessionDate={sessionDate} setSessionDate={setSessionDate}
+            onStartSession={startSession} onNavigate={setView} onLogout={handleLogout}
+          />
+        )}
+        {view === "session" && activeDay && (
+          <SessionView activeDay={activeDay} sessionDate={sessionDate}
+            sessionData={sessionData} completedSets={completedSets}
+            sessionNote={sessionNote} logs={logs} routine={routine}
+            onBack={() => setView("home")} onUpdateSet={updateSet}
+            onToggleSet={toggleSet} onAddSet={addSet} onRemoveSet={removeSet}
+            onChangeNote={setSessionNote} onSave={saveSession}
+            onAddExercise={handleAddExercise} onRemoveExercise={handleRemoveExercise}
+          />
+        )}
+        {view === "history" && (
+          <HistoryView logs={logs} user={user} onBack={() => setView("home")}
+            onViewSession={startSession} onDeleteSession={handleDeleteSession}
+          />
+        )}
+        {view === "progress"    && <ProgressView logs={logs} routine={routine} onBack={() => setView("home")} />}
+        {view === "progression" && <ProgressionView logs={logs} routine={routine} onBack={() => setView("home")} />}
+        {view === "friends"     && <FriendsView user={user} myProfile={myProfile} onBack={() => setView("home")}
+          onOpenChat={(uid, name) => { setChatTarget({ id: getDMChatId(user.uid, uid), title: name, accent: "#60a5fa", from: "friends" }); setView("chat"); }}
+        />}
+        {view === "groups"      && <GroupsView user={user} onBack={() => setView("home")}
+          onOpenChat={(gid, name) => { setChatTarget({ id: getGroupChatId(gid), title: name, accent: "#a78bfa", from: "groups" }); setView("chat"); }}
+        />}
+        {view === "challenges"  && <ChallengesView user={user} myLogs={logs} myRoutine={routine} onBack={() => setView("home")} />}
+        {view === "leaderboard" && <LeaderboardView user={user} myXP={userXP} onBack={() => setView("home")} />}
+        {view === "profile"     && (
+          <ProfileView user={user} myProfile={myProfile} userXP={userXP} logs={logs}
+            onBack={() => setView("home")} onProfileUpdated={handleProfileUpdated}
+          />
+        )}
+        {view === "editRoutine" && (
+          <EditRoutineView user={user} routine={routine} onBack={() => setView("home")}
+            onRoutineUpdated={(updated) => { setRoutine(updated); setView("home"); }}
+          />
+        )}
+        {view === "chat" && chatTarget && (
+          <ChatView
+            chatId={chatTarget.id}
+            currentUser={{ ...user, photoURL: myProfile?.photoURL }}
+            title={chatTarget.title}
+            accentColor={chatTarget.accent || "#60a5fa"}
+            onBack={() => { setView(chatTarget.from || "home"); setChatTarget(null); }}
+          />
+        )}
+      </div>
+
+      {TAB_VIEWS.includes(view) && (
+        <TabBar currentView={view} onNavigate={setView} />
       )}
     </>
   );

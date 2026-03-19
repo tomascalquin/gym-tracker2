@@ -3,160 +3,178 @@ import { DAY_META } from "../data/routine";
 import ExerciseCard from "../components/ExerciseCard";
 import AddExerciseModal from "../components/AddExerciseModal";
 import RestTimer from "../components/RestTimer";
+import { tokens } from "../design";
 
-/**
- * Vista de entrenamiento activo.
- * Permite agregar ejercicios nuevos via modal — persisten en la rutina base.
- */
 export default function SessionView({
-  activeDay,
-  sessionDate,
-  sessionData,
-  completedSets,
-  sessionNote,
-  logs,
-  routine,
-  onBack,
-  onUpdateSet,
-  onToggleSet,
-  onAddSet,
-  onChangeNote,
-  onSave,
-  onAddExercise,
-  onRemoveExercise,
-  onRemoveSet,
+  activeDay, sessionDate, sessionData, completedSets,
+  sessionNote, logs, routine, onBack, onUpdateSet,
+  onToggleSet, onAddSet, onRemoveSet, onChangeNote,
+  onSave, onAddExercise, onRemoveExercise,
 }) {
   const [modalOpen, setModalOpen] = useState(false);
   const [timerOpen, setTimerOpen] = useState(false);
-  const accent    = DAY_META[activeDay]?.accent || "#60a5fa";
+  const [saving, setSaving]       = useState(false);
+
+  const c        = DAY_META[activeDay] || { accent: "#60a5fa", dim: "#1e3a5f", tag: "DÍA" };
   const exercises = routine[activeDay]?.exercises || [];
 
-  const progress = (() => {
-    const total = exercises.reduce((a, ex) => a + ex.sets.length, 0);
-    const done = Object.values(completedSets).filter(Boolean).length;
-    return total ? Math.round((done / total) * 100) : 0;
-  })();
+  const totalSets = exercises.reduce((a, ex) => a + ex.sets.length, 0);
+  const doneSets  = Object.values(completedSets).filter(Boolean).length;
+  const progress  = totalSets > 0 ? Math.round((doneSets / totalSets) * 100) : 0;
 
-  function handleAddExercise(exercise) {
-    onAddExercise(activeDay, exercise);
-    setModalOpen(false);
+  async function handleSave() {
+    setSaving(true);
+    await onSave();
+    setSaving(false);
   }
 
   return (
     <>
-      <div style={{ maxWidth: 500, margin: "0 auto", paddingBottom: 80 }}>
-        {/* Sticky header */}
-        <div style={{
-          position: "sticky", top: 0, background: "#080810",
-          borderBottom: "1px solid #1a1a2a", padding: "12px 18px", zIndex: 10,
-        }}>
-          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-            <button onClick={onBack} className="nbtn" style={{ color: "#475569", fontSize: 14, letterSpacing: 1 }}>
-              ← HOME
-            </button>
-            <div style={{ textAlign: "center" }}>
-              <div style={{ fontSize: 14, color: accent, letterSpacing: 2 }}>{activeDay}</div>
-              <div style={{ fontSize: 12, color: "#64748b" }}>{sessionDate}</div>
-            </div>
-            <button onClick={onSave} style={{
-              background: accent, border: "none", color: "#000",
-              padding: "6px 14px", borderRadius: 6, cursor: "pointer",
-              fontSize: 13, fontWeight: 700, letterSpacing: 1, fontFamily: "inherit",
-            }}>SAVE</button>
+      {/* Header fijo */}
+      <div style={{
+        position: "sticky", top: 0, zIndex: 20,
+        background: "rgba(8,8,16,0.95)",
+        backdropFilter: "blur(20px)",
+        WebkitBackdropFilter: "blur(20px)",
+        borderBottom: `1px solid ${c.accent}22`,
+        padding: "12px 18px 0",
+      }}>
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 12 }}>
+          <button onClick={onBack} style={{
+            background: "none", border: "none", cursor: "pointer",
+            color: "var(--text3)", fontSize: 20, display: "flex", alignItems: "center",
+            gap: 6, fontFamily: "inherit", minHeight: 44, padding: "0 4px",
+            WebkitTapHighlightColor: "transparent",
+          }}>←</button>
+
+          <div style={{ textAlign: "center" }}>
+            <div style={{ fontSize: 9, letterSpacing: 3, color: c.accent, marginBottom: 2 }}>{c.tag || "DÍA"}</div>
+            <div style={{ fontSize: 16, color: "var(--text)", fontWeight: 400 }}>{activeDay}</div>
           </div>
 
-          <div style={{ marginTop: 8, background: "#1a1a2a", borderRadius: 3, height: 3 }}>
-            <div style={{ height: 3, borderRadius: 3, background: accent, width: `${progress}%`, transition: "width 0.4s" }} />
-          </div>
-          <div style={{ fontSize: 12, color: "#64748b", textAlign: "right", marginTop: 2 }}>
-            {progress}% completado
-          </div>
+          <SaveButton onClick={handleSave} saving={saving} accent={c.accent} />
         </div>
 
-        <div style={{ padding: "14px 18px" }}>
-          {/* Nota de sesión */}
-          <div style={{ marginBottom: 14 }}>
-            <div style={{ fontSize: 12, letterSpacing: 3, color: "#64748b", marginBottom: 5 }}>NOTA DE SESIÓN</div>
-            <textarea
-              value={sessionNote}
-              onChange={(e) => onChangeNote(e.target.value)}
-              placeholder="Sensaciones, fatiga, observaciones..."
-              rows={2}
-              style={{
-                width: "100%", background: "#0e0e1a", border: "1px solid #1a1a2a",
-                color: "#94a3b8", padding: "9px 12px", borderRadius: 8,
-                fontSize: 14, fontFamily: "inherit", outline: "none",
-              }}
-            />
+        {/* Barra de progreso */}
+        <div style={{ marginBottom: 0 }}>
+          <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 5 }}>
+            <span style={{ fontSize: 9, color: "var(--text3)", letterSpacing: 1 }}>PROGRESO</span>
+            <span style={{ fontSize: 9, color: c.accent }}>{doneSets}/{totalSets} series</span>
           </div>
-
-          {/* Ejercicios */}
-          {exercises.map((ex, ei) => {
-            const sets = sessionData[ei] || ex.sets.map((s) => ({ weight: s.weight, reps: s.reps, note: s.note || "" }));
-            return (
-              <ExerciseCard
-                key={`${ex.name}-${ei}`}
-                exercise={ex}
-                exIndex={ei}
-                sets={sets}
-                completedSets={completedSets}
-                accent={accent}
-                dayName={activeDay}
-                logs={logs}
-                routine={routine}
-                isCustom={!!ex.custom}
-                onUpdateSet={onUpdateSet}
-                onToggleSet={onToggleSet}
-                onAddSet={onAddSet}
-                onRemoveSet={onRemoveSet}
-                onRemove={ex.custom ? () => onRemoveExercise(activeDay, ei) : null}
-              />
-            );
-          })}
-
-          {/* Botón agregar ejercicio */}
-          <button
-            onClick={() => setModalOpen(true)}
-            className="nbtn"
-            style={{
-              width: "100%", border: `1px dashed ${accent}55`,
-              color: accent, padding: "12px", borderRadius: 10,
-              fontSize: 14, letterSpacing: 2, marginBottom: 10,
-            }}
-          >
-            + AGREGAR EJERCICIO
-          </button>
-
-          <button onClick={onSave} style={{
-            width: "100%", padding: "13px", background: accent, border: "none",
-            borderRadius: 10, color: "#000", fontWeight: 700, fontSize: 15,
-            letterSpacing: 2, cursor: "pointer", fontFamily: "inherit",
-          }}>GUARDAR SESIÓN</button>
+          <div style={{ height: 3, background: "var(--border)", borderRadius: 2, marginBottom: 12, overflow: "hidden" }}>
+            <div style={{
+              height: "100%", borderRadius: 2, background: c.accent,
+              width: `${progress}%`, transition: "width 0.4s ease",
+              boxShadow: progress > 0 ? `0 0 8px ${c.accent}88` : "none",
+            }} />
+          </div>
         </div>
       </div>
 
-      {/* Botón temporizador flotante */}
-      <button
-        onClick={() => setTimerOpen(true)}
-        style={{
-          position: "fixed", bottom: 24, right: 20, zIndex: 50,
-          background: accent, border: "none", borderRadius: "50%",
-          width: 52, height: 52, cursor: "pointer",
-          fontSize: 22, display: "flex", alignItems: "center", justifyContent: "center",
-          boxShadow: `0 4px 20px ${accent}66`,
-        }}
-        title="Temporizador de descanso"
-      >⏱️</button>
+      {/* Contenido */}
+      <div style={{ padding: "16px 18px", maxWidth: 460, margin: "0 auto" }}>
+        {/* Fecha */}
+        <div style={{ marginBottom: 14, fontSize: 11, color: "var(--text3)", textAlign: "center" }}>
+          📅 {sessionDate}
+        </div>
+
+        {/* Ejercicios */}
+        {exercises.map((ex, ei) => (
+          <ExerciseCard
+            key={ei} exercise={ex} exIndex={ei}
+            sets={sessionData[ei] || ex.sets}
+            completedSets={completedSets}
+            accent={c.accent} dayName={activeDay}
+            logs={logs} routine={routine}
+            isCustom={ex.custom}
+            onUpdateSet={onUpdateSet}
+            onToggleSet={onToggleSet}
+            onAddSet={onAddSet}
+            onRemoveSet={onRemoveSet}
+            onRemove={ex.custom ? () => onRemoveExercise(activeDay, ei) : null}
+          />
+        ))}
+
+        {/* Nota */}
+        <div style={{ marginBottom: 16 }}>
+          <div style={{ fontSize: 9, color: "var(--text3)", letterSpacing: 2, marginBottom: 6 }}>NOTA DE SESIÓN</div>
+          <textarea
+            value={sessionNote}
+            onChange={e => onChangeNote(e.target.value)}
+            placeholder="¿Cómo fue la sesión? ¿Algo que destacar?"
+            rows={2}
+            style={{
+              width: "100%", background: "var(--bg2)", border: "1px solid var(--border)",
+              color: "var(--text)", padding: "11px 14px", borderRadius: tokens.radius.md,
+              fontSize: 13, fontFamily: "inherit", outline: "none",
+              lineHeight: 1.5,
+            }}
+          />
+        </div>
+
+        {/* Botón agregar ejercicio */}
+        <button onClick={() => setModalOpen(true)} style={{
+          width: "100%", background: "transparent",
+          border: `1px dashed ${c.accent}44`, color: c.accent,
+          padding: "13px", borderRadius: tokens.radius.lg,
+          fontSize: 11, letterSpacing: 2, fontFamily: "inherit",
+          cursor: "pointer", marginBottom: 12,
+          display: "flex", alignItems: "center", justifyContent: "center", gap: 8,
+        }}>
+          + AGREGAR EJERCICIO
+        </button>
+
+        {/* Guardar */}
+        <SaveButton onClick={handleSave} saving={saving} accent={c.accent} full />
+      </div>
+
+      {/* FAB Timer */}
+      <button onClick={() => setTimerOpen(true)} style={{
+        position: "fixed", bottom: "calc(72px + env(safe-area-inset-bottom))", right: 20,
+        width: 54, height: 54, borderRadius: "50%",
+        background: c.accent, border: "none",
+        boxShadow: `0 4px 20px ${c.accent}66, 0 0 0 1px ${c.accent}44`,
+        display: "flex", alignItems: "center", justifyContent: "center",
+        fontSize: 22, cursor: "pointer", zIndex: 50,
+        animation: "scaleIn 0.3s ease",
+        WebkitTapHighlightColor: "transparent",
+      }}>⏱️</button>
 
       {timerOpen && <RestTimer onClose={() => setTimerOpen(false)} />}
 
       {modalOpen && (
-        <AddExerciseModal
-          accent={accent}
-          onAdd={handleAddExercise}
+        <AddExerciseModal accent={c.accent}
+          onAdd={ex => { onAddExercise(activeDay, ex); setModalOpen(false); }}
           onClose={() => setModalOpen(false)}
         />
       )}
     </>
+  );
+}
+
+function SaveButton({ onClick, saving, accent, full }) {
+  const [pressed, setPressed] = useState(false);
+  return (
+    <button onClick={onClick} disabled={saving}
+      onTouchStart={() => setPressed(true)} onTouchEnd={() => setPressed(false)}
+      onMouseDown={() => setPressed(true)} onMouseUp={() => setPressed(false)}
+      style={{
+        width: full ? "100%" : "auto",
+        background: saving ? "var(--bg2)" : pressed ? accent + "dd" : accent,
+        border: saving ? "1px solid var(--border)" : "none",
+        color: saving ? "var(--text3)" : "#000",
+        padding: full ? "14px" : "8px 16px",
+        borderRadius: full ? tokens.radius.lg : tokens.radius.md,
+        cursor: saving ? "default" : "pointer",
+        fontSize: 11, fontWeight: 700, letterSpacing: 2, fontFamily: "inherit",
+        transform: pressed ? "scale(0.97)" : "scale(1)",
+        boxShadow: saving ? "none" : `0 4px 16px ${accent}44`,
+        transition: "all 0.12s ease",
+        minHeight: 44, display: "flex", alignItems: "center",
+        justifyContent: "center", gap: 8,
+        WebkitTapHighlightColor: "transparent",
+      }}>
+      {saving ? "GUARDANDO..." : full ? "✓ GUARDAR SESIÓN" : "GUARDAR"}
+    </button>
   );
 }

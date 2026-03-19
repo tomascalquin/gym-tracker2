@@ -1,331 +1,327 @@
 import { useState } from "react";
 import { saveFullRoutine } from "../utils/storage";
 import { DAY_META } from "../data/routine";
+import { tokens } from "../design";
 
 export default function EditRoutineView({ user, routine, onBack, onRoutineUpdated }) {
   const [local, setLocal]         = useState(() => JSON.parse(JSON.stringify(routine)));
   const [activeDay, setActiveDay] = useState(Object.keys(routine)[0] || "");
   const [saving, setSaving]       = useState(false);
+  const [saved, setSaved]         = useState(false);
   const [newDayName, setNewDayName] = useState("");
-  const [addingDay, setAddingDay] = useState(false);
-  const [toast, setToast]         = useState("");
+  const [addingDay, setAddingDay]   = useState(false);
 
-  const days = Object.keys(local);
+  const days     = Object.keys(local);
+  const c        = DAY_META[activeDay] || { accent: "#60a5fa" };
+  const exercises = local[activeDay]?.exercises || [];
 
-  function showToast(msg) {
-    setToast(msg);
-    setTimeout(() => setToast(""), 2000);
-  }
+  function showSaved() { setSaved(true); setTimeout(() => setSaved(false), 1800); }
 
-  // ── Días ──────────────────────────────────────────────────────────────────
+  // Días
   function addDay() {
-    if (!newDayName.trim()) return;
-    if (local[newDayName.trim()]) { showToast("Ese día ya existe."); return; }
+    if (!newDayName.trim() || local[newDayName.trim()]) return;
     setLocal(prev => ({ ...prev, [newDayName.trim()]: { exercises: [] } }));
-    setActiveDay(newDayName.trim());
-    setNewDayName("");
-    setAddingDay(false);
+    setActiveDay(newDayName.trim()); setNewDayName(""); setAddingDay(false);
   }
 
   function deleteDay(day) {
-    if (days.length <= 1) { showToast("Necesitas al menos un día."); return; }
-    setLocal(prev => {
-      const next = { ...prev };
-      delete next[day];
-      return next;
-    });
+    if (days.length <= 1) return;
+    setLocal(prev => { const n = { ...prev }; delete n[day]; return n; });
     setActiveDay(Object.keys(local).filter(d => d !== day)[0]);
   }
 
   function renameDay(oldName, newName) {
-    if (!newName.trim() || oldName === newName.trim()) return;
-    if (local[newName.trim()]) { showToast("Ese nombre ya existe."); return; }
+    if (!newName.trim() || oldName === newName.trim() || local[newName.trim()]) return;
     setLocal(prev => {
       const next = {};
-      Object.entries(prev).forEach(([k, v]) => {
-        next[k === oldName ? newName.trim() : k] = v;
-      });
+      Object.entries(prev).forEach(([k, v]) => { next[k === oldName ? newName.trim() : k] = v; });
       return next;
     });
     setActiveDay(newName.trim());
   }
 
-  // ── Ejercicios ─────────────────────────────────────────────────────────────
+  // Ejercicios
   function addExercise() {
     setLocal(prev => ({
       ...prev,
-      [activeDay]: {
-        exercises: [...(prev[activeDay]?.exercises || []),
-          { name: "", sets: [{ weight: 0, reps: 8, note: "" }] }
-        ]
-      }
+      [activeDay]: { exercises: [...(prev[activeDay]?.exercises || []), { name: "", sets: [{ weight: 0, reps: 8, note: "" }] }] }
     }));
   }
 
   function updateExName(ei, name) {
-    setLocal(prev => {
-      const exs = [...prev[activeDay].exercises];
-      exs[ei] = { ...exs[ei], name };
-      return { ...prev, [activeDay]: { exercises: exs } };
-    });
+    setLocal(prev => { const exs = [...prev[activeDay].exercises]; exs[ei] = { ...exs[ei], name }; return { ...prev, [activeDay]: { exercises: exs } }; });
   }
 
   function deleteExercise(ei) {
-    setLocal(prev => {
-      const exs = prev[activeDay].exercises.filter((_, i) => i !== ei);
-      return { ...prev, [activeDay]: { exercises: exs } };
-    });
+    setLocal(prev => ({ ...prev, [activeDay]: { exercises: prev[activeDay].exercises.filter((_, i) => i !== ei) } }));
   }
 
   function moveExercise(ei, dir) {
     setLocal(prev => {
       const exs = [...prev[activeDay].exercises];
-      const target = ei + dir;
-      if (target < 0 || target >= exs.length) return prev;
-      [exs[ei], exs[target]] = [exs[target], exs[ei]];
+      const t = ei + dir;
+      if (t < 0 || t >= exs.length) return prev;
+      [exs[ei], exs[t]] = [exs[t], exs[ei]];
       return { ...prev, [activeDay]: { exercises: exs } };
     });
   }
 
-  // ── Sets ───────────────────────────────────────────────────────────────────
+  // Sets
   function updateSet(ei, si, field, val) {
     setLocal(prev => {
-      const exs  = [...prev[activeDay].exercises];
+      const exs = [...prev[activeDay].exercises];
       const sets = [...exs[ei].sets];
-      sets[si]   = { ...sets[si], [field]: val };
-      exs[ei]    = { ...exs[ei], sets };
+      sets[si] = { ...sets[si], [field]: val };
+      exs[ei] = { ...exs[ei], sets };
       return { ...prev, [activeDay]: { exercises: exs } };
     });
   }
 
   function addSet(ei) {
     setLocal(prev => {
-      const exs  = [...prev[activeDay].exercises];
+      const exs = [...prev[activeDay].exercises];
       const last = exs[ei].sets[exs[ei].sets.length - 1] || { weight: 0, reps: 8 };
-      exs[ei]    = { ...exs[ei], sets: [...exs[ei].sets, { weight: last.weight, reps: last.reps, note: "" }] };
+      exs[ei] = { ...exs[ei], sets: [...exs[ei].sets, { weight: last.weight, reps: last.reps, note: "" }] };
       return { ...prev, [activeDay]: { exercises: exs } };
     });
   }
 
   function removeSet(ei, si) {
     setLocal(prev => {
-      const exs  = [...prev[activeDay].exercises];
+      const exs = [...prev[activeDay].exercises];
       if (exs[ei].sets.length <= 1) return prev;
-      exs[ei]    = { ...exs[ei], sets: exs[ei].sets.filter((_, i) => i !== si) };
+      exs[ei] = { ...exs[ei], sets: exs[ei].sets.filter((_, i) => i !== si) };
       return { ...prev, [activeDay]: { exercises: exs } };
     });
   }
 
-  // ── Guardar ────────────────────────────────────────────────────────────────
   async function handleSave() {
     setSaving(true);
     try {
       await saveFullRoutine(user.uid, local);
       onRoutineUpdated(local);
-      showToast("Rutina guardada ✓");
+      showSaved();
       setTimeout(onBack, 1200);
-    } catch { showToast("Error al guardar."); }
+    } catch { }
     finally { setSaving(false); }
   }
 
-  const accent     = DAY_META[activeDay]?.accent || "#60a5fa";
-  const exercises  = local[activeDay]?.exercises || [];
-
   return (
-    <div style={{ maxWidth: 500, margin: "0 auto", paddingBottom: 80, fontFamily: "DM Mono, monospace" }}>
+    <div style={{ maxWidth: 500, margin: "0 auto", paddingBottom: 100, fontFamily: "DM Mono, monospace", animation: "fadeIn 0.25s ease" }}>
 
-      {/* Toast */}
-      {toast && (
-        <div style={{
-          position: "fixed", top: 14, left: "50%", transform: "translateX(-50%)",
-          background: "#14532d", border: "1px solid #22c55e", color: "#fff",
-          padding: "8px 18px", borderRadius: 8, fontSize: 12, zIndex: 999,
-          animation: "slideDown 0.2s ease", whiteSpace: "nowrap",
-        }}>{toast}</div>
-      )}
-
-      {/* Header */}
+      {/* Header sticky */}
       <div style={{
-        position: "sticky", top: 0, background: "#080810",
-        borderBottom: "1px solid #1a1a2a", padding: "12px 18px", zIndex: 10,
+        position: "sticky", top: 0, zIndex: 20,
+        background: "rgba(8,8,16,0.95)", backdropFilter: "blur(20px)",
+        WebkitBackdropFilter: "blur(20px)",
+        borderBottom: "1px solid var(--border)",
+        padding: "12px 18px",
         display: "flex", alignItems: "center", justifyContent: "space-between",
       }}>
-        <button onClick={onBack} className="nbtn" style={{ color: "#475569", fontSize: 13 }}>← HOME</button>
-        <div style={{ fontSize: 13, color: "#f1f5f9", letterSpacing: 2 }}>EDITAR RUTINA</div>
+        <button onClick={onBack} className="nbtn" style={{ color: "var(--text3)", fontSize: 20, padding: "0 4px" }}>←</button>
+        <div style={{ textAlign: "center" }}>
+          <div style={{ fontSize: 9, color: "var(--text3)", letterSpacing: 3 }}>CONFIGURACIÓN</div>
+          <div style={{ fontSize: 14, color: "var(--text)" }}>Editar Rutina</div>
+        </div>
         <button onClick={handleSave} disabled={saving} style={{
-          background: saving ? "#1e3a5f" : "#60a5fa", border: "none", color: "#000",
-          padding: "6px 14px", borderRadius: 6, cursor: saving ? "default" : "pointer",
+          background: saved ? "#22c55e" : saving ? "var(--bg2)" : "#60a5fa",
+          border: "none", color: saved || (!saving) ? "#000" : "var(--text3)",
+          padding: "8px 16px", borderRadius: 10, cursor: saving ? "default" : "pointer",
           fontSize: 10, fontWeight: 700, letterSpacing: 1, fontFamily: "inherit",
-        }}>{saving ? "..." : "GUARDAR"}</button>
+          minHeight: 38, transition: "all 0.2s",
+          boxShadow: saved ? "0 4px 14px #22c55e44" : saving ? "none" : "0 4px 14px #60a5fa44",
+        }}>{saved ? "✓ LISTO" : saving ? "..." : "GUARDAR"}</button>
       </div>
 
-      <div style={{ padding: "14px 18px" }}>
-
-        {/* Selector de días */}
+      <div style={{ padding: "16px 18px" }}>
+        {/* Selector de días — pills */}
         <div style={{ marginBottom: 16 }}>
-          <div style={{ fontSize: 10, color: "#475569", letterSpacing: 2, marginBottom: 8 }}>DÍAS</div>
+          <div style={{ fontSize: 9, color: "var(--text3)", letterSpacing: 3, marginBottom: 10 }}>DÍAS</div>
           <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
             {days.map(day => {
-              const c = DAY_META[day] || { accent: "#60a5fa" };
-              const active = activeDay === day;
+              const dc = DAY_META[day] || { accent: "#60a5fa" };
               return (
                 <button key={day} onClick={() => setActiveDay(day)} style={{
-                  background: active ? c.accent + "22" : "#0e0e1a",
-                  border: `1px solid ${active ? c.accent : "#1a1a2a"}`,
-                  color: active ? c.accent : "#475569",
-                  padding: "6px 12px", borderRadius: 8, cursor: "pointer",
-                  fontSize: 12, fontFamily: "inherit",
+                  background: activeDay === day ? dc.accent + "22" : "var(--bg2)",
+                  border: `1px solid ${activeDay === day ? dc.accent : "var(--border)"}`,
+                  color: activeDay === day ? dc.accent : "var(--text3)",
+                  padding: "7px 14px", borderRadius: 99, cursor: "pointer",
+                  fontSize: 10, letterSpacing: 1, fontFamily: "inherit",
+                  transition: "all 0.15s",
+                  boxShadow: activeDay === day ? `0 2px 10px ${dc.accent}33` : "none",
                 }}>{day}</button>
               );
             })}
-            {/* Agregar día */}
             {!addingDay ? (
-              <button onClick={() => setAddingDay(true)} className="nbtn" style={{
-                border: "1px dashed #1a1a2a", color: "#475569",
-                padding: "6px 12px", borderRadius: 8, fontSize: 12,
+              <button onClick={() => setAddingDay(true)} style={{
+                background: "transparent", border: "1px dashed var(--border)",
+                color: "var(--text3)", padding: "7px 14px", borderRadius: 99,
+                cursor: "pointer", fontSize: 10, letterSpacing: 1, fontFamily: "inherit",
               }}>+ DÍA</button>
             ) : (
               <div style={{ display: "flex", gap: 6, alignItems: "center" }}>
                 <input value={newDayName} onChange={e => setNewDayName(e.target.value)}
-                  onKeyDown={e => e.key === "Enter" && addDay()}
-                  placeholder="Nombre del día" autoFocus
+                  onKeyDown={e => e.key === "Enter" && addDay()} placeholder="Nombre" autoFocus
                   style={{
-                    background: "#0e0e1a", border: "1px solid #60a5fa44", color: "#f1f5f9",
-                    padding: "6px 10px", borderRadius: 8, fontSize: 12,
-                    fontFamily: "inherit", outline: "none", width: 130,
+                    background: "var(--bg2)", border: "1px solid #60a5fa44", color: "var(--text)",
+                    padding: "7px 12px", borderRadius: 99, fontSize: 11, fontFamily: "inherit",
+                    outline: "none", width: 110,
                   }}
                 />
                 <button onClick={addDay} style={{
                   background: "#60a5fa", border: "none", color: "#000",
-                  padding: "6px 10px", borderRadius: 6, cursor: "pointer",
-                  fontSize: 11, fontWeight: 700, fontFamily: "inherit",
+                  padding: "7px 12px", borderRadius: 99, cursor: "pointer",
+                  fontSize: 10, fontWeight: 700, fontFamily: "inherit",
                 }}>OK</button>
-                <button onClick={() => { setAddingDay(false); setNewDayName(""); }} className="nbtn" style={{
-                  color: "#475569", fontSize: 13,
-                }}>✕</button>
+                <button onClick={() => { setAddingDay(false); setNewDayName(""); }} className="nbtn"
+                  style={{ color: "var(--text3)", fontSize: 14 }}>✕</button>
               </div>
             )}
           </div>
         </div>
 
-        {/* Editor del día activo */}
+        {/* Header del día activo */}
         {activeDay && (
-          <div>
-            {/* Header del día */}
-            <div className="card" style={{ padding: "12px 14px", marginBottom: 12, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-              <DayNameEditor name={activeDay} onRename={newName => renameDay(activeDay, newName)} accent={accent} />
-              <button onClick={() => deleteDay(activeDay)} className="nbtn" style={{
-                border: "1px solid #3f1010", color: "#ef4444",
-                padding: "5px 10px", borderRadius: 6, fontSize: 11,
-              }}>ELIMINAR DÍA</button>
-            </div>
-
-            {/* Ejercicios */}
-            {exercises.map((ex, ei) => (
-              <div key={ei} className="card" style={{ marginBottom: 10 }}>
-                {/* Header ejercicio */}
-                <div style={{ padding: "10px 14px", borderBottom: "1px solid #1a1a2a", display: "flex", gap: 8, alignItems: "center" }}>
-                  <input
-                    value={ex.name}
-                    onChange={e => updateExName(ei, e.target.value)}
-                    placeholder="Nombre del ejercicio"
-                    style={{
-                      flex: 1, background: "#0a0a14", border: "1px solid #1a1a2a",
-                      color: "#f1f5f9", padding: "7px 10px", borderRadius: 6,
-                      fontSize: 13, fontFamily: "inherit", outline: "none",
-                    }}
-                  />
-                  {/* Mover arriba/abajo */}
-                  <button onClick={() => moveExercise(ei, -1)} disabled={ei === 0} className="nbtn" style={{
-                    color: ei === 0 ? "#1a1a2a" : "#475569", fontSize: 14,
-                  }}>↑</button>
-                  <button onClick={() => moveExercise(ei, 1)} disabled={ei === exercises.length - 1} className="nbtn" style={{
-                    color: ei === exercises.length - 1 ? "#1a1a2a" : "#475569", fontSize: 14,
-                  }}>↓</button>
-                  <button onClick={() => deleteExercise(ei)} className="nbtn" style={{
-                    color: "#ef4444", border: "1px solid #3f1010",
-                    padding: "4px 8px", borderRadius: 5, fontSize: 11,
-                  }}>✕</button>
-                </div>
-
-                {/* Sets */}
-                <div style={{ padding: "9px 14px 11px" }}>
-                  <div style={{ display: "grid", gridTemplateColumns: "18px 64px 64px 1fr 22px", gap: 5, marginBottom: 5 }}>
-                    <span />
-                    <span style={{ fontSize: 9, color: "#475569", textAlign: "center", letterSpacing: 1 }}>KG</span>
-                    <span style={{ fontSize: 9, color: "#475569", textAlign: "center", letterSpacing: 1 }}>REPS</span>
-                    <span style={{ fontSize: 9, color: "#475569", letterSpacing: 1 }}>NOTA</span>
-                    <span />
-                  </div>
-                  {ex.sets.map((set, si) => (
-                    <div key={si} style={{ display: "grid", gridTemplateColumns: "18px 64px 64px 1fr 22px", gap: 5, alignItems: "center", marginBottom: 5 }}>
-                      <span style={{ fontSize: 10, color: "#475569", textAlign: "center" }}>{si + 1}</span>
-                      <input type="number" value={set.weight} onChange={e => updateSet(ei, si, "weight", parseFloat(e.target.value) || 0)} style={{
-                        background: "#0a0a14", border: "1px solid #1a1a2a", color: accent,
-                        padding: "5px 4px", borderRadius: 5, fontSize: 13, fontWeight: 500,
-                        textAlign: "center", fontFamily: "inherit", width: "100%", outline: "none",
-                      }} />
-                      <input type="number" value={set.reps} onChange={e => updateSet(ei, si, "reps", parseInt(e.target.value) || 0)} style={{
-                        background: "#0a0a14", border: "1px solid #1a1a2a", color: "#f1f5f9",
-                        padding: "5px 4px", borderRadius: 5, fontSize: 13, fontWeight: 500,
-                        textAlign: "center", fontFamily: "inherit", width: "100%", outline: "none",
-                      }} />
-                      <input value={set.note || ""} onChange={e => updateSet(ei, si, "note", e.target.value)} placeholder="—" style={{
-                        background: "#0a0a14", border: "1px solid #1a1a2a", color: "#475569",
-                        padding: "5px 7px", borderRadius: 5, fontSize: 11,
-                        fontFamily: "inherit", width: "100%", outline: "none",
-                      }} />
-                      <button onClick={() => removeSet(ei, si)} disabled={ex.sets.length <= 1} className="nbtn" style={{
-                        color: ex.sets.length <= 1 ? "#1a1a2a" : "#ef4444",
-                        border: `1px solid ${ex.sets.length <= 1 ? "transparent" : "#3f1010"}`,
-                        width: 22, height: 22, borderRadius: 5, fontSize: 11,
-                        display: "flex", alignItems: "center", justifyContent: "center",
-                      }}>✕</button>
-                    </div>
-                  ))}
-                  <button onClick={() => addSet(ei)} className="nbtn" style={{
-                    marginTop: 2, width: "100%", border: "1px dashed #1a1a2a",
-                    color: "#334155", padding: "5px", borderRadius: 6, fontSize: 10,
-                  }}>+ SERIE</button>
-                </div>
-              </div>
-            ))}
-
-            <button onClick={addExercise} className="nbtn" style={{
-              width: "100%", border: `1px dashed ${accent}55`, color: accent,
-              padding: "12px", borderRadius: 10, fontSize: 12, letterSpacing: 2,
-              marginBottom: 12,
-            }}>+ EJERCICIO</button>
-
-            <button onClick={handleSave} disabled={saving} style={{
-              width: "100%", padding: "13px", background: saving ? "#1e3a5f" : accent,
-              border: "none", borderRadius: 10, color: "#000", fontWeight: 700,
-              fontSize: 13, letterSpacing: 2, cursor: saving ? "default" : "pointer",
-              fontFamily: "inherit",
-            }}>{saving ? "GUARDANDO..." : "GUARDAR RUTINA ✓"}</button>
+          <div style={{
+            background: "var(--bg2)", border: `1px solid ${c.accent}22`,
+            borderLeft: `3px solid ${c.accent}`, borderRadius: 12,
+            padding: "12px 14px", marginBottom: 12,
+            display: "flex", justifyContent: "space-between", alignItems: "center",
+          }}>
+            <DayNameEditor name={activeDay} onRename={n => renameDay(activeDay, n)} accent={c.accent} />
+            <button onClick={() => deleteDay(activeDay)} disabled={days.length <= 1} style={{
+              background: "transparent", border: "1px solid #3f1010",
+              color: days.length <= 1 ? "var(--border)" : "var(--red)",
+              padding: "6px 12px", borderRadius: 8, cursor: days.length <= 1 ? "default" : "pointer",
+              fontSize: 9, letterSpacing: 1, fontFamily: "inherit", minHeight: 34,
+            }}>ELIMINAR</button>
           </div>
         )}
+
+        {/* Ejercicios */}
+        {exercises.map((ex, ei) => (
+          <div key={ei} style={{
+            background: "var(--bg2)", border: "1px solid var(--border)",
+            borderRadius: 14, marginBottom: 10, overflow: "hidden",
+            animation: `slideDown 0.2s ease ${ei * 0.04}s both`,
+          }}>
+            {/* Header ejercicio */}
+            <div style={{
+              padding: "11px 14px", borderBottom: "1px solid var(--border)",
+              display: "flex", gap: 8, alignItems: "center",
+              background: "var(--bg3)",
+            }}>
+              <input value={ex.name} onChange={e => updateExName(ei, e.target.value)}
+                placeholder="Nombre del ejercicio"
+                style={{
+                  flex: 1, background: "transparent", border: "none",
+                  color: "var(--text)", fontSize: 14, fontFamily: "inherit",
+                  outline: "none", minWidth: 0,
+                }}
+              />
+              <button onClick={() => moveExercise(ei, -1)} disabled={ei === 0} className="nbtn" style={{
+                color: ei === 0 ? "var(--border)" : "var(--text3)", fontSize: 16, padding: "0 4px",
+              }}>↑</button>
+              <button onClick={() => moveExercise(ei, 1)} disabled={ei === exercises.length - 1} className="nbtn" style={{
+                color: ei === exercises.length - 1 ? "var(--border)" : "var(--text3)", fontSize: 16, padding: "0 4px",
+              }}>↓</button>
+              <button onClick={() => deleteExercise(ei)} style={{
+                background: "transparent", border: "1px solid #3f1010",
+                color: "var(--red)", width: 28, height: 28, borderRadius: 7,
+                cursor: "pointer", fontSize: 12, fontFamily: "inherit",
+                display: "flex", alignItems: "center", justifyContent: "center",
+              }}>✕</button>
+            </div>
+
+            {/* Sets */}
+            <div style={{ padding: "10px 14px 12px" }}>
+              {/* Headers */}
+              <div style={{ display: "grid", gridTemplateColumns: "18px 1fr 60px 60px 28px", gap: 5, marginBottom: 6 }}>
+                {["", "NOTA", "KG", "REPS", ""].map((h, i) => (
+                  <span key={i} style={{ fontSize: 8, color: "var(--text3)", letterSpacing: 1, textAlign: i > 1 ? "center" : "left" }}>{h}</span>
+                ))}
+              </div>
+
+              {ex.sets.map((set, si) => (
+                <div key={si} style={{ display: "grid", gridTemplateColumns: "18px 1fr 60px 60px 28px", gap: 5, alignItems: "center", marginBottom: 6 }}>
+                  <span style={{ fontSize: 10, color: "var(--text3)", textAlign: "center" }}>{si + 1}</span>
+                  <input value={set.note || ""} onChange={e => updateSet(ei, si, "note", e.target.value)} placeholder="—"
+                    style={{
+                      background: "var(--bg3)", border: "1px solid var(--border)", color: "var(--text3)",
+                      padding: "6px 8px", borderRadius: 7, fontSize: 12, fontFamily: "inherit",
+                      outline: "none", width: "100%",
+                    }}
+                  />
+                  <input type="number" value={set.weight} onChange={e => updateSet(ei, si, "weight", parseFloat(e.target.value) || 0)}
+                    style={{
+                      background: "var(--bg3)", border: "1px solid var(--border)", color: c.accent,
+                      padding: "6px 4px", borderRadius: 7, fontSize: 14, fontWeight: 300,
+                      textAlign: "center", fontFamily: "inherit", width: "100%", outline: "none",
+                    }}
+                  />
+                  <input type="number" value={set.reps} onChange={e => updateSet(ei, si, "reps", parseInt(e.target.value) || 0)}
+                    style={{
+                      background: "var(--bg3)", border: "1px solid var(--border)", color: "var(--text)",
+                      padding: "6px 4px", borderRadius: 7, fontSize: 14, fontWeight: 300,
+                      textAlign: "center", fontFamily: "inherit", width: "100%", outline: "none",
+                    }}
+                  />
+                  <button onClick={() => removeSet(ei, si)} disabled={ex.sets.length <= 1} style={{
+                    background: "transparent",
+                    border: ex.sets.length <= 1 ? "1px solid transparent" : "1px solid #3f1010",
+                    color: ex.sets.length <= 1 ? "transparent" : "var(--red)",
+                    width: 28, height: 28, borderRadius: 7, cursor: ex.sets.length <= 1 ? "default" : "pointer",
+                    fontSize: 11, display: "flex", alignItems: "center", justifyContent: "center",
+                    fontFamily: "inherit",
+                  }}>✕</button>
+                </div>
+              ))}
+
+              <button onClick={() => addSet(ei)} style={{
+                marginTop: 4, width: "100%", background: "transparent",
+                border: "1px dashed var(--border)", color: "var(--text3)",
+                padding: "6px", borderRadius: 8, fontSize: 10, letterSpacing: 1,
+                cursor: "pointer", fontFamily: "inherit",
+              }}>+ SERIE</button>
+            </div>
+          </div>
+        ))}
+
+        <button onClick={addExercise} style={{
+          width: "100%", background: "transparent",
+          border: `1px dashed ${c.accent}55`, color: c.accent,
+          padding: "13px", borderRadius: 14, fontSize: 11, letterSpacing: 2,
+          cursor: "pointer", fontFamily: "inherit", marginBottom: 12,
+          display: "flex", alignItems: "center", justifyContent: "center", gap: 8,
+        }}>+ AGREGAR EJERCICIO</button>
+
+        <button onClick={handleSave} disabled={saving} style={{
+          width: "100%", padding: "14px",
+          background: saved ? "#22c55e" : saving ? "var(--bg2)" : "#60a5fa",
+          border: "none", borderRadius: 14, color: "#000",
+          fontWeight: 700, fontSize: 11, letterSpacing: 2, fontFamily: "inherit",
+          cursor: saving ? "default" : "pointer", minHeight: 52,
+          boxShadow: saved ? "0 4px 20px #22c55e44" : saving ? "none" : "0 4px 20px #60a5fa44",
+          transition: "all 0.2s",
+        }}>{saved ? "✓ GUARDADO" : saving ? "GUARDANDO..." : "GUARDAR RUTINA"}</button>
       </div>
     </div>
   );
 }
 
-// Input inline para renombrar el día
 function DayNameEditor({ name, onRename, accent }) {
   const [editing, setEditing] = useState(false);
   const [val, setVal]         = useState(name);
 
-  function confirm() {
-    onRename(val);
-    setEditing(false);
-  }
+  function confirm() { onRename(val); setEditing(false); }
 
   if (!editing) return (
     <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-      <span style={{ fontSize: 14, color: "#f1f5f9" }}>{name}</span>
-      <button onClick={() => setEditing(true)} className="nbtn" style={{
-        fontSize: 10, color: accent, border: `1px solid ${accent}44`,
-        padding: "2px 8px", borderRadius: 5, letterSpacing: 1,
+      <span style={{ fontSize: 14, color: "var(--text)" }}>{name}</span>
+      <button onClick={() => setEditing(true)} style={{
+        background: accent + "22", border: `1px solid ${accent}33`,
+        color: accent, padding: "4px 10px", borderRadius: 99,
+        cursor: "pointer", fontSize: 9, letterSpacing: 1, fontFamily: "inherit",
       }}>RENOMBRAR</button>
     </div>
   );
@@ -335,17 +331,18 @@ function DayNameEditor({ name, onRename, accent }) {
       <input value={val} onChange={e => setVal(e.target.value)}
         onKeyDown={e => e.key === "Enter" && confirm()} autoFocus
         style={{
-          background: "#0a0a14", border: `1px solid ${accent}44`, color: "#f1f5f9",
-          padding: "5px 10px", borderRadius: 6, fontSize: 13,
-          fontFamily: "inherit", outline: "none", width: 140,
+          background: "var(--bg3)", border: `1px solid ${accent}44`, color: "var(--text)",
+          padding: "6px 10px", borderRadius: 8, fontSize: 13, fontFamily: "inherit",
+          outline: "none", width: 130,
         }}
       />
       <button onClick={confirm} style={{
         background: accent, border: "none", color: "#000",
-        padding: "5px 10px", borderRadius: 6, cursor: "pointer",
-        fontSize: 11, fontWeight: 700, fontFamily: "inherit",
+        padding: "6px 12px", borderRadius: 8, cursor: "pointer",
+        fontSize: 10, fontWeight: 700, fontFamily: "inherit",
       }}>OK</button>
-      <button onClick={() => { setVal(name); setEditing(false); }} className="nbtn" style={{ color: "#475569", fontSize: 13 }}>✕</button>
+      <button onClick={() => { setVal(name); setEditing(false); }} className="nbtn"
+        style={{ color: "var(--text3)", fontSize: 14 }}>✕</button>
     </div>
   );
 }

@@ -5,24 +5,22 @@ import {
 } from "../../utils/groups";
 import { calc1RM, bestSet, sessionVolume } from "../../utils/fitness";
 import { DAY_META } from "../../data/routine";
+import { tokens } from "../../design";
 
 const ACCENT = "#a78bfa";
 
-export default function GroupDetail({ group, user, onBack, onLeave, onDelete }) {
-  const [tab, setTab]             = useState("semana");
-  const [members, setMembers]     = useState([]);
-  const [allLogs, setAllLogs]     = useState({});     // { uid: logs }
-  const [allRoutines, setAllRoutines] = useState({}); // { uid: routine }
-  const [weeklyLogs, setWeeklyLogs]   = useState({}); // { uid: weeklyLogs }
-  const [loading, setLoading]     = useState(true);
+export default function GroupDetail({ group, user, onBack, onLeave, onDelete, onOpenChat }) {
+  const [tab, setTab]           = useState("semana");
+  const [members, setMembers]   = useState([]);
+  const [allLogs, setAllLogs]   = useState({});
+  const [allRoutines, setAllRoutines] = useState({});
+  const [weeklyLogs, setWeeklyLogs]   = useState({});
+  const [loading, setLoading]   = useState(true);
   const [confirmLeave, setConfirmLeave] = useState(false);
-
-  // 1RM compare state
-  const [selectedDay, setSelectedDay] = useState("");
-  const [selectedEx, setSelectedEx]   = useState("");
+  const [selectedDay, setSelectedDay]   = useState("");
+  const [selectedEx, setSelectedEx]     = useState("");
   const [availableDays, setAvailableDays] = useState([]);
   const [availableExs, setAvailableExs]   = useState([]);
-
   const isOwner = group.createdBy === user.uid;
 
   useEffect(() => {
@@ -30,50 +28,27 @@ export default function GroupDetail({ group, user, onBack, onLeave, onDelete }) 
       setLoading(true);
       const memberProfiles = await loadGroupMembers(group.members);
       setMembers(memberProfiles);
-
-      // Cargar logs y rutinas de todos los miembros en paralelo
-      const [logsResults, routineResults, weeklyResults] = await Promise.all([
-        Promise.all(group.members.map(uid =>
-          loadMemberAllLogs(uid).then(logs => ({ uid, logs }))
-        )),
-        Promise.all(group.members.map(uid =>
-          loadMemberRoutine(uid).then(routine => ({ uid, routine }))
-        )),
-        Promise.all(group.members.map(uid =>
-          loadMemberWeeklyLogs(uid).then(logs => ({ uid, logs }))
-        )),
+      const [logsR, routineR, weeklyR] = await Promise.all([
+        Promise.all(group.members.map(uid => loadMemberAllLogs(uid).then(logs => ({ uid, logs })))),
+        Promise.all(group.members.map(uid => loadMemberRoutine(uid).then(routine => ({ uid, routine })))),
+        Promise.all(group.members.map(uid => loadMemberWeeklyLogs(uid).then(logs => ({ uid, logs })))),
       ]);
-
-      const logsMap    = {};
-      const routineMap = {};
-      const weeklyMap  = {};
-
-      logsResults.forEach(({ uid, logs })       => { logsMap[uid]    = logs; });
-      routineResults.forEach(({ uid, routine }) => { routineMap[uid] = routine; });
-      weeklyResults.forEach(({ uid, logs })     => { weeklyMap[uid]  = logs; });
-
-      setAllLogs(logsMap);
-      setAllRoutines(routineMap);
-      setWeeklyLogs(weeklyMap);
-
-      // Calcular días comunes entre miembros para el selector de 1RM
-      const daysSets = group.members.map(uid =>
-        Object.keys(routineMap[uid] || {})
-      );
-      // Unión de todos los días disponibles
-      const allDays = [...new Set(daysSets.flat())];
+      const logsMap = {}, routineMap = {}, weeklyMap = {};
+      logsR.forEach(({ uid, logs }) => { logsMap[uid] = logs; });
+      routineR.forEach(({ uid, routine }) => { routineMap[uid] = routine; });
+      weeklyR.forEach(({ uid, logs }) => { weeklyMap[uid] = logs; });
+      setAllLogs(logsMap); setAllRoutines(routineMap); setWeeklyLogs(weeklyMap);
+      const allDays = [...new Set(group.members.flatMap(uid => Object.keys(routineMap[uid] || {})))];
       setAvailableDays(allDays);
       if (allDays.length) {
         setSelectedDay(allDays[0]);
-        // Ejercicios del primer día del primer miembro que lo tenga
-        const firstMemberWithDay = group.members.find(uid => routineMap[uid]?.[allDays[0]]);
-        if (firstMemberWithDay) {
-          const exs = routineMap[firstMemberWithDay][allDays[0]]?.exercises || [];
+        const firstMember = group.members.find(uid => routineMap[uid]?.[allDays[0]]);
+        if (firstMember) {
+          const exs = routineMap[firstMember][allDays[0]]?.exercises || [];
           setAvailableExs(exs.map(e => e.name));
           if (exs.length) setSelectedEx(exs[0].name);
         }
       }
-
       setLoading(false);
     }
     load();
@@ -81,306 +56,320 @@ export default function GroupDetail({ group, user, onBack, onLeave, onDelete }) 
 
   function handleDayChange(day) {
     setSelectedDay(day);
-    // Actualizar ejercicios disponibles del día seleccionado
-    const firstMemberWithDay = group.members.find(uid => allRoutines[uid]?.[day]);
-    if (firstMemberWithDay) {
-      const exs = allRoutines[firstMemberWithDay][day]?.exercises || [];
-      const names = exs.map(e => e.name);
-      setAvailableExs(names);
-      setSelectedEx(names[0] || "");
-    } else {
-      setAvailableExs([]);
-      setSelectedEx("");
+    const first = group.members.find(uid => allRoutines[uid]?.[day]);
+    if (first) {
+      const exs = allRoutines[first][day]?.exercises || [];
+      setAvailableExs(exs.map(e => e.name));
+      setSelectedEx(exs[0]?.name || "");
     }
   }
 
-  // Calcular mejor 1RM de un miembro para un ejercicio
-  function getMemberBest1RM(uid, day, exName) {
-    const logs    = allLogs[uid] || {};
-    const routine = allRoutines[uid] || {};
-    const sessions = Object.values(logs).filter(s => s.day === day);
+  function getMember1RM(uid, day, exName) {
     let best = 0;
-    sessions.forEach(s => {
-      const exs = routine[day]?.exercises || [];
-      const ei  = exs.findIndex(e => e.name === exName);
+    Object.values(allLogs[uid] || {}).filter(s => s.day === day).forEach(s => {
+      const ei = (allRoutines[uid]?.[day]?.exercises || []).findIndex(e => e.name === exName);
       if (ei === -1) return;
-      const sets = s.sets[ei];
-      if (!sets?.length) return;
-      const b  = bestSet(sets);
+      const b = bestSet(s.sets?.[ei]);
+      if (!b) return;
       const rm = calc1RM(b.weight, b.reps);
       if (rm > best) best = rm;
     });
     return best;
   }
 
-  // Calcular frecuencia de entrenamientos (total sesiones)
-  function getMemberFrequency(uid) {
-    return Object.keys(allLogs[uid] || {}).length;
-  }
+  function getMemberFreq(uid)  { return Object.keys(allLogs[uid] || {}).length; }
+  function getMemberWeek(uid)  { return Object.keys(weeklyLogs[uid] || {}).length; }
 
-  // Calcular sesiones esta semana
-  function getMemberWeekSessions(uid) {
-    return Object.keys(weeklyLogs[uid] || {}).length;
-  }
+  const maxRM   = selectedEx ? Math.max(...group.members.map(uid => getMember1RM(uid, selectedDay, selectedEx)), 0) : 0;
+  const maxFreq = Math.max(...group.members.map(uid => getMemberFreq(uid)), 1);
 
-  const maxRM = selectedEx
-    ? Math.max(...group.members.map(uid => getMemberBest1RM(uid, selectedDay, selectedEx)), 0)
-    : 0;
-
-  const maxFreq = Math.max(...group.members.map(uid => getMemberFrequency(uid)), 1);
+  const TABS = [
+    { key: "semana",     label: "SEMANA" },
+    { key: "1rm",        label: "1RM" },
+    { key: "frecuencia", label: "FRECUENCIA" },
+  ];
 
   return (
-    <div style={{ maxWidth: 460, margin: "0 auto", padding: "24px 18px", fontFamily: "DM Mono, monospace" }}>
-      {/* Header */}
-      <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 6 }}>
-        <button onClick={onBack} className="nbtn" style={{ color: "#475569", fontSize: 13 }}>← GRUPOS</button>
-        <div style={{ marginLeft: "auto", display: "flex", gap: 8 }}>
-          {!confirmLeave ? (
-            <button onClick={() => setConfirmLeave(true)} className="nbtn" style={{
-              border: "1px solid #3f1010", color: "#ef4444",
-              padding: "5px 10px", borderRadius: 6, fontSize: 10,
-            }}>{isOwner ? "ELIMINAR" : "SALIR"}</button>
-          ) : (
-            <>
-              <button onClick={isOwner ? onDelete : onLeave} style={{
-                background: "#7f1d1d", border: "1px solid #ef4444", color: "#ef4444",
-                padding: "5px 10px", borderRadius: 6, fontSize: 10,
-                cursor: "pointer", fontFamily: "inherit",
-              }}>¿SEGURO?</button>
-              <button onClick={() => setConfirmLeave(false)} className="nbtn" style={{
-                border: "1px solid #1a1a2a", color: "#475569",
-                padding: "5px 10px", borderRadius: 6, fontSize: 10,
-              }}>CANCELAR</button>
-            </>
-          )}
-        </div>
-      </div>
+    <div style={{ maxWidth: 460, margin: "0 auto", fontFamily: "DM Mono, monospace", animation: "fadeIn 0.25s ease" }}>
 
-      {/* Nombre y código */}
-      <div style={{ marginBottom: 20 }}>
-        <h2 style={{ margin: 0, fontSize: 18, fontWeight: 400, color: "#f1f5f9" }}>{group.name}</h2>
-        <div style={{ fontSize: 11, color: "#475569", marginTop: 4 }}>
-          Código: <span style={{ color: ACCENT, letterSpacing: 2 }}>{group.code}</span>
-          {" · "}{group.members.length} miembros
-        </div>
-      </div>
-
-      {/* Tabs */}
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 6, marginBottom: 20 }}>
-        {[
-          { key: "semana",    label: "SEMANA" },
-          { key: "1rm",       label: "1RM" },
-          { key: "frecuencia",label: "FRECUENCIA" },
-        ].map(t => (
-          <button key={t.key} onClick={() => setTab(t.key)} style={{
-            background: tab === t.key ? "#1e1b4b" : "transparent",
-            border: `1px solid ${tab === t.key ? ACCENT + "44" : "#1a1a2a"}`,
-            color: tab === t.key ? ACCENT : "#475569",
-            padding: "8px 4px", borderRadius: 8, cursor: "pointer",
-            fontSize: 10, letterSpacing: 1, fontFamily: "inherit",
-          }}>{t.label}</button>
-        ))}
-      </div>
-
-      {loading ? (
-        <div style={{ textAlign: "center", color: "#475569", padding: "40px 0", fontSize: 13 }}>
-          Cargando datos del grupo...
-        </div>
-      ) : (
-        <>
-          {/* ── SEMANA ── */}
-          {tab === "semana" && (
-            <div>
-              <div style={{ fontSize: 11, color: "#475569", letterSpacing: 1, marginBottom: 14 }}>
-                QUIÉN ENTRENÓ ESTA SEMANA
-              </div>
-              {members.map(m => {
-                const sessions  = getMemberWeekSessions(m.uid);
-                const weekLogs  = weeklyLogs[m.uid] || {};
-                const days      = [...new Set(Object.values(weekLogs).map(s => s.day))];
-                const vol       = Object.values(weekLogs).reduce((a, s) => a + sessionVolume(s.sets), 0);
-                const isMe      = m.uid === user.uid;
-                return (
-                  <div key={m.uid} className="card" style={{
-                    marginBottom: 10, padding: "14px 16px",
-                    borderLeft: `3px solid ${sessions > 0 ? "#22c55e" : "#334155"}`,
-                    opacity: sessions > 0 ? 1 : 0.6,
-                  }}>
-                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                      <div>
-                        <div style={{ fontSize: 14, color: "#f1f5f9" }}>
-                          {m.displayName}{isMe ? " (tú)" : ""}
-                        </div>
-                        <div style={{ fontSize: 11, color: "#475569", marginTop: 2 }}>
-                          {sessions > 0
-                            ? `${sessions} sesión${sessions > 1 ? "es" : ""} · ${vol.toLocaleString()} kg`
-                            : "Sin entrenar esta semana"}
-                        </div>
-                        {days.length > 0 && (
-                          <div style={{ display: "flex", gap: 4, flexWrap: "wrap", marginTop: 6 }}>
-                            {days.map(d => (
-                              <span key={d} style={{
-                                fontSize: 9, background: "#1a1a2e",
-                                color: DAY_META[d]?.accent || ACCENT,
-                                padding: "2px 7px", borderRadius: 10,
-                              }}>{d}</span>
-                            ))}
-                          </div>
-                        )}
-                      </div>
-                      <div style={{
-                        fontSize: 22, color: sessions > 0 ? "#22c55e" : "#334155",
-                      }}>
-                        {sessions > 0 ? "✓" : "·"}
-                      </div>
-                    </div>
-                  </div>
-                );
-              })}
+      {/* Hero header */}
+      <div style={{
+        background: `linear-gradient(160deg, #1e1b4b 0%, #12102a 100%)`,
+        padding: "20px 18px 0",
+        borderBottom: "1px solid var(--border)",
+      }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 16 }}>
+          <button onClick={onBack} className="nbtn" style={{ color: "var(--text3)", fontSize: 20, padding: "0 4px" }}>←</button>
+          <div style={{ flex: 1 }}>
+            <div style={{ fontSize: 9, color: ACCENT + "88", letterSpacing: 3 }}>GRUPO</div>
+            <h2 style={{ margin: 0, fontSize: 20, fontWeight: 300, color: "var(--text)" }}>{group.name}</h2>
+            <div style={{ fontSize: 11, color: "var(--text3)", marginTop: 2 }}>
+              {group.members.length} miembros ·{" "}
+              <span style={{ color: ACCENT, letterSpacing: 2 }}>{group.code}</span>
             </div>
-          )}
-
-          {/* ── 1RM ── */}
-          {tab === "1rm" && (
-            <div>
-              {/* Selector día */}
-              {availableDays.length > 0 ? (
-                <>
-                  <div style={{ display: "grid", gridTemplateColumns: `repeat(${Math.min(availableDays.length, 4)}, 1fr)`, gap: 6, marginBottom: 10 }}>
-                    {availableDays.map(d => {
-                      const c = DAY_META[d] || { accent: ACCENT, dim: "#1e1b4b" };
-                      const active = selectedDay === d;
-                      return (
-                        <button key={d} onClick={() => handleDayChange(d)} style={{
-                          background: active ? c.dim : "#0e0e1a",
-                          border: `1px solid ${active ? c.accent : "#1a1a2a"}`,
-                          color: active ? c.accent : "#334155",
-                          padding: "7px 4px", borderRadius: 7, cursor: "pointer",
-                          fontSize: 9, letterSpacing: 1, fontFamily: "inherit",
-                          overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap",
-                        }}>{d}</button>
-                      );
-                    })}
-                  </div>
-
-                  {/* Selector ejercicio */}
-                  {availableExs.length > 0 ? (
-                    <>
-                      <select value={selectedEx} onChange={e => setSelectedEx(e.target.value)} style={{
-                        width: "100%", background: "#0e0e1a", border: "1px solid #1a1a2a",
-                        color: "#94a3b8", padding: "9px 12px", borderRadius: 8,
-                        fontSize: 13, fontFamily: "inherit", outline: "none", marginBottom: 16,
-                      }}>
-                        {availableExs.map(ex => <option key={ex} value={ex}>{ex}</option>)}
-                      </select>
-
-                      {/* Ranking 1RM */}
-                      <div className="card" style={{ padding: "16px" }}>
-                        <div style={{ fontSize: 11, color: ACCENT, marginBottom: 14, letterSpacing: 1 }}>
-                          MEJOR 1RM — {selectedEx}
-                        </div>
-                        {[...members]
-                          .map(m => ({ ...m, rm: getMemberBest1RM(m.uid, selectedDay, selectedEx) }))
-                          .sort((a, b) => b.rm - a.rm)
-                          .map((m, i) => (
-                            <RankBar
-                              key={m.uid}
-                              rank={i + 1}
-                              name={m.displayName + (m.uid === user.uid ? " (tú)" : "")}
-                              value={m.rm}
-                              max={maxRM}
-                              accent={ACCENT}
-                              isMe={m.uid === user.uid}
-                            />
-                          ))}
-                      </div>
-                    </>
-                  ) : (
-                    <div style={{ color: "#475569", fontSize: 12, textAlign: "center", padding: "20px 0" }}>
-                      Ningún miembro tiene ejercicios en este día.
-                    </div>
-                  )}
-                </>
-              ) : (
-                <div style={{ color: "#475569", fontSize: 12, textAlign: "center", padding: "30px 0" }}>
-                  Los miembros aún no tienen rutina configurada.
-                </div>
-              )}
-            </div>
-          )}
-
-          {/* ── FRECUENCIA ── */}
-          {tab === "frecuencia" && (
-            <div>
-              <div style={{ fontSize: 11, color: "#475569", letterSpacing: 1, marginBottom: 14 }}>
-                RANKING TOTAL DE SESIONES
+          </div>
+          <div style={{ display: "flex", gap: 6 }}>
+            {onOpenChat && (
+              <button onClick={() => onOpenChat(group.id, group.name)} style={{
+                background: ACCENT + "22", border: `1px solid ${ACCENT}33`,
+                color: ACCENT, padding: "7px 12px", borderRadius: 10,
+                cursor: "pointer", fontSize: 13, fontFamily: "inherit", minHeight: 36,
+              }}>💬</button>
+            )}
+            {!confirmLeave ? (
+              <button onClick={() => setConfirmLeave(true)} style={{
+                background: "transparent", border: "1px solid #3f1010",
+                color: "var(--red)", padding: "7px 10px", borderRadius: 10,
+                cursor: "pointer", fontSize: 10, letterSpacing: 1, fontFamily: "inherit", minHeight: 36,
+              }}>{isOwner ? "ELIMINAR" : "SALIR"}</button>
+            ) : (
+              <div style={{ display: "flex", gap: 6 }}>
+                <button onClick={isOwner ? onDelete : onLeave} style={{
+                  background: "#7f1d1d", border: "1px solid var(--red)", color: "var(--red)",
+                  padding: "7px 10px", borderRadius: 10, cursor: "pointer",
+                  fontSize: 10, fontFamily: "inherit", minHeight: 36,
+                }}>¿SEGURO?</button>
+                <button onClick={() => setConfirmLeave(false)} style={{
+                  background: "transparent", border: "1px solid var(--border)", color: "var(--text3)",
+                  padding: "7px 10px", borderRadius: 10, cursor: "pointer",
+                  fontSize: 10, fontFamily: "inherit", minHeight: 36,
+                }}>NO</button>
               </div>
-              <div className="card" style={{ padding: "16px" }}>
-                {[...members]
-                  .map(m => ({ ...m, freq: getMemberFrequency(m.uid), week: getMemberWeekSessions(m.uid) }))
-                  .sort((a, b) => b.freq - a.freq)
-                  .map((m, i) => (
-                    <div key={m.uid} style={{ marginBottom: 14 }}>
-                      <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 5, alignItems: "center" }}>
-                        <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                          <span style={{ fontSize: 12, color: i === 0 ? "#fbbf24" : "#475569", width: 18 }}>
-                            {i === 0 ? "🏆" : `#${i + 1}`}
-                          </span>
-                          <span style={{ fontSize: 13, color: m.uid === user.uid ? ACCENT : "#e2e8f0" }}>
-                            {m.displayName}{m.uid === user.uid ? " (tú)" : ""}
-                          </span>
-                        </div>
-                        <div style={{ textAlign: "right" }}>
-                          <span style={{ fontSize: 14, color: ACCENT, fontWeight: 500 }}>{m.freq}</span>
-                          <span style={{ fontSize: 10, color: "#475569" }}> total</span>
-                          {m.week > 0 && (
-                            <span style={{ fontSize: 10, color: "#22c55e", marginLeft: 6 }}>
-                              +{m.week} sem
+            )}
+          </div>
+        </div>
+
+        {/* Tabs underline */}
+        <div style={{ display: "flex", borderBottom: "1px solid var(--border)" }}>
+          {TABS.map(t => (
+            <button key={t.key} onClick={() => setTab(t.key)} style={{
+              flex: 1, background: "none", border: "none",
+              borderBottom: `2px solid ${tab === t.key ? ACCENT : "transparent"}`,
+              color: tab === t.key ? ACCENT : "var(--text3)",
+              padding: "10px 4px", cursor: "pointer",
+              fontSize: 9, letterSpacing: 2, fontFamily: "inherit",
+              transition: "all 0.15s", marginBottom: -1,
+            }}>{t.label}</button>
+          ))}
+        </div>
+      </div>
+
+      <div style={{ padding: "16px 18px" }}>
+        {loading ? (
+          <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+            {[...Array(4)].map((_, i) => <div key={i} className="skeleton" style={{ height: 72, borderRadius: 14 }} />)}
+          </div>
+        ) : (
+          <>
+            {/* SEMANA */}
+            {tab === "semana" && (
+              <div>
+                <div style={{ fontSize: 9, color: "var(--text3)", letterSpacing: 3, marginBottom: 12 }}>ACTIVIDAD ESTA SEMANA</div>
+                {members.map((m, i) => {
+                  const sessions = getMemberWeek(m.uid);
+                  const logs_    = weeklyLogs[m.uid] || {};
+                  const days_    = [...new Set(Object.values(logs_).map(s => s.day))];
+                  const vol      = Object.values(logs_).reduce((a, s) => a + sessionVolume(s.sets), 0);
+                  const isMe     = m.uid === user.uid;
+                  return (
+                    <div key={m.uid} style={{
+                      background: sessions > 0 ? `linear-gradient(135deg, var(--bg2) 0%, ${"#22c55e"}08 100%)` : "var(--bg2)",
+                      border: `1px solid ${sessions > 0 ? "#22c55e22" : "var(--border)"}`,
+                      borderLeft: `3px solid ${sessions > 0 ? "#22c55e" : "var(--border)"}`,
+                      borderRadius: 14, padding: "13px 16px", marginBottom: 8,
+                      opacity: sessions > 0 ? 1 : 0.6,
+                      animation: `slideDown 0.2s ease ${i * 0.05}s both`,
+                    }}>
+                      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                        <div>
+                          <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 4 }}>
+                            <div style={{
+                              width: 32, height: 32, borderRadius: "50%",
+                              background: isMe ? "#a78bfa22" : "#60a5fa22",
+                              border: `1.5px solid ${isMe ? "#a78bfa44" : "#60a5fa33"}`,
+                              display: "flex", alignItems: "center", justifyContent: "center",
+                              overflow: "hidden", flexShrink: 0,
+                            }}>
+                              {m.photoURL
+                                ? <img src={m.photoURL} alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                                : <span style={{ fontSize: 13, color: isMe ? "#a78bfa" : "#60a5fa" }}>{(m.displayName||"?")[0].toUpperCase()}</span>
+                              }
+                            </div>
+                            <span style={{ fontSize: 14, color: isMe ? "#a78bfa" : "var(--text)" }}>
+                              {m.displayName}{isMe ? " · tú" : ""}
                             </span>
+                          </div>
+                          <div style={{ fontSize: 11, color: "var(--text3)", paddingLeft: 40 }}>
+                            {sessions > 0 ? `${sessions} sesión${sessions > 1 ? "es" : ""} · ${vol.toLocaleString()} kg` : "Sin entrenar"}
+                          </div>
+                          {days_.length > 0 && (
+                            <div style={{ display: "flex", gap: 4, flexWrap: "wrap", marginTop: 6, paddingLeft: 40 }}>
+                              {days_.map(d => {
+                                const c = DAY_META[d] || { accent: ACCENT };
+                                return (
+                                  <span key={d} style={{
+                                    fontSize: 9, background: c.accent + "22", color: c.accent,
+                                    padding: "2px 8px", borderRadius: 99, letterSpacing: 1,
+                                  }}>{d}</span>
+                                );
+                              })}
+                            </div>
                           )}
                         </div>
-                      </div>
-                      <div style={{ background: "#1a1a2a", borderRadius: 4, height: 6 }}>
-                        <div style={{
-                          height: 6, borderRadius: 4,
-                          background: i === 0 ? "#fbbf24" : ACCENT,
-                          width: `${maxFreq > 0 ? Math.round((m.freq / maxFreq) * 100) : 0}%`,
-                          transition: "width 0.5s",
-                        }} />
+                        <span style={{ fontSize: 20, color: sessions > 0 ? "#22c55e" : "var(--border)" }}>
+                          {sessions > 0 ? "✓" : "·"}
+                        </span>
                       </div>
                     </div>
-                  ))}
+                  );
+                })}
               </div>
-            </div>
-          )}
-        </>
-      )}
+            )}
+
+            {/* 1RM */}
+            {tab === "1rm" && (
+              <div>
+                {availableDays.length ? (
+                  <>
+                    <div style={{ display: "flex", gap: 6, flexWrap: "wrap", marginBottom: 12 }}>
+                      {availableDays.map(d => {
+                        const c = DAY_META[d] || { accent: ACCENT };
+                        return (
+                          <button key={d} onClick={() => handleDayChange(d)} style={{
+                            background: selectedDay === d ? c.accent + "22" : "var(--bg2)",
+                            border: `1px solid ${selectedDay === d ? c.accent : "var(--border)"}`,
+                            color: selectedDay === d ? c.accent : "var(--text3)",
+                            padding: "6px 12px", borderRadius: 99, cursor: "pointer",
+                            fontSize: 10, letterSpacing: 1, fontFamily: "inherit",
+                            transition: "all 0.15s",
+                          }}>{d}</button>
+                        );
+                      })}
+                    </div>
+                    {availableExs.length ? (
+                      <>
+                        <select value={selectedEx} onChange={e => setSelectedEx(e.target.value)} style={{
+                          width: "100%", background: "var(--bg2)", border: "1px solid var(--border)",
+                          color: "var(--text2)", padding: "10px 14px", borderRadius: 12,
+                          fontSize: 13, fontFamily: "inherit", outline: "none", marginBottom: 16,
+                        }}>
+                          {availableExs.map(ex => <option key={ex} value={ex}>{ex}</option>)}
+                        </select>
+                        <div style={{ background: "var(--bg2)", border: "1px solid var(--border)", borderRadius: 14, padding: "16px" }}>
+                          <div style={{ fontSize: 9, color: ACCENT, letterSpacing: 3, marginBottom: 14 }}>
+                            MEJOR 1RM — {selectedEx}
+                          </div>
+                          {[...members]
+                            .map(m => ({ ...m, rm: getMember1RM(m.uid, selectedDay, selectedEx) }))
+                            .sort((a, b) => b.rm - a.rm)
+                            .map((m, i) => (
+                              <RankBar key={m.uid} rank={i+1} name={m.displayName + (m.uid === user.uid ? " · tú" : "")}
+                                value={m.rm} max={maxRM} accent={ACCENT} isMe={m.uid === user.uid}
+                                photoURL={m.photoURL}
+                              />
+                            ))}
+                        </div>
+                      </>
+                    ) : <div style={{ color: "var(--text3)", fontSize: 12, textAlign: "center", padding: "30px 0" }}>Sin ejercicios en este día.</div>}
+                  </>
+                ) : <div style={{ color: "var(--text3)", fontSize: 12, textAlign: "center", padding: "30px 0" }}>Sin rutinas configuradas.</div>}
+              </div>
+            )}
+
+            {/* FRECUENCIA */}
+            {tab === "frecuencia" && (
+              <div>
+                <div style={{ fontSize: 9, color: "var(--text3)", letterSpacing: 3, marginBottom: 12 }}>RANKING TOTAL DE SESIONES</div>
+                <div style={{ background: "var(--bg2)", border: "1px solid var(--border)", borderRadius: 14, padding: "16px" }}>
+                  {[...members]
+                    .map(m => ({ ...m, freq: getMemberFreq(m.uid), week: getMemberWeek(m.uid) }))
+                    .sort((a, b) => b.freq - a.freq)
+                    .map((m, i) => (
+                      <div key={m.uid} style={{ marginBottom: 14 }}>
+                        <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 6, alignItems: "center" }}>
+                          <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                            <span style={{ fontSize: 14, width: 24, textAlign: "center" }}>
+                              {i === 0 ? "🏆" : i === 1 ? "🥈" : i === 2 ? "🥉" : `#${i+1}`}
+                            </span>
+                            <div style={{
+                              width: 28, height: 28, borderRadius: "50%",
+                              background: m.uid === user.uid ? "#a78bfa22" : "var(--bg3)",
+                              border: `1.5px solid ${m.uid === user.uid ? "#a78bfa44" : "var(--border)"}`,
+                              display: "flex", alignItems: "center", justifyContent: "center",
+                              overflow: "hidden", flexShrink: 0,
+                            }}>
+                              {m.photoURL
+                                ? <img src={m.photoURL} alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                                : <span style={{ fontSize: 12, color: m.uid === user.uid ? "#a78bfa" : "var(--text3)" }}>{(m.displayName||"?")[0].toUpperCase()}</span>
+                              }
+                            </div>
+                            <span style={{ fontSize: 13, color: m.uid === user.uid ? ACCENT : "var(--text)" }}>
+                              {m.displayName}{m.uid === user.uid ? " · tú" : ""}
+                            </span>
+                          </div>
+                          <div style={{ textAlign: "right" }}>
+                            <span style={{ fontSize: 16, color: ACCENT, fontWeight: 400 }}>{m.freq}</span>
+                            <span style={{ fontSize: 10, color: "var(--text3)" }}> sesiones</span>
+                            {m.week > 0 && <span style={{ fontSize: 10, color: "var(--green)", marginLeft: 6 }}>+{m.week} sem</span>}
+                          </div>
+                        </div>
+                        <div style={{ background: "var(--bg3)", borderRadius: 99, height: 4, overflow: "hidden" }}>
+                          <div style={{
+                            height: "100%", borderRadius: 99,
+                            background: i === 0 ? `linear-gradient(90deg, #fbbf24, #f59e0b)` : ACCENT,
+                            width: `${maxFreq > 0 ? Math.round((m.freq/maxFreq)*100) : 0}%`,
+                            transition: "width 0.5s ease",
+                            boxShadow: i === 0 ? "0 0 8px #fbbf2466" : `0 0 6px ${ACCENT}44`,
+                          }} />
+                        </div>
+                      </div>
+                    ))}
+                </div>
+              </div>
+            )}
+          </>
+        )}
+      </div>
     </div>
   );
 }
 
-function RankBar({ rank, name, value, max, accent, isMe }) {
+function RankBar({ rank, name, value, max, accent, isMe, photoURL }) {
   const pct = max > 0 ? Math.round((value / max) * 100) : 0;
+  const initial = (name || "?")[0].toUpperCase();
   return (
     <div style={{ marginBottom: 14 }}>
-      <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 5, alignItems: "center" }}>
+      <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 6, alignItems: "center" }}>
         <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-          <span style={{ fontSize: 11, color: rank === 1 ? "#fbbf24" : "#475569", width: 18 }}>
+          <span style={{ fontSize: 14, width: 24, textAlign: "center" }}>
             {rank === 1 ? "🥇" : rank === 2 ? "🥈" : rank === 3 ? "🥉" : `#${rank}`}
           </span>
-          <span style={{ fontSize: 13, color: isMe ? accent : "#e2e8f0" }}>{name}</span>
+          <div style={{
+            width: 28, height: 28, borderRadius: "50%", overflow: "hidden",
+            background: isMe ? "#a78bfa22" : "var(--bg3)",
+            border: `1.5px solid ${isMe ? "#a78bfa44" : "var(--border)"}`,
+            display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0,
+          }}>
+            {photoURL
+              ? <img src={photoURL} alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+              : <span style={{ fontSize: 12, color: isMe ? "#a78bfa" : "var(--text3)" }}>{initial}</span>
+            }
+          </div>
+          <span style={{ fontSize: 13, color: isMe ? accent : "var(--text)" }}>{name}</span>
         </div>
-        <span style={{ fontSize: 14, color: value > 0 ? accent : "#334155", fontWeight: value > 0 ? 500 : 400 }}>
+        <span style={{ fontSize: 14, color: value > 0 ? accent : "var(--text3)", fontWeight: value > 0 ? 400 : 300 }}>
           {value > 0 ? `${value} kg` : "—"}
         </span>
       </div>
-      <div style={{ background: "#1a1a2a", borderRadius: 4, height: 6 }}>
+      <div style={{ background: "var(--bg3)", borderRadius: 99, height: 4, overflow: "hidden" }}>
         <div style={{
-          height: 6, borderRadius: 4,
-          background: rank === 1 ? "#fbbf24" : accent,
-          width: `${pct}%`, transition: "width 0.5s",
+          height: "100%", borderRadius: 99,
+          background: rank === 1 ? `linear-gradient(90deg, #fbbf24, #f59e0b)` : accent,
+          width: `${pct}%`, transition: "width 0.5s ease",
+          boxShadow: rank === 1 ? "0 0 8px #fbbf2466" : `0 0 6px ${accent}44`,
         }} />
       </div>
     </div>
   );
 }
+npc 

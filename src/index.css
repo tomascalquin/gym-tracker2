@@ -1,41 +1,89 @@
 * { box-sizing: border-box; margin: 0; padding: 0; }
 
 :root {
-  --bg:     #080810;
-  --bg2:    #0e0e1a;
-  --bg3:    #0a0a14;
-  --border: #1a1a2a;
-  --text:   #f1f5f9;
-  --text2:  #94a3b8;
-  --text3:  #475569;
-  --accent: #60a5fa;
-  --green:  #22c55e;
-  --red:    #ef4444;
-  --yellow: #fbbf24;
+  --bg:      #080810;
+  --bg2:     #0e0e1a;
+  --bg3:     #0a0a14;
+  --border:  #1a1a2a;
+  --text:    #f1f5f9;
+  --text2:   #94a3b8;
+  --text3:   #475569;
+  --accent:  #60a5fa;
+  --green:   #22c55e;
+  --red:     #ef4444;
+  --yellow:  #fbbf24;
+  --sat: env(safe-area-inset-top);
+  --sab: env(safe-area-inset-bottom);
+  --sal: env(safe-area-inset-left);
+  --sar: env(safe-area-inset-right);
+  --tab-height: 64px;
+  --bottom-pad: calc(var(--tab-height) + var(--sab) + 12px);
 }
 
+html { height: 100%; }
+
 body {
+  height: 100%;
   background: var(--bg);
   color: var(--text);
   font-family: "DM Mono", monospace;
   font-size: 15px;
   font-weight: 400;
-  min-height: 100vh;
   -webkit-font-smoothing: antialiased;
-  transition: background 0.2s, color 0.2s;
+  -webkit-text-size-adjust: 100%;
+  touch-action: manipulation;
+  overscroll-behavior: none;
 }
 
-input, textarea, select, button { font-family: inherit; font-weight: 400; }
+#root {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  padding-top: var(--sat);
+}
+
+.scroll-view {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior-y: contain;
+  padding-bottom: var(--bottom-pad);
+}
+
+input, textarea, select, button {
+  font-family: inherit;
+  font-weight: 400;
+  -webkit-appearance: none;
+}
+
+button {
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+  min-height: 44px;
+}
+
 input[type="number"]::-webkit-inner-spin-button { opacity: 0.2; }
 input[type="date"]::-webkit-calendar-picker-indicator { filter: invert(0.4); }
 textarea { resize: none; }
-::-webkit-scrollbar { width: 4px; }
-::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
 
+::-webkit-scrollbar { display: none; }
+* { scrollbar-width: none; }
+
+/* Card con glassmorphism sutil */
 .card {
   background: var(--bg2);
   border: 1px solid var(--border);
-  border-radius: 12px;
+  border-radius: 14px;
+  backdrop-filter: blur(10px);
+}
+
+/* Card hover state */
+.card-hover {
+  transition: transform 0.1s, border-color 0.15s;
+}
+.card-hover:active {
+  transform: scale(0.98);
 }
 
 .nbtn {
@@ -44,8 +92,67 @@ textarea { resize: none; }
   cursor: pointer;
   font-family: inherit;
   font-size: inherit;
+  -webkit-tap-highlight-color: transparent;
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+}
+
+/* Separador con gradiente */
+.divider {
+  height: 1px;
+  background: linear-gradient(to right, transparent, var(--border), transparent);
+  margin: 12px 0;
+}
+
+/* Label section */
+.section-label {
+  font-size: 10px;
+  letter-spacing: 2px;
+  color: var(--text3);
+  margin-bottom: 8px;
+  text-transform: uppercase;
 }
 
 @keyframes slideDown { from { opacity:0; transform:translateY(-6px); } to { opacity:1; transform:translateY(0); } }
-@keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.2} }
-@keyframes slideUp { from { transform:translateX(-50%) translateY(40px); opacity:0; } to { transform:translateX(-50%) translateY(0); opacity:1; } }
+@keyframes slideUp   { from { opacity:0; transform:translateY(20px); } to { opacity:1; transform:translateY(0); } }
+@keyframes blink     { 0%,100%{opacity:1} 50%{opacity:0.2} }
+@keyframes fadeIn    { from { opacity:0; } to { opacity:1; } }
+@keyframes scaleIn   { from { opacity:0; transform:scale(0.95); } to { opacity:1; transform:scale(1); } }
+
+/* ── Animaciones de página ── */
+.page-enter {
+  animation: pageEnter 0.25s ease both;
+}
+@keyframes pageEnter {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ── Botón press effect ── */
+.btn-press {
+  transition: transform 0.1s ease, box-shadow 0.1s ease;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+}
+.btn-press:active {
+  transform: scale(0.95);
+}
+
+/* ── Skeleton loader ── */
+.skeleton {
+  background: linear-gradient(90deg, var(--bg2) 25%, var(--bg3) 50%, var(--bg2) 75%);
+  background-size: 200% 100%;
+  animation: skeleton-shimmer 1.4s infinite;
+  border-radius: 8px;
+}
+@keyframes skeleton-shimmer {
+  0%   { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+/* ── Glow pulse ── */
+@keyframes glow-pulse {
+  0%, 100% { box-shadow: 0 0 10px currentColor; }
+  50%       { box-shadow: 0 0 24px currentColor; }
+}

@@ -8,270 +8,292 @@ import {
 import { collection, getDocs } from "firebase/firestore";
 import { db } from "../../utils/firebase";
 import FriendProfile from "./FriendProfile";
+import { tokens } from "../../design";
 
-const ACCENT = "#60a5fa";
+const TABS = [
+  { key: "friends",  label: "AMIGOS" },
+  { key: "add",      label: "AGREGAR" },
+  { key: "requests", label: "SOLICITUDES" },
+];
 
-export default function FriendsView({ user, myProfile, onBack }) {
-  const [tab, setTab]               = useState("friends"); // friends | add | requests
+export default function FriendsView({ user, myProfile, onBack, onOpenChat }) {
+  const [tab, setTab]               = useState("friends");
   const [friends, setFriends]       = useState([]);
   const [requests, setRequests]     = useState([]);
   const [loading, setLoading]       = useState(true);
   const [selectedFriend, setSelectedFriend] = useState(null);
-
-  // Add friend state
   const [searchInput, setSearchInput] = useState("");
   const [searchResult, setSearchResult] = useState(null);
   const [searchError, setSearchError]   = useState("");
   const [searching, setSearching]       = useState(false);
-  const [requestSent, setRequestSent]   = useState(false);
+  const [sendingReq, setSendingReq]     = useState(false);
 
   useEffect(() => {
     async function load() {
       setLoading(true);
-      const [f, r, sentSnap] = await Promise.all([
-        loadFriends(user.uid),
-        loadFriendRequests(user.uid),
-        getDocs(collection(db, "friendships", user.uid, "sent")),
-      ]);
-      setFriends(f);
-      setRequests(r);
-      // Pre-cargar uids a los que ya envié solicitud
-      const sentUids = new Set(sentSnap.docs.map(d => d.id));
-      setLoading(false);
-      return sentUids;
+      const [f, r] = await Promise.all([loadFriends(user.uid), loadFriendRequests(user.uid)]);
+      setFriends(f); setRequests(r); setLoading(false);
     }
     load();
   }, [user.uid]);
 
   async function handleSearch() {
     if (!searchInput.trim()) return;
-    setSearching(true);
-    setSearchError("");
-    setSearchResult(null);
-    setRequestSent(false);
+    setSearching(true); setSearchError(""); setSearchResult(null);
     try {
-      const isEmail = searchInput.includes("@");
-      const result  = isEmail
-        ? await findUserByEmail(searchInput.trim())
-        : await findUserByCode(searchInput.trim());
-
+      const byCode  = searchInput.trim().length === 6;
+      const result  = byCode
+        ? await findUserByCode(searchInput.trim().toUpperCase())
+        : await findUserByEmail(searchInput.trim());
       if (!result) { setSearchError("Usuario no encontrado."); return; }
       if (result.uid === user.uid) { setSearchError("Ese eres tú 😄"); return; }
       if (friends.find(f => f.uid === result.uid)) { setSearchError("Ya son amigos."); return; }
-
-      // Verificar si ya envié solicitud a este usuario
       try {
         const sentSnap = await getDocs(collection(db, "friendships", user.uid, "sent"));
-        const alreadySent = sentSnap.docs.some(d => d.id === result.uid);
-        if (alreadySent) { setSearchError("Ya le enviaste una solicitud."); return; }
+        if (sentSnap.docs.some(d => d.id === result.uid)) { setSearchError("Ya le enviaste una solicitud."); return; }
       } catch {}
-
       setSearchResult(result);
-    } catch { setSearchError("Error al buscar. Intenta de nuevo."); }
+    } catch { setSearchError("Error al buscar."); }
     finally { setSearching(false); }
   }
 
   async function handleSendRequest() {
     if (!searchResult) return;
+    setSendingReq(true);
     await sendFriendRequest(user.uid, searchResult.uid);
-    setRequestSent(true);
+    setSearchResult(null); setSearchInput("");
+    setSendingReq(false);
   }
 
-  async function handleAccept(fromUid, requestId) {
-    await acceptFriendRequest(user.uid, requestId);
-    const accepted = requests.find(r => r.requestId === requestId);
-    setRequests(prev => prev.filter(r => r.requestId !== requestId));
-    if (accepted) setFriends(prev => [...prev, accepted]);
+  async function handleAccept(fromUid) {
+    await acceptFriendRequest(user.uid, fromUid);
+    const newFriend = requests.find(r => r.uid === fromUid);
+    if (newFriend) setFriends(prev => [...prev, newFriend]);
+    setRequests(prev => prev.filter(r => r.uid !== fromUid));
   }
 
-  async function handleReject(fromUid, requestId) {
-    await rejectFriendRequest(user.uid, requestId);
-    setRequests(prev => prev.filter(r => r.requestId !== requestId));
+  async function handleReject(fromUid) {
+    await rejectFriendRequest(user.uid, fromUid);
+    setRequests(prev => prev.filter(r => r.uid !== fromUid));
   }
 
-  async function handleRemove(friendUid) {
-    await removeFriend(user.uid, friendUid);
-    setFriends(prev => prev.filter(f => f.uid !== friendUid));
+  async function handleRemove(uid) {
+    await removeFriend(user.uid, uid);
+    setFriends(prev => prev.filter(f => f.uid !== uid));
     setSelectedFriend(null);
   }
 
-  // Ver perfil de amigo
-  if (selectedFriend) {
-    return (
-      <FriendProfile
-        friend={selectedFriend}
-        myUid={user.uid}
-        myLogs={{}}
-        onBack={() => setSelectedFriend(null)}
-        onRemove={() => handleRemove(selectedFriend.uid)}
-      />
-    );
-  }
+  if (selectedFriend) return (
+    <FriendProfile friend={selectedFriend} user={user} onBack={() => setSelectedFriend(null)} onRemove={() => handleRemove(selectedFriend.uid)} />
+  );
 
   return (
-    <div style={{ maxWidth: 440, margin: "0 auto", padding: "24px 18px", fontFamily: "DM Mono, monospace" }}>
+    <div style={{ maxWidth: 460, margin: "0 auto", fontFamily: "DM Mono, monospace", animation: "fadeIn 0.25s ease" }}>
+
       {/* Header */}
-      <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 20 }}>
-        <button onClick={onBack} className="nbtn" style={{ color: "#475569", fontSize: 13, letterSpacing: 1 }}>← HOME</button>
-        <h2 style={{ margin: 0, fontSize: 15, fontWeight: 400, letterSpacing: 2, color: "#f1f5f9" }}>AMIGOS</h2>
-        {requests.length > 0 && (
-          <span style={{ marginLeft: "auto", background: "#ef4444", color: "#fff", borderRadius: 10, padding: "2px 8px", fontSize: 11 }}>
-            {requests.length}
-          </span>
+      <div style={{ padding: "20px 18px 0" }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 20 }}>
+          <button onClick={onBack} className="nbtn" style={{ color: "var(--text3)", fontSize: 20, padding: "0 4px" }}>←</button>
+          <div>
+            <div style={{ fontSize: 9, color: "var(--text3)", letterSpacing: 3 }}>SOCIAL</div>
+            <h2 style={{ margin: 0, fontSize: 18, fontWeight: 300, color: "var(--text)" }}>Amigos</h2>
+          </div>
+          {requests.length > 0 && (
+            <div style={{
+              marginLeft: "auto", background: "#ef4444",
+              color: "#fff", fontSize: 10, fontWeight: 700,
+              padding: "3px 8px", borderRadius: 99,
+            }}>{requests.length}</div>
+          )}
+        </div>
+
+        {/* Tabs */}
+        <div style={{ display: "flex", gap: 0, marginBottom: 0, borderBottom: "1px solid var(--border)" }}>
+          {TABS.map(t => (
+            <button key={t.key} onClick={() => setTab(t.key)} style={{
+              flex: 1, background: "none", border: "none",
+              borderBottom: `2px solid ${tab === t.key ? "#60a5fa" : "transparent"}`,
+              color: tab === t.key ? "#60a5fa" : "var(--text3)",
+              padding: "10px 4px", cursor: "pointer",
+              fontSize: 9, letterSpacing: 2, fontFamily: "inherit",
+              transition: "all 0.15s ease",
+              marginBottom: -1, position: "relative",
+            }}>
+              {t.label}
+              {t.key === "requests" && requests.length > 0 && (
+                <span style={{
+                  position: "absolute", top: 6, right: "calc(50% - 24px)",
+                  width: 6, height: 6, borderRadius: "50%", background: "#ef4444",
+                }} />
+              )}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      <div style={{ padding: "16px 18px" }}>
+        {/* AMIGOS */}
+        {tab === "friends" && (
+          <div>
+            {loading && [...Array(3)].map((_, i) => (
+              <div key={i} className="skeleton" style={{ height: 68, borderRadius: 14, marginBottom: 8 }} />
+            ))}
+            {!loading && !friends.length && (
+              <div style={{ textAlign: "center", padding: "50px 20px" }}>
+                <div style={{ fontSize: 36, marginBottom: 12 }}>👥</div>
+                <div style={{ fontSize: 14, color: "var(--text2)" }}>Sin amigos aún</div>
+                <div style={{ fontSize: 12, color: "var(--text3)", marginTop: 4 }}>Agrega uno con su código o email</div>
+              </div>
+            )}
+            {friends.map((f, i) => (
+              <div key={f.uid} style={{
+                display: "flex", gap: 8, alignItems: "center", marginBottom: 8,
+                animation: `slideDown 0.2s ease ${i * 0.04}s both`,
+              }}>
+                <button onClick={() => setSelectedFriend(f)} style={{
+                  flex: 1, background: "var(--bg2)", border: "1px solid var(--border)",
+                  borderRadius: 14, padding: "12px 14px", cursor: "pointer",
+                  textAlign: "left", fontFamily: "inherit",
+                  display: "flex", alignItems: "center", gap: 12,
+                  transition: "border-color 0.15s",
+                }}>
+                  <div style={{
+                    width: 40, height: 40, borderRadius: "50%", flexShrink: 0,
+                    background: "#60a5fa22", border: "1.5px solid #60a5fa33",
+                    display: "flex", alignItems: "center", justifyContent: "center",
+                    overflow: "hidden",
+                  }}>
+                    {f.photoURL
+                      ? <img src={f.photoURL} alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                      : <span style={{ fontSize: 16, color: "#60a5fa" }}>{(f.displayName||"?")[0].toUpperCase()}</span>
+                    }
+                  </div>
+                  <div>
+                    <div style={{ fontSize: 14, color: "var(--text)" }}>{f.displayName}</div>
+                    <div style={{ fontSize: 11, color: "var(--text3)", marginTop: 1 }}>{f.email}</div>
+                  </div>
+                  <span style={{ marginLeft: "auto", color: "var(--text3)", fontSize: 16 }}>›</span>
+                </button>
+                {onOpenChat && (
+                  <button onClick={() => onOpenChat(f.uid, f.displayName)} style={{
+                    width: 44, height: 44, borderRadius: 12, flexShrink: 0,
+                    background: "#60a5fa18", border: "1px solid #60a5fa33",
+                    color: "#60a5fa", cursor: "pointer", fontSize: 18,
+                    display: "flex", alignItems: "center", justifyContent: "center",
+                    fontFamily: "inherit",
+                  }}>💬</button>
+                )}
+              </div>
+            ))}
+          </div>
+        )}
+
+        {/* AGREGAR */}
+        {tab === "add" && (
+          <div>
+            <div style={{ fontSize: 10, color: "var(--text3)", letterSpacing: 2, marginBottom: 10 }}>BUSCAR POR CÓDIGO O EMAIL</div>
+            <div style={{ display: "flex", gap: 8, marginBottom: 12 }}>
+              <input value={searchInput} onChange={e => { setSearchInput(e.target.value); setSearchError(""); setSearchResult(null); }}
+                onKeyDown={e => e.key === "Enter" && handleSearch()}
+                placeholder="Código de 6 letras o email..."
+                style={{
+                  flex: 1, background: "var(--bg2)", border: `1px solid ${searchError ? "var(--red)" : "var(--border)"}`,
+                  color: "var(--text)", padding: "11px 14px", borderRadius: 12,
+                  fontSize: 13, fontFamily: "inherit", outline: "none",
+                }}
+              />
+              <button onClick={handleSearch} disabled={searching} style={{
+                background: searching ? "var(--bg2)" : "#60a5fa",
+                border: "none", color: searching ? "var(--text3)" : "#000",
+                padding: "11px 16px", borderRadius: 12, cursor: "pointer",
+                fontSize: 11, fontWeight: 700, fontFamily: "inherit", minHeight: 44,
+                transition: "all 0.15s",
+              }}>{searching ? "..." : "BUSCAR"}</button>
+            </div>
+
+            {searchError && <div style={{ color: "var(--red)", fontSize: 12, marginBottom: 12 }}>{searchError}</div>}
+
+            {searchResult && (
+              <div style={{
+                background: "var(--bg2)", border: "1px solid #22c55e33",
+                borderRadius: 14, padding: "14px 16px",
+                display: "flex", alignItems: "center", gap: 12,
+                animation: "scaleIn 0.2s ease",
+              }}>
+                <div style={{
+                  width: 44, height: 44, borderRadius: "50%", flexShrink: 0,
+                  background: "#22c55e22", border: "1.5px solid #22c55e33",
+                  display: "flex", alignItems: "center", justifyContent: "center",
+                  overflow: "hidden",
+                }}>
+                  {searchResult.photoURL
+                    ? <img src={searchResult.photoURL} alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                    : <span style={{ fontSize: 18, color: "#22c55e" }}>{(searchResult.displayName||"?")[0].toUpperCase()}</span>
+                  }
+                </div>
+                <div style={{ flex: 1 }}>
+                  <div style={{ fontSize: 14, color: "var(--text)" }}>{searchResult.displayName}</div>
+                  <div style={{ fontSize: 11, color: "var(--text3)" }}>{searchResult.email}</div>
+                </div>
+                <button onClick={handleSendRequest} disabled={sendingReq} style={{
+                  background: sendingReq ? "#14532d" : "#22c55e",
+                  border: "none", color: "#000", padding: "9px 16px",
+                  borderRadius: 10, cursor: "pointer", fontSize: 11,
+                  fontWeight: 700, fontFamily: "inherit", minHeight: 40,
+                }}>{sendingReq ? "✓" : "AGREGAR"}</button>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* SOLICITUDES */}
+        {tab === "requests" && (
+          <div>
+            {!requests.length && (
+              <div style={{ textAlign: "center", padding: "50px 20px" }}>
+                <div style={{ fontSize: 36, marginBottom: 12 }}>📬</div>
+                <div style={{ fontSize: 14, color: "var(--text2)" }}>Sin solicitudes pendientes</div>
+              </div>
+            )}
+            {requests.map((r, i) => (
+              <div key={r.uid} style={{
+                background: "var(--bg2)", border: "1px solid var(--border)",
+                borderRadius: 14, padding: "14px 16px", marginBottom: 8,
+                display: "flex", alignItems: "center", gap: 12,
+                animation: `slideDown 0.2s ease ${i * 0.05}s both`,
+              }}>
+                <div style={{
+                  width: 44, height: 44, borderRadius: "50%", flexShrink: 0,
+                  background: "#a78bfa22", border: "1.5px solid #a78bfa33",
+                  display: "flex", alignItems: "center", justifyContent: "center",
+                  overflow: "hidden",
+                }}>
+                  {r.photoURL
+                    ? <img src={r.photoURL} alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                    : <span style={{ fontSize: 18, color: "#a78bfa" }}>{(r.displayName||"?")[0].toUpperCase()}</span>
+                  }
+                </div>
+                <div style={{ flex: 1 }}>
+                  <div style={{ fontSize: 14, color: "var(--text)" }}>{r.displayName}</div>
+                  <div style={{ fontSize: 11, color: "var(--text3)" }}>{r.email}</div>
+                </div>
+                <div style={{ display: "flex", gap: 6 }}>
+                  <button onClick={() => handleAccept(r.uid)} style={{
+                    background: "#22c55e", border: "none", color: "#000",
+                    padding: "8px 14px", borderRadius: 10, cursor: "pointer",
+                    fontSize: 11, fontWeight: 700, fontFamily: "inherit", minHeight: 38,
+                  }}>✓</button>
+                  <button onClick={() => handleReject(r.uid)} style={{
+                    background: "var(--bg3)", border: "1px solid var(--border)", color: "var(--red)",
+                    padding: "8px 14px", borderRadius: 10, cursor: "pointer",
+                    fontSize: 11, fontFamily: "inherit", minHeight: 38,
+                  }}>✕</button>
+                </div>
+              </div>
+            ))}
+          </div>
         )}
       </div>
-
-      {/* Mi código */}
-      <div className="card" style={{ padding: "14px 16px", marginBottom: 16, borderLeft: `3px solid ${ACCENT}` }}>
-        <div style={{ fontSize: 11, color: "#475569", letterSpacing: 2, marginBottom: 6 }}>TU CÓDIGO DE AMIGO</div>
-        <div style={{ fontSize: 22, fontWeight: 500, color: ACCENT, letterSpacing: 4 }}>
-          {myProfile?.friendCode || "—"}
-        </div>
-        <div style={{ fontSize: 11, color: "#475569", marginTop: 4 }}>Compártelo para que te agreguen</div>
-      </div>
-
-      {/* Tabs */}
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 6, marginBottom: 20 }}>
-        {[
-          { key: "friends", label: `AMIGOS (${friends.length})` },
-          { key: "add",     label: "AGREGAR" },
-          { key: "requests", label: `SOLICITUDES${requests.length ? ` (${requests.length})` : ""}` },
-        ].map(t => (
-          <button key={t.key} onClick={() => setTab(t.key)} style={{
-            background: tab === t.key ? "#1a1a2e" : "transparent",
-            border: `1px solid ${tab === t.key ? ACCENT + "44" : "#1a1a2a"}`,
-            color: tab === t.key ? ACCENT : "#475569",
-            padding: "8px 4px", borderRadius: 8, cursor: "pointer",
-            fontSize: 9, letterSpacing: 1, fontFamily: "inherit",
-          }}>{t.label}</button>
-        ))}
-      </div>
-
-      {loading ? (
-        <div style={{ textAlign: "center", color: "#475569", padding: "40px 0", fontSize: 13 }}>Cargando...</div>
-      ) : (
-        <>
-          {/* Lista de amigos */}
-          {tab === "friends" && (
-            <div>
-              {!friends.length && (
-                <div style={{ textAlign: "center", color: "#475569", padding: "40px 0", fontSize: 13 }}>
-                  Aún no tienes amigos.<br />
-                  <span style={{ fontSize: 11 }}>Agrega uno con su código o email.</span>
-                </div>
-              )}
-              {friends.map(f => (
-                <FriendCard key={f.uid} friend={f} onClick={() => setSelectedFriend(f)} />
-              ))}
-            </div>
-          )}
-
-          {/* Agregar amigo */}
-          {tab === "add" && (
-            <div>
-              <div style={{ fontSize: 11, color: "#475569", letterSpacing: 2, marginBottom: 8 }}>BUSCAR POR CÓDIGO O EMAIL</div>
-              <div style={{ display: "flex", gap: 8, marginBottom: 12 }}>
-                <input
-                  value={searchInput}
-                  onChange={e => { setSearchInput(e.target.value); setSearchError(""); setSearchResult(null); setRequestSent(false); }}
-                  onKeyDown={e => e.key === "Enter" && handleSearch()}
-                  placeholder="ABC123 o email@ejemplo.com"
-                  style={{
-                    flex: 1, background: "#0e0e1a", border: "1px solid #1a1a2a",
-                    color: "#f1f5f9", padding: "10px 12px", borderRadius: 8,
-                    fontSize: 13, fontFamily: "inherit", outline: "none",
-                  }}
-                />
-                <button onClick={handleSearch} disabled={searching} style={{
-                  background: ACCENT, border: "none", color: "#000",
-                  padding: "10px 16px", borderRadius: 8, cursor: "pointer",
-                  fontSize: 12, fontWeight: 700, fontFamily: "inherit",
-                }}>
-                  {searching ? "..." : "BUSCAR"}
-                </button>
-              </div>
-
-              {searchError && (
-                <div style={{ color: "#ef4444", fontSize: 12, marginBottom: 10 }}>{searchError}</div>
-              )}
-
-              {searchResult && !requestSent && (
-                <div className="card" style={{ padding: "14px 16px", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                  <div>
-                    <div style={{ fontSize: 14, color: "#f1f5f9" }}>{searchResult.displayName}</div>
-                    <div style={{ fontSize: 11, color: "#475569" }}>{searchResult.email}</div>
-                  </div>
-                  <button onClick={handleSendRequest} style={{
-                    background: ACCENT, border: "none", color: "#000",
-                    padding: "7px 14px", borderRadius: 6, cursor: "pointer",
-                    fontSize: 11, fontWeight: 700, fontFamily: "inherit",
-                  }}>AGREGAR</button>
-                </div>
-              )}
-
-              {requestSent && (
-                <div style={{ textAlign: "center", color: "#22c55e", fontSize: 13, padding: "16px 0" }}>
-                  ✓ Solicitud enviada a {searchResult?.displayName}
-                </div>
-              )}
-            </div>
-          )}
-
-          {/* Solicitudes */}
-          {tab === "requests" && (
-            <div>
-              {!requests.length && (
-                <div style={{ textAlign: "center", color: "#475569", padding: "40px 0", fontSize: 13 }}>
-                  Sin solicitudes pendientes.
-                </div>
-              )}
-              {requests.map(r => (
-                <div key={r.uid} className="card" style={{ padding: "14px 16px", marginBottom: 10, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                  <div>
-                    <div style={{ fontSize: 14, color: "#f1f5f9" }}>{r.displayName}</div>
-                    <div style={{ fontSize: 11, color: "#475569" }}>{r.email}</div>
-                  </div>
-                  <div style={{ display: "flex", gap: 6 }}>
-                    <button onClick={() => handleAccept(r.uid, r.requestId)} style={{
-                      background: "#14532d", border: "1px solid #22c55e", color: "#22c55e",
-                      padding: "6px 12px", borderRadius: 6, cursor: "pointer",
-                      fontSize: 11, fontFamily: "inherit",
-                    }}>✓ ACEPTAR</button>
-                    <button onClick={() => handleReject(r.uid, r.requestId)} className="nbtn" style={{
-                      border: "1px solid #3f1010", color: "#ef4444",
-                      padding: "6px 10px", borderRadius: 6, fontSize: 11,
-                    }}>✕</button>
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
-        </>
-      )}
     </div>
-  );
-}
-
-function FriendCard({ friend, onClick }) {
-  const initial = (friend.displayName || "?")[0].toUpperCase();
-  return (
-    <button onClick={onClick} style={{
-      width: "100%", background: "#0e0e1a", border: "1px solid #1a1a2a",
-      borderRadius: 10, padding: "13px 16px", cursor: "pointer",
-      textAlign: "left", marginBottom: 8,
-      display: "flex", alignItems: "center", gap: 12,
-    }}>
-      <div style={{
-        width: 38, height: 38, borderRadius: "50%",
-        background: "#1a1a2e", border: "1px solid #60a5fa44",
-        display: "flex", alignItems: "center", justifyContent: "center",
-        fontSize: 16, color: "#60a5fa", fontWeight: 500, flexShrink: 0,
-      }}>{initial}</div>
-      <div>
-        <div style={{ fontSize: 14, color: "#f1f5f9", marginBottom: 2 }}>{friend.displayName}</div>
-        <div style={{ fontSize: 11, color: "#475569" }}>{friend.email}</div>
-      </div>
-      <span style={{ marginLeft: "auto", color: "#475569" }}>›</span>
-    </button>
   );
 }
