@@ -37,6 +37,16 @@
   </head>
   <body>
     <div id="root"></div>
+    <script>
+      window.onerror = function(msg, src, line) {
+        document.getElementById('root').innerHTML =
+          '<div style="color:#ef4444;padding:20px;font-family:monospace;font-size:12px;background:#080810;min-height:100vh">' +
+          '<div style="margin-bottom:8px">ERROR:</div>' +
+          '<div>' + msg + '</div>' +
+          '<div style="color:#475569;margin-top:8px">' + src + ':' + line + '</div>' +
+          '</div>';
+      };
+    </script>
     <script type="module" src="/src/main.jsx"></script>
   </body>
 </html>
