@@ -5,6 +5,7 @@ import { getProgressionHistory, predictRM, daysToTarget } from "../utils/predict
 import ExerciseChart from "../components/ExerciseChart";
 import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, ReferenceLine } from "recharts";
 import { tokens } from "../design";
+import MuscleMap from "../components/MuscleMap";
 
 export default function ProgressView({ logs, routine, onBack }) {
   const routineDays = Object.keys(routine || {});
@@ -92,6 +93,7 @@ export default function ProgressView({ logs, routine, onBack }) {
           {[
             { key: "historial", label: "HISTORIAL" },
             { key: "predictor", label: "🔮 PREDICTOR" },
+            { key: "musculos",  label: "💪 MÚSCULOS" },
           ].map(t => (
             <button key={t.key} onClick={() => setTab(t.key)} style={{
               flex: 1, background: "none", border: "none",
@@ -147,6 +149,21 @@ export default function ProgressView({ logs, routine, onBack }) {
                 <div style={{ fontSize: 12, color: "var(--text3)", marginTop: 4 }}>Registra sesiones para ver tu progreso</div>
               </div>
             )}
+          </div>
+        )}
+
+        {/* MÚSCULOS */}
+        {tab === "musculos" && (
+          <div style={{ animation: "fadeIn 0.2s ease" }}>
+            <div style={{
+              background: "var(--bg2)", border: "1px solid var(--border)",
+              borderRadius: 14, padding: "16px",
+            }}>
+              <div style={{ fontSize: 9, color: "var(--text3)", letterSpacing: 3, marginBottom: 14 }}>
+                MAPA MUSCULAR — GRUPOS TRABAJADOS
+              </div>
+              <MuscleMap logs={logs} routine={routine} />
+            </div>
           </div>
         )}
 
