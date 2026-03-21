@@ -11,6 +11,7 @@ import XPBar from "../components/XPBar";
 import { registerPushNotifications, hasNotificationPermission } from "../utils/notifications";
 import { tokens } from "../design";
 import ActivityRings from "../components/ActivityRings";
+import FireStreak from "../components/FireStreak";
 import ActiveSessionBanner from "../components/ActiveSessionBanner";
 import { DayCardSkeleton, StatSkeleton, XPBarSkeleton } from "../components/Skeleton";
 import Ripple from "../components/Ripple";

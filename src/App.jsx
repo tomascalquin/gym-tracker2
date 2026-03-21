@@ -34,6 +34,8 @@ import PageTransition from "./components/PageTransition";
 import SplashScreen from "./components/SplashScreen";
 import Confetti from "./components/Confetti";
 import { haptics } from "./utils/haptics";
+import SessionTransition from "./components/SessionTransition";
+import { DAY_META } from "./data/routine";
 import EditRoutineView from "./views/EditRoutineView";
 import OnboardingView from "./views/OnboardingView";
 
@@ -54,7 +56,8 @@ export default function App() {
   const [userXP, setUserXP]                 = useState(0);
   const [rankUpData, setRankUpData]         = useState(null);
   const [chatTarget, setChatTarget]         = useState(null);
-  const [showConfetti, setShowConfetti]     = useState(false); // { id, title, accent }
+  const [showConfetti, setShowConfetti]     = useState(false);
+  const [sessionTransition, setSessionTransition] = useState(null); // { id, title, accent }
   const [theme, setTheme]                   = useState(getTheme);
   const [timerOpen, setTimerOpen]           = useState(false);
   const [timerVisible, setTimerVisible]     = useState(false);
@@ -139,7 +142,13 @@ export default function App() {
       setSessionData(draft.sessionData);
       setCompletedSets(draft.completedSets);
       setSessionNote(draft.sessionNote || "");
+      // Mostrar transición épica
+    const meta  = DAY_META[day];
+    const color = meta?.accent || "#60a5fa";
+    setSessionTransition(color);
+    setTimeout(() => {
       setActiveDay(day); setView("session");
+    }, 350);
       return;
     }
 
@@ -156,7 +165,13 @@ export default function App() {
       });
       setSessionData(defaults); setCompletedSets({}); setSessionNote("");
     }
-    setActiveDay(day); setView("session");
+    // Mostrar transición épica
+    const meta  = DAY_META[day];
+    const color = meta?.accent || "#60a5fa";
+    setSessionTransition(color);
+    setTimeout(() => {
+      setActiveDay(day); setView("session");
+    }, 350);
   }
 
   async function saveSession() {
@@ -266,6 +281,16 @@ export default function App() {
       {timerOpen && <RestTimer onClose={() => setTimerOpen(false)} />}
       <Confetti active={showConfetti} onDone={() => { setShowConfetti(false); setView("home"); }} />
 
+      {view === "chat" && chatTarget && (
+        <ChatView
+          chatId={chatTarget.id}
+          currentUser={{ ...user, photoURL: myProfile?.photoURL }}
+          title={chatTarget.title}
+          accentColor={chatTarget.accent || "#60a5fa"}
+          onBack={() => { setView(chatTarget.from || "home"); setChatTarget(null); }}
+        />
+      )}
+
       <div className="scroll-view">
         <PageTransition view={view}>
           {(currentView) => (<>
@@ -312,21 +337,19 @@ export default function App() {
                 onRoutineUpdated={(updated) => { setRoutine(updated); setView("home"); }}
               />
             )}
-            {currentView === "chat" && chatTarget && (
-              <ChatView
-                chatId={chatTarget.id}
-                currentUser={{ ...user, photoURL: myProfile?.photoURL }}
-                title={chatTarget.title}
-                accentColor={chatTarget.accent || "#60a5fa"}
-                onBack={() => { setView(chatTarget.from || "home"); setChatTarget(null); }}
-              />
-            )}
           </>)}
         </PageTransition>
       </div>
 
       {TAB_VIEWS.includes(view) && (
         <TabBar currentView={view} onNavigate={setView} />
+      )}
+
+      {sessionTransition && (
+        <SessionTransition
+          color={sessionTransition}
+          onDone={() => setSessionTransition(null)}
+        />
       )}
     </>
   );

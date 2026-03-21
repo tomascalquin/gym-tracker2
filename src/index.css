@@ -86,6 +86,19 @@ textarea { resize: none; }
   transform: scale(0.98);
 }
 
+.dot-btn {
+  min-height: unset !important;
+  height: 28px !important;
+  width: 28px !important;
+  padding: 0 !important;
+  border-radius: 50% !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  flex: 0 0 28px !important;
+  line-height: 1 !important;
+}
+
 .nbtn {
   background: none;
   border: none;

@@ -98,8 +98,7 @@ export default function ChatView({ chatId, currentUser, title, onBack, accentCol
       display: "flex", flexDirection: "column",
       height: "100%", background: "var(--bg)",
       fontFamily: "DM Mono, monospace",
-      // Fix iOS keyboard
-      position: "fixed", inset: 0,
+      position: "fixed", inset: 0, zIndex: 200,
       paddingTop: "env(safe-area-inset-top)",
     }}>
       {/* Header */}
