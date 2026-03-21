@@ -371,5 +371,4 @@ function RankBar({ rank, name, value, max, accent, isMe, photoURL }) {
       </div>
     </div>
   );
-}
-npc 
+}     

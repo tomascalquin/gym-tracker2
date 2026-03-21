@@ -12,6 +12,7 @@ import { calcStreak } from "./utils/streak";
 import { registerServiceWorker, showLocalNotification } from "./utils/notifications";
 import { applyTheme, getTheme } from "./utils/theme";
 import { checkInviteParam, processPendingInvite } from "./utils/invite";
+import { saveDraft, loadDraft, clearDraft } from "./utils/sessionDraft";
 import ChatView from "./components/ChatView";
 import { getDMChatId, getGroupChatId } from "./utils/chat";
 import AuthScreen from "./components/AuthScreen";
@@ -29,6 +30,10 @@ import LeaderboardView from "./views/LeaderboardView";
 import ProfileView from "./views/ProfileView";
 import ProgressionView from "./views/ProgressionView";
 import TabBar, { TAB_VIEWS } from "./components/TabBar";
+import PageTransition from "./components/PageTransition";
+import SplashScreen from "./components/SplashScreen";
+import Confetti from "./components/Confetti";
+import { haptics } from "./utils/haptics";
 import EditRoutineView from "./views/EditRoutineView";
 import OnboardingView from "./views/OnboardingView";
 
@@ -48,7 +53,8 @@ export default function App() {
   const [dataLoading, setDataLoading]       = useState(false);
   const [userXP, setUserXP]                 = useState(0);
   const [rankUpData, setRankUpData]         = useState(null);
-  const [chatTarget, setChatTarget]         = useState(null); // { id, title, accent }
+  const [chatTarget, setChatTarget]         = useState(null);
+  const [showConfetti, setShowConfetti]     = useState(false); // { id, title, accent }
   const [theme, setTheme]                   = useState(getTheme);
   const [timerOpen, setTimerOpen]           = useState(false);
   const [timerVisible, setTimerVisible]     = useState(false);
@@ -103,6 +109,13 @@ export default function App() {
     setMyProfile(updated);
   }
 
+  // Auto-guardar borrador de sesión en localStorage
+  useEffect(() => {
+    if (view === "session" && activeDay && user) {
+      saveDraft(user.uid, { activeDay, sessionDate, sessionData, completedSets, sessionNote });
+    }
+  }, [sessionData, completedSets, sessionNote, view, activeDay]);
+
   async function handleLogout() {
     await logout();
     setLogs({}); setRoutine(undefined); setMyProfile(null); setView("home"); setUserXP(0);
@@ -119,6 +132,16 @@ export default function App() {
     const key    = getSessionKey(day, date);
     const existing = logs[key];
     const dayExs = routine?.[day]?.exercises || [];
+
+    // Verificar si hay un draft guardado para este día
+    const draft = loadDraft(user.uid);
+    if (draft && draft.activeDay === day && draft.sessionDate === date) {
+      setSessionData(draft.sessionData);
+      setCompletedSets(draft.completedSets);
+      setSessionNote(draft.sessionNote || "");
+      setActiveDay(day); setView("session");
+      return;
+    }
 
     if (existing) {
       setSessionData(existing.sets);
@@ -140,20 +163,21 @@ export default function App() {
     const key     = getSessionKey(activeDay, sessionDate);
     const session = { day: activeDay, date: sessionDate, sets: sessionData, completed: completedSets, note: sessionNote };
 
-    // Calcular XP antes de actualizar logs
+    // Limpiar draft al guardar
+    clearDraft();
+
     const streak  = calcStreak(logs);
     const { xp: xpEarned, reasons, prs } = calcSessionXP(session, logs, routine, streak);
 
-    // Guardar sesión
     setLogs(prev => ({ ...prev, [key]: session }));
     await saveLog(user.uid, key, session);
 
-    // Agregar XP
     const displayName = user.displayName || user.email.split("@")[0];
     const result = await addXP(user.uid, displayName, xpEarned, reasons.join(" | "));
     setUserXP(result.newXP);
 
-    // Mostrar modal si subió de rango
+    setShowConfetti(true);
+    haptics.celebrate();
     if (result.rankUp) {
       setRankUpData({ oldRank: result.oldRank, newRank: result.newRank, xpGained: xpEarned, prs });
       showLocalNotification("¡Subiste de rango! 🎉", `Ahora eres ${result.newRank.emoji} ${result.newRank.name}`);
@@ -161,6 +185,13 @@ export default function App() {
       toast(`+${xpEarned} XP 💪${prs.length ? ` · 🏆 PR en ${prs[0]}` : ""}`);
       if (prs.length) showLocalNotification("🏆 Nuevo PR", `${prs[0]} — ${xpEarned} XP ganados`);
     }
+  }
+
+  function handleDiscardSession() {
+    setActiveDay(null);
+    setSessionData({});
+    setCompletedSets({});
+    setSessionNote("");
   }
 
   function updateSet(ei, si, field, val) {
@@ -233,58 +264,65 @@ export default function App() {
       )}
 
       {timerOpen && <RestTimer onClose={() => setTimerOpen(false)} />}
+      <Confetti active={showConfetti} onDone={() => { setShowConfetti(false); setView("home"); }} />
 
       <div className="scroll-view">
-        {view === "home" && (
-          <HomeView logs={logs} user={user} myProfile={myProfile} routine={routine} userXP={userXP}
-            sessionDate={sessionDate} setSessionDate={setSessionDate}
-            onStartSession={startSession} onNavigate={setView} onLogout={handleLogout}
-          />
-        )}
-        {view === "session" && activeDay && (
-          <SessionView activeDay={activeDay} sessionDate={sessionDate}
-            sessionData={sessionData} completedSets={completedSets}
-            sessionNote={sessionNote} logs={logs} routine={routine}
-            onBack={() => setView("home")} onUpdateSet={updateSet}
-            onToggleSet={toggleSet} onAddSet={addSet} onRemoveSet={removeSet}
-            onChangeNote={setSessionNote} onSave={saveSession}
-            onAddExercise={handleAddExercise} onRemoveExercise={handleRemoveExercise}
-          />
-        )}
-        {view === "history" && (
-          <HistoryView logs={logs} user={user} onBack={() => setView("home")}
-            onViewSession={startSession} onDeleteSession={handleDeleteSession}
-          />
-        )}
-        {view === "progress"    && <ProgressView logs={logs} routine={routine} onBack={() => setView("home")} />}
-        {view === "progression" && <ProgressionView logs={logs} routine={routine} onBack={() => setView("home")} />}
-        {view === "friends"     && <FriendsView user={user} myProfile={myProfile} onBack={() => setView("home")}
-          onOpenChat={(uid, name) => { setChatTarget({ id: getDMChatId(user.uid, uid), title: name, accent: "#60a5fa", from: "friends" }); setView("chat"); }}
-        />}
-        {view === "groups"      && <GroupsView user={user} onBack={() => setView("home")}
-          onOpenChat={(gid, name) => { setChatTarget({ id: getGroupChatId(gid), title: name, accent: "#a78bfa", from: "groups" }); setView("chat"); }}
-        />}
-        {view === "challenges"  && <ChallengesView user={user} myLogs={logs} myRoutine={routine} onBack={() => setView("home")} />}
-        {view === "leaderboard" && <LeaderboardView user={user} myXP={userXP} onBack={() => setView("home")} />}
-        {view === "profile"     && (
-          <ProfileView user={user} myProfile={myProfile} userXP={userXP} logs={logs}
-            onBack={() => setView("home")} onProfileUpdated={handleProfileUpdated}
-          />
-        )}
-        {view === "editRoutine" && (
-          <EditRoutineView user={user} routine={routine} onBack={() => setView("home")}
-            onRoutineUpdated={(updated) => { setRoutine(updated); setView("home"); }}
-          />
-        )}
-        {view === "chat" && chatTarget && (
-          <ChatView
-            chatId={chatTarget.id}
-            currentUser={{ ...user, photoURL: myProfile?.photoURL }}
-            title={chatTarget.title}
-            accentColor={chatTarget.accent || "#60a5fa"}
-            onBack={() => { setView(chatTarget.from || "home"); setChatTarget(null); }}
-          />
-        )}
+        <PageTransition view={view}>
+          {(currentView) => (<>
+            {currentView === "home" && (
+              <HomeView logs={logs} user={user} myProfile={myProfile} routine={routine} userXP={userXP}
+                sessionDate={sessionDate} setSessionDate={setSessionDate}
+                onStartSession={startSession} onNavigate={setView} onLogout={handleLogout}
+                activeDay={activeDay} completedSets={completedSets}
+                onDiscardSession={handleDiscardSession}
+              />
+            )}
+            {currentView === "session" && activeDay && (
+              <SessionView activeDay={activeDay} sessionDate={sessionDate}
+                sessionData={sessionData} completedSets={completedSets}
+                sessionNote={sessionNote} logs={logs} routine={routine}
+                onBack={() => setView("home")} onUpdateSet={updateSet}
+                onToggleSet={toggleSet} onAddSet={addSet} onRemoveSet={removeSet}
+                onChangeNote={setSessionNote} onSave={saveSession}
+                onAddExercise={handleAddExercise} onRemoveExercise={handleRemoveExercise}
+              />
+            )}
+            {currentView === "history" && (
+              <HistoryView logs={logs} user={user} onBack={() => setView("home")}
+                onViewSession={startSession} onDeleteSession={handleDeleteSession}
+              />
+            )}
+            {currentView === "progress"    && <ProgressView logs={logs} routine={routine} onBack={() => setView("home")} />}
+            {currentView === "progression" && <ProgressionView logs={logs} routine={routine} onBack={() => setView("home")} />}
+            {currentView === "friends"     && <FriendsView user={user} myProfile={myProfile} onBack={() => setView("home")}
+              onOpenChat={(uid, name) => { setChatTarget({ id: getDMChatId(user.uid, uid), title: name, accent: "#60a5fa", from: "friends" }); setView("chat"); }}
+            />}
+            {currentView === "groups"      && <GroupsView user={user} onBack={() => setView("home")}
+              onOpenChat={(gid, name) => { setChatTarget({ id: getGroupChatId(gid), title: name, accent: "#a78bfa", from: "groups" }); setView("chat"); }}
+            />}
+            {currentView === "challenges"  && <ChallengesView user={user} myLogs={logs} myRoutine={routine} onBack={() => setView("home")} />}
+            {currentView === "leaderboard" && <LeaderboardView user={user} myXP={userXP} onBack={() => setView("home")} />}
+            {currentView === "profile"     && (
+              <ProfileView user={user} myProfile={myProfile} userXP={userXP} logs={logs}
+                onBack={() => setView("home")} onProfileUpdated={handleProfileUpdated}
+              />
+            )}
+            {currentView === "editRoutine" && (
+              <EditRoutineView user={user} routine={routine} onBack={() => setView("home")}
+                onRoutineUpdated={(updated) => { setRoutine(updated); setView("home"); }}
+              />
+            )}
+            {currentView === "chat" && chatTarget && (
+              <ChatView
+                chatId={chatTarget.id}
+                currentUser={{ ...user, photoURL: myProfile?.photoURL }}
+                title={chatTarget.title}
+                accentColor={chatTarget.accent || "#60a5fa"}
+                onBack={() => { setView(chatTarget.from || "home"); setChatTarget(null); }}
+              />
+            )}
+          </>)}
+        </PageTransition>
       </div>
 
       {TAB_VIEWS.includes(view) && (
@@ -296,9 +334,15 @@ export default function App() {
 
 function Splash({ text }) {
   return (
-    <div style={{ minHeight: "100vh", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 16, background: "#080810", color: "#475569", fontFamily: "DM Mono, monospace" }}>
-      <div style={{ fontSize: 24, animation: "blink 1s infinite" }}>◆</div>
-      <div style={{ fontSize: 13, letterSpacing: 3 }}>{text}</div>
+    <div style={{
+      position: "fixed", inset: 0,
+      display: "flex", flexDirection: "column",
+      alignItems: "center", justifyContent: "center",
+      gap: 16, background: "#080810",
+      color: "#475569", fontFamily: "DM Mono, monospace",
+    }}>
+      <div style={{ fontSize: 28, animation: "blink 1s infinite", color: "#60a5fa" }}>◆</div>
+      <div style={{ fontSize: 11, letterSpacing: 4 }}>{text}</div>
     </div>
   );
 }

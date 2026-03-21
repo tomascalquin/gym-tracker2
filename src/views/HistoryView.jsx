@@ -4,6 +4,7 @@ import { sessionVolume } from "../utils/fitness";
 import { exportToExcel } from "../utils/xlsx";
 import SessionComments from "../components/SessionComments";
 import { tokens } from "../design";
+import SwipeToDelete from "../components/SwipeToDelete";
 
 export default function HistoryView({ logs, user, onBack, onViewSession, onDeleteSession }) {
   const [search, setSearch]           = useState("");
@@ -94,10 +95,11 @@ export default function HistoryView({ logs, user, onBack, onViewSession, onDelet
         const isDeleting = deletingKey === key;
 
         return (
-          <div key={key} style={{
+          <SwipeToDelete key={key} onDelete={() => handleDelete(key)}>
+          <div style={{
             background: "var(--bg2)", border: `1px solid ${isExpanded ? c.accent + "44" : "var(--border)"}`,
             borderLeft: `3px solid ${c.accent}`, borderRadius: 14,
-            marginBottom: 8, overflow: "hidden",
+            overflow: "hidden",
             transform: isDeleting ? "scale(0.95)" : "scale(1)",
             opacity: isDeleting ? 0 : 1,
             transition: "all 0.25s ease",
@@ -149,6 +151,7 @@ export default function HistoryView({ logs, user, onBack, onViewSession, onDelet
               </div>
             )}
           </div>
+          </SwipeToDelete>
         );
       })}
     </div>

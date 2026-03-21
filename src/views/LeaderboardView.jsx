@@ -36,7 +36,7 @@ export default function LeaderboardView({ user, myXP, onBack }) {
   const myRank     = myEntry ? getRank(myEntry.xp) : null;
 
   return (
-    <div style={{ maxWidth: 460, margin: "0 auto", padding: "20px 18px", fontFamily: "DM Mono, monospace", animation: "fadeIn 0.25s ease" }}>
+    <div style={{ maxWidth: 460, margin: "0 auto", padding: "20px 18px 100px", fontFamily: "DM Mono, monospace", animation: "fadeIn 0.25s ease" }}>
 
       {/* Header */}
       <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 20 }}>

@@ -10,6 +10,10 @@ import ActivityFeed from "../components/ActivityFeed";
 import XPBar from "../components/XPBar";
 import { registerPushNotifications, hasNotificationPermission } from "../utils/notifications";
 import { tokens } from "../design";
+import ActivityRings from "../components/ActivityRings";
+import ActiveSessionBanner from "../components/ActiveSessionBanner";
+import { DayCardSkeleton, StatSkeleton, XPBarSkeleton } from "../components/Skeleton";
+import Ripple from "../components/Ripple";
 
 const C = {
   bg: "var(--bg)", bg2: "var(--bg2)", bg3: "var(--bg3)",
@@ -17,7 +21,7 @@ const C = {
   text3: "var(--text3)", accent: "var(--accent)", green: "var(--green)",
 };
 
-export default function HomeView({ logs, user, myProfile, routine, userXP, sessionDate, setSessionDate, onStartSession, onNavigate, onLogout }) {
+export default function HomeView({ logs, user, myProfile, routine, userXP, sessionDate, setSessionDate, onStartSession, onNavigate, onLogout, activeDay, completedSets, onDiscardSession }) {
   const firstName     = (user?.displayName || user?.email || "Atleta").split(" ")[0];
   const streak        = calcStreak(logs);
   const routineDays   = Object.keys(routine || {});
@@ -39,7 +43,7 @@ export default function HomeView({ logs, user, myProfile, routine, userXP, sessi
   }, [user.uid]);
 
   return (
-    <div style={{ maxWidth: 460, margin: "0 auto", padding: "20px 18px", fontFamily: "DM Mono, monospace", animation: "fadeIn 0.3s ease" }}>
+    <div style={{ maxWidth: 460, margin: "0 auto", padding: "20px 18px 100px", fontFamily: "DM Mono, monospace", animation: "fadeIn 0.3s ease" }}>
 
       {/* ── Header ── */}
       <div style={{ marginBottom: 22, display: "flex", alignItems: "flex-start", justifyContent: "space-between" }}>
@@ -86,6 +90,18 @@ export default function HomeView({ logs, user, myProfile, routine, userXP, sessi
 
       {/* ── Feed ── */}
       {showFeed && <ActivityFeed activity={activity} onDismiss={() => setShowFeed(false)} />}
+
+      {/* Banner sesión activa */}
+      {activeDay && (
+        <ActiveSessionBanner
+          activeDay={activeDay}
+          sessionDate={sessionDate}
+          completedSets={completedSets || {}}
+          routine={routine}
+          onResume={() => onStartSession(activeDay, sessionDate)}
+          onDiscard={onDiscardSession}
+        />
+      )}
 
       {/* ── Stats días ── */}
       {routineDays.length > 0 && (
@@ -231,7 +247,7 @@ function NavCard({ icon, label, sub, color, onClick }) {
         textAlign: "left", fontFamily: "inherit", width: "100%",
         transform: pressed ? "scale(0.96)" : "scale(1)",
         transition: "all 0.12s ease",
-        boxShadow: pressed ? `0 4px 16px ${color}22` : "none",
+        WebkitTapHighlightColor: "transparent",
       }}>
       <div style={{ fontSize: 22, marginBottom: 8 }}>{icon}</div>
       <div style={{ fontSize: 10, color, letterSpacing: 2, fontWeight: 500 }}>{label}</div>

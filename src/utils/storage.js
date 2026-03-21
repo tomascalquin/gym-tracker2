@@ -17,7 +17,11 @@ export function todayStr() { return new Date().toISOString().split("T")[0]; }
 
 function logsCol(uid)         { return collection(db, "users", uid, "gym_logs"); }
 function logDoc(uid, key)     { return doc(db, "users", uid, "gym_logs", key); }
-function routineDoc(uid, day) { return doc(db, "users", uid, "gym_routine", day); }
+function sanitizeDayId(day) {
+  // Reemplaza "/" y "." que rompen las rutas de Firestore
+  return day.replace(/\//g, "-").replace(/\./g, "_").trim();
+}
+function routineDoc(uid, day) { return doc(db, "users", uid, "gym_routine", sanitizeDayId(day)); }
 function localLogsKey(uid)    { return `gym_logs_${uid}`; }
 function localRoutineKey(uid) { return `gym_routine_${uid}`; }
 
@@ -58,20 +62,20 @@ function loadLogsLocal(uid) {
 // ─── RUTINA ───────────────────────────────────────────────────────────────────
 
 /**
- * Carga la rutina del usuario desde Firestore.
- * Retorna null si el usuario no tiene rutina creada aún.
+ * Carga la rutina del usuario.
+ * Primero intenta el cache local (instantáneo), luego sincroniza con Firestore.
+ * Retorna null si el usuario no tiene rutina.
  */
 export async function loadRoutine(uid) {
   try {
-    const result = {};
-    let hasAny = false;
-    // Intentar cargar por días predefinidos Y por días custom
+    // Cache local primero — respuesta instantánea
+    const cached = loadRoutineLocal(uid);
+
     const snap = await getDocs(collection(db, "users", uid, "gym_routine"));
-    snap.forEach((d) => {
-      result[d.id] = d.data();
-      hasAny = true;
-    });
-    if (!hasAny) return null; // usuario nuevo sin rutina
+    if (snap.empty) return cached || null;
+
+    const result = {};
+    snap.forEach(d => { result[d.id] = d.data(); });
     localStorage.setItem(localRoutineKey(uid), JSON.stringify(result));
     return result;
   } catch (err) {
@@ -85,10 +89,15 @@ export async function loadRoutine(uid) {
  * routine = { "Upper A": { exercises: [...] }, ... }
  */
 export async function saveFullRoutine(uid, routine) {
-  for (const [day, data] of Object.entries(routine)) {
-    await setDoc(routineDoc(uid, day), data);
-  }
-  localStorage.setItem(localRoutineKey(uid), JSON.stringify(routine));
+  // Sanitizar keys con "/" antes de guardar
+  const sanitized = {};
+  Object.entries(routine).forEach(([day, data]) => {
+    sanitized[sanitizeDayId(day)] = data;
+  });
+  await Promise.all(
+    Object.entries(sanitized).map(([day, data]) => setDoc(routineDoc(uid, day), data))
+  );
+  localStorage.setItem(localRoutineKey(uid), JSON.stringify(sanitized));
 }
 
 export async function addExerciseToRoutine(uid, day, exercise) {

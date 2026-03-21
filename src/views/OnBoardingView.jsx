@@ -109,7 +109,7 @@ const PRESET_ROUTINES = {
   "Arnold Split (PPL)": {
     description: "6 días · Pecho/Espalda · Hombros/Brazos · Piernas",
     days: {
-      "Pecho/Espalda A": {
+      "Pecho-Espalda A": {
         exercises: [
           { name: "Press de Banca", sets: [{ weight: 80, reps: 8 }, { weight: 80, reps: 8 }, { weight: 80, reps: 8 }] },
           { name: "Remo con Barra", sets: [{ weight: 70, reps: 8 }, { weight: 70, reps: 8 }, { weight: 70, reps: 8 }] },
@@ -119,7 +119,7 @@ const PRESET_ROUTINES = {
           { name: "Remo en Polea", sets: [{ weight: 55, reps: 12 }, { weight: 55, reps: 12 }] },
         ]
       },
-      "Hombros/Brazos A": {
+      "Hombros-Brazos A": {
         exercises: [
           { name: "Press Militar", sets: [{ weight: 50, reps: 8 }, { weight: 50, reps: 8 }, { weight: 50, reps: 8 }] },
           { name: "Curl Bíceps Barra", sets: [{ weight: 35, reps: 10 }, { weight: 35, reps: 10 }, { weight: 35, reps: 10 }] },
@@ -138,7 +138,7 @@ const PRESET_ROUTINES = {
           { name: "Gemelos de Pie", sets: [{ weight: 80, reps: 15 }, { weight: 80, reps: 15 }] },
         ]
       },
-      "Pecho/Espalda B": {
+      "Pecho-Espalda B": {
         exercises: [
           { name: "Press Inclinado Mancuernas", sets: [{ weight: 30, reps: 10 }, { weight: 30, reps: 10 }, { weight: 30, reps: 10 }] },
           { name: "Dominadas", sets: [{ weight: 0, reps: 8 }, { weight: 0, reps: 8 }, { weight: 0, reps: 8 }] },
@@ -147,7 +147,7 @@ const PRESET_ROUTINES = {
           { name: "Fondos en Paralelas", sets: [{ weight: 0, reps: 10 }, { weight: 0, reps: 10 }] },
         ]
       },
-      "Hombros/Brazos B": {
+      "Hombros-Brazos B": {
         exercises: [
           { name: "Press Arnold", sets: [{ weight: 22, reps: 10 }, { weight: 22, reps: 10 }, { weight: 22, reps: 10 }] },
           { name: "Curl Predicador", sets: [{ weight: 30, reps: 10 }, { weight: 30, reps: 10 }] },
@@ -234,7 +234,7 @@ const PRESET_ROUTINES = {
           { name: "Press Arnold", sets: [{ weight: 22, reps: 10 }, { weight: 22, reps: 10 }] },
         ]
       },
-      "Bíceps/Tríceps": {
+      "Bíceps-Tríceps": {
         exercises: [
           { name: "Curl Bíceps Barra", sets: [{ weight: 35, reps: 10 }, { weight: 35, reps: 10 }, { weight: 35, reps: 10 }] },
           { name: "Press Francés", sets: [{ weight: 30, reps: 10 }, { weight: 30, reps: 10 }, { weight: 30, reps: 10 }] },
@@ -281,6 +281,18 @@ export default function OnboardingView({ user, onRoutineReady }) {
       fontFamily: "DM Mono, monospace", minHeight: "100vh",
       background: "var(--bg)", animation: "fadeIn 0.3s ease",
     }}>
+      {/* Skip arriba — primera opción visible */}
+      <div style={{ display: "flex", justifyContent: "flex-end", marginBottom: 20 }}>
+        <button onClick={() => onRoutineReady({ "Mi Rutina": { exercises: [] } })} style={{
+          background: "transparent", border: "none",
+          color: "var(--text3)", cursor: "pointer",
+          fontSize: 12, letterSpacing: 1, fontFamily: "inherit",
+          display: "flex", alignItems: "center", gap: 6, padding: "4px 0",
+        }}>
+          Explorar app <span style={{ fontSize: 16 }}>→</span>
+        </button>
+      </div>
+
       <div style={{ marginBottom: 32 }}>
         <div style={{ fontSize: 9, letterSpacing: 4, color: "var(--text3)", marginBottom: 8 }}>BIENVENIDO</div>
         <h1 style={{ fontSize: 26, fontWeight: 300, color: "var(--text)", margin: 0, letterSpacing: -1 }}>
@@ -358,9 +370,20 @@ export default function OnboardingView({ user, onRoutineReady }) {
       )}
 
       <div style={{ textAlign: "center", marginTop: 20 }}>
-        <div style={{ fontSize: 10, color: "var(--text3)", marginBottom: 8 }}>
+        <div style={{ fontSize: 10, color: "var(--text3)", marginBottom: 12 }}>
           Puedes editar los ejercicios y pesos después desde la app.
         </div>
+        <button onClick={() => onRoutineReady({ "Mi Rutina": { exercises: [] } })} style={{
+          background: "transparent",
+          border: "1px solid var(--border)",
+          color: "var(--text3)", padding: "12px 24px",
+          borderRadius: 12, cursor: "pointer",
+          fontSize: 11, letterSpacing: 2, fontFamily: "inherit",
+          width: "100%", minHeight: 46,
+          transition: "all 0.15s",
+        }}>
+          OMITIR — Configurar después →
+        </button>
       </div>
     </div>
   );

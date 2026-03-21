@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { DAY_META } from "../data/routine";
 import ExerciseCard from "../components/ExerciseCard";
+import ExerciseCardCompact from "../components/ExerciseCardCompact";
 import AddExerciseModal from "../components/AddExerciseModal";
 import RestTimer from "../components/RestTimer";
 import { tokens } from "../design";
@@ -13,6 +14,7 @@ export default function SessionView({
 }) {
   const [modalOpen, setModalOpen] = useState(false);
   const [timerOpen, setTimerOpen] = useState(false);
+  const [compact, setCompact]       = useState(false);
   const [saving, setSaving]       = useState(false);
 
   const c        = DAY_META[activeDay] || { accent: "#60a5fa", dim: "#1e3a5f", tag: "DÍA" };
@@ -52,6 +54,13 @@ export default function SessionView({
             <div style={{ fontSize: 16, color: "var(--text)", fontWeight: 400 }}>{activeDay}</div>
           </div>
 
+<button onClick={() => setCompact(v => !v)} style={{
+            background: compact ? c.accent + "22" : "transparent",
+            border: `1px solid ${compact ? c.accent + "44" : "var(--border)"}`,
+            color: compact ? c.accent : "var(--text3)",
+            padding: "6px 10px", borderRadius: 8, cursor: "pointer",
+            fontSize: 9, letterSpacing: 1, fontFamily: "inherit", minHeight: 34,
+          }}>{compact ? "DETALLADO" : "COMPACTO"}</button>
           <SaveButton onClick={handleSave} saving={saving} accent={c.accent} />
         </div>
 
@@ -79,7 +88,18 @@ export default function SessionView({
         </div>
 
         {/* Ejercicios */}
-        {exercises.map((ex, ei) => (
+        {exercises.map((ex, ei) => compact ? (
+          <ExerciseCardCompact
+            key={ei} exercise={ex} exIndex={ei}
+            sets={sessionData[ei] || ex.sets}
+            completedSets={completedSets}
+            accent={c.accent}
+            onUpdateSet={onUpdateSet}
+            onToggleSet={onToggleSet}
+            onAddSet={onAddSet}
+            onRemoveSet={onRemoveSet}
+          />
+        ) : (
           <ExerciseCard
             key={ei} exercise={ex} exIndex={ei}
             sets={sessionData[ei] || ex.sets}
