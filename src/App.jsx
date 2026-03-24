@@ -34,6 +34,7 @@ import PageTransition from "./components/PageTransition";
 import SplashScreen from "./components/SplashScreen";
 import Confetti from "./components/Confetti";
 import { haptics } from "./utils/haptics";
+import { initPWAInstall, canInstall, installPWA, isInstalled } from "./utils/pwa";
 import SessionTransition from "./components/SessionTransition";
 import { DAY_META } from "./data/routine";
 import EditRoutineView from "./views/EditRoutineView";
@@ -57,7 +58,8 @@ export default function App() {
   const [rankUpData, setRankUpData]         = useState(null);
   const [chatTarget, setChatTarget]         = useState(null);
   const [showConfetti, setShowConfetti]     = useState(false);
-  const [sessionTransition, setSessionTransition] = useState(null); // { id, title, accent }
+  const [sessionTransition, setSessionTransition] = useState(null);
+  const [showInstall, setShowInstall]         = useState(false); // { id, title, accent }
   const [theme, setTheme]                   = useState(getTheme);
   const [timerOpen, setTimerOpen]           = useState(false);
   const [timerVisible, setTimerVisible]     = useState(false);
@@ -111,6 +113,14 @@ export default function App() {
   function handleProfileUpdated(updated) {
     setMyProfile(updated);
   }
+
+  // Init PWA install
+  useEffect(() => {
+    initPWAInstall();
+    setTimeout(() => {
+      if (canInstall() && !isInstalled()) setShowInstall(true);
+    }, 3000);
+  }, []);
 
   // Auto-guardar borrador de sesión en localStorage
   useEffect(() => {
