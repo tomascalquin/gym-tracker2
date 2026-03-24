@@ -31,7 +31,7 @@ body {
   -webkit-font-smoothing: antialiased;
   -webkit-text-size-adjust: 100%;
   touch-action: manipulation;
-  overscroll-behavior: none;
+ 
 }
 
 #root {
@@ -44,11 +44,12 @@ body {
 
 .scroll-view {
   flex: 1;
-  overflow-y: auto;
-  overflow-x: hidden;
-  -webkit-overflow-scrolling: touch;
-  overscroll-behavior-y: contain;
+  /* overflow-y: auto;  <-- ELIMINA ESTO */
+  /* overflow-x: hidden; <-- ELIMINA ESTO */
+  /* -webkit-overflow-scrolling: touch; <-- ELIMINA ESTO */
+  /* overscroll-behavior-y: contain; <-- ELIMINA ESTO */
   padding-bottom: var(--bottom-pad);
+  width: 100%; /* Asegura que tome el ancho */
 }
 
 input, textarea, select, button {

@@ -50,7 +50,7 @@ export default function ExerciseCardCompact({
           </div>
         </div>
 
-        {/* Sets como pills */}
+        {/* Sets como cuadrados */}
         <div style={{ display: "flex", gap: 4, flexShrink: 0, alignItems: "center" }}>
           {sets.map((_, si) => {
             const done = !!completedSets[`${exIndex}-${si}`];
@@ -59,7 +59,7 @@ export default function ExerciseCardCompact({
                 key={si}
                 onClick={e => { e.stopPropagation(); handleToggle(si); }}
                 style={{
-                  padding: "4px 10px",
+                  width: 28, height: 28,
                   borderRadius: 6,
                   background: done ? accent : "var(--bg3)",
                   border: `1.5px solid ${done ? accent : "var(--border)"}`,
@@ -70,7 +70,8 @@ export default function ExerciseCardCompact({
                   fontFamily: "inherit",
                   userSelect: "none",
                   WebkitTapHighlightColor: "transparent",
-                  whiteSpace: "nowrap",
+                  display: "flex", alignItems: "center", justifyContent: "center",
+                  flexShrink: 0,
                 }}
               >{done ? "✓" : si + 1}</div>
             );
