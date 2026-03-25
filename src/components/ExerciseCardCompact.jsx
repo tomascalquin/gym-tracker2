@@ -1,6 +1,7 @@
 import { useState, useMemo } from "react";
 import { calcWarmup } from "../utils/warmup";
 import { haptics } from "../utils/haptics";
+import { getHypertrophyZone } from "../utils/hypertrophyZone";
 
 /**
  * Versión compacta del ExerciseCard.
@@ -45,8 +46,21 @@ export default function ExerciseCardCompact({
             overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap",
             transition: "color 0.2s",
           }}>{exercise.name}</div>
-          <div style={{ fontSize: 11, color: "var(--text3)", marginTop: 2 }}>
-            {firstSet.weight}kg × {firstSet.reps} · {sets.length} series
+          <div style={{ fontSize: 11, color: "var(--text3)", marginTop: 2, display: "flex", alignItems: "center", gap: 6 }}>
+            <span>{firstSet.weight}kg × {firstSet.reps} · {sets.length} series</span>
+            {(() => {
+              const zone = getHypertrophyZone(firstSet.reps);
+              if (!zone) return null;
+              return (
+                <span style={{
+                  fontSize: 8, letterSpacing: 1,
+                  color: zone.color, background: zone.bg,
+                  border: `1px solid ${zone.border}`,
+                  padding: "1px 5px", borderRadius: 99,
+                  flexShrink: 0,
+                }}>{zone.label}</span>
+              );
+            })()}
           </div>
         </div>
 

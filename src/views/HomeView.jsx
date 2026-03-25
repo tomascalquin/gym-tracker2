@@ -165,6 +165,9 @@ export default function HomeView({ logs, user, myProfile, routine, userXP, sessi
           <NavCard icon="🤖" label="SEMANA IA"  sub="Análisis"   color="#a78bfa" onClick={() => onNavigate("weeklySummary")} />
           <NavCard icon="🏅" label="LOGROS"     sub="Achievements" color="#f59e0b" onClick={() => onNavigate("achievements")} />
         </div>
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8, marginBottom: 8 }}>
+          <NavCard icon="✈️" label="MODO VIAJE" sub="Sin gym"    color="#34d399" onClick={() => onNavigate("travelMode")} />
+        </div>
       </div>
 
       {/* ── Export ── */}

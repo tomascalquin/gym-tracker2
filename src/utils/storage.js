@@ -11,6 +11,7 @@ import {
 } from "firebase/firestore";
 import { db } from "./firebase";
 import { DAY_ORDER } from "../data/routine";
+import { enqueue, isOnline } from "./offlineQueue";
 
 export function getSessionKey(day, date) { return `${day}__${date}`; }
 export function todayStr() { return new Date().toISOString().split("T")[0]; }
@@ -40,18 +41,36 @@ export async function loadLogs(uid) {
 }
 
 export async function saveLog(uid, key, session) {
-  try { await setDoc(logDoc(uid, key), session); }
-  catch (err) { console.warn("saveLog error:", err.message); }
+  // Siempre guardar local primero — respuesta instantánea
   const local = loadLogsLocal(uid);
   localStorage.setItem(localLogsKey(uid), JSON.stringify({ ...local, [key]: session }));
+
+  if (!isOnline()) {
+    enqueue({ type: "saveLog", payload: { key, session } });
+    return;
+  }
+  try { await setDoc(logDoc(uid, key), session); }
+  catch (err) {
+    console.warn("saveLog error:", err.message);
+    enqueue({ type: "saveLog", payload: { key, session } });
+  }
 }
 
 export async function deleteLog(uid, key) {
-  try { await deleteDoc(logDoc(uid, key)); }
-  catch (err) { console.warn("deleteLog error:", err.message); }
+  // Siempre borrar local primero
   const local = loadLogsLocal(uid);
   delete local[key];
   localStorage.setItem(localLogsKey(uid), JSON.stringify(local));
+
+  if (!isOnline()) {
+    enqueue({ type: "deleteLog", payload: { key } });
+    return;
+  }
+  try { await deleteDoc(logDoc(uid, key)); }
+  catch (err) {
+    console.warn("deleteLog error:", err.message);
+    enqueue({ type: "deleteLog", payload: { key } });
+  }
 }
 
 function loadLogsLocal(uid) {
