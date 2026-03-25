@@ -8,7 +8,7 @@ import { getInviteLink, copyInviteLink } from "../utils/invite";
 import AnimatedNumber from "../components/AnimatedNumber";
 import { haptics } from "../utils/haptics";
 
-export default function ProfileView({ user, myProfile, userXP, logs, onBack, onProfileUpdated }) {
+export default function ProfileView({ user, myProfile, userXP, logs, onBack, onProfileUpdated, onNavigate }) {
   const [photo, setPhoto]         = useState(myProfile?.photoURL || null);
   const [uploading, setUploading] = useState(false);
   const [theme, setThemeState]    = useState(getTheme());
@@ -217,6 +217,50 @@ export default function ProfileView({ user, myProfile, userXP, logs, onBack, onP
               <div style={{ fontSize: 8, color: "var(--text3)", letterSpacing: 2, marginTop: 3 }}>{s.label}</div>
             </div>
           ))}
+        </div>
+
+        {/* Accesos rápidos — Logros y Resumen semanal */}
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8, marginBottom: 14 }}>
+          <button
+            onClick={() => { haptics.light(); onNavigate("achievements"); }}
+            style={{
+              background: "#78350f22", border: "1px solid #f59e0b33",
+              borderRadius: 14, padding: "14px 12px", cursor: "pointer",
+              fontFamily: "inherit", textAlign: "left",
+              display: "flex", flexDirection: "column", gap: 6,
+              WebkitTapHighlightColor: "transparent",
+              transition: "all 0.15s",
+            }}
+          >
+            <span style={{ fontSize: 22, lineHeight: 1 }}>🏆</span>
+            <div>
+              <div style={{ fontSize: 11, color: "#f59e0b", fontWeight: 500 }}>Logros</div>
+              <div style={{ fontSize: 9, color: "var(--text3)", marginTop: 2, letterSpacing: 0.5 }}>
+                VER ACHIEVEMENTS →
+              </div>
+            </div>
+          </button>
+
+          <button
+            onClick={() => { haptics.light(); onNavigate("weeklySummary"); }}
+            style={{
+              background: "#1e1b4b",
+              border: "1px solid #534ab733",
+              borderRadius: 14, padding: "14px 12px", cursor: "pointer",
+              fontFamily: "inherit", textAlign: "left",
+              display: "flex", flexDirection: "column", gap: 6,
+              WebkitTapHighlightColor: "transparent",
+              transition: "all 0.15s",
+            }}
+          >
+            <span style={{ fontSize: 22, lineHeight: 1 }}>🤖</span>
+            <div>
+              <div style={{ fontSize: 11, color: "#a78bfa", fontWeight: 500 }}>Resumen IA</div>
+              <div style={{ fontSize: 9, color: "var(--text3)", marginTop: 2, letterSpacing: 0.5 }}>
+                ANÁLISIS SEMANAL →
+              </div>
+            </div>
+          </button>
         </div>
 
         {/* Código + invitación */}

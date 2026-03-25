@@ -39,6 +39,9 @@ import SessionTransition from "./components/SessionTransition";
 import { DAY_META } from "./data/routine";
 import EditRoutineView from "./views/EditRoutineView";
 import OnboardingView from "./views/OnboardingView";
+import WeeklySummaryView from "./views/WeeklySummaryView";
+import AchievementsView from "./views/AchievementsView";
+import { evaluateAchievements, getNewlyUnlocked, saveUnlockedAchievements, loadUnlockedAchievements } from "./utils/achievements";
 
 export default function App() {
   const [user, setUser]                     = useState(undefined);
@@ -194,12 +197,23 @@ export default function App() {
     const streak  = calcStreak(logs);
     const { xp: xpEarned, reasons, prs } = calcSessionXP(session, logs, routine, streak);
 
-    setLogs(prev => ({ ...prev, [key]: session }));
+    const newLogs = { ...logs, [key]: session };
+    setLogs(newLogs);
     await saveLog(user.uid, key, session);
 
     const displayName = user.displayName || user.email.split("@")[0];
     const result = await addXP(user.uid, displayName, xpEarned, reasons.join(" | "));
     setUserXP(result.newXP);
+
+    // ── Detectar logros nuevos ─────────────────────────────────────────────
+    const prevUnlocked = loadUnlockedAchievements(user.uid);
+    const currUnlocked = evaluateAchievements(newLogs, routine, result.newXP);
+    const newAchs      = getNewlyUnlocked(prevUnlocked, currUnlocked);
+    saveUnlockedAchievements(user.uid, currUnlocked);
+    if (newAchs.length > 0) {
+      setTimeout(() => toast(`${newAchs[0].icon} LOGRO: ${newAchs[0].title}`), 800);
+    }
+    // ──────────────────────────────────────────────────────────────────────
 
     setShowConfetti(true);
     haptics.celebrate();
@@ -340,9 +354,12 @@ export default function App() {
             {currentView === "profile"     && (
               <ProfileView user={user} myProfile={myProfile} userXP={userXP} logs={logs}
                 onBack={() => setView("home")} onProfileUpdated={handleProfileUpdated}
+                onNavigate={setView}
               />
             )}
-            {currentView === "editRoutine" && (
+            {currentView === "weeklySummary" && <WeeklySummaryView logs={logs} routine={routine} onBack={() => setView("home")} />}
+            {currentView === "achievements"  && <AchievementsView logs={logs} routine={routine} userXP={userXP} onBack={() => setView("profile")} />}
+            {currentView === "editRoutine"   && (
               <EditRoutineView user={user} routine={routine} onBack={() => setView("home")}
                 onRoutineUpdated={(updated) => { setRoutine(updated); setView("home"); }}
               />

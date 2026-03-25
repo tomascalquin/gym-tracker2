@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { calcWarmup } from "../utils/warmup";
 import { haptics } from "../utils/haptics";
 
@@ -85,6 +85,8 @@ export default function ExerciseCardCompact({
       {/* Expandido: inputs completos */}
       {expanded && (
         <div style={{ padding: "6px 12px 10px", borderTop: "1px solid var(--border)", animation: "slideDown 0.15s ease" }}>
+          {/* Aproximamiento inline */}
+          <WarmupInline sets={sets} accent={accent} />
           {/* Headers */}
           <div style={{ display: "grid", gridTemplateColumns: "18px 1fr 60px 60px 32px 28px", gap: 4, marginBottom: 5 }}>
             {["", "NOTA", "KG", "REPS", "✓", ""].map((h, i) => (
@@ -152,6 +154,69 @@ export default function ExerciseCardCompact({
             padding: "5px", borderRadius: 7, fontSize: 9,
             letterSpacing: 1, cursor: "pointer", fontFamily: "inherit",
           }}>+ SERIE</button>
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ─── Aproximamiento inline ────────────────────────────────────────────────────
+function WarmupInline({ sets, accent }) {
+  const [open, setOpen] = useState(false);
+  const workingSet = sets?.[0];
+  const weight = workingSet?.weight || 0;
+  const reps   = workingSet?.reps   || 8;
+
+  const warmup = useMemo(() => {
+    if (!weight) return [];
+    return calcWarmup(weight, reps);
+  }, [weight, reps]);
+
+  if (!weight || !warmup.length) return null;
+
+  return (
+    <div style={{ marginBottom: 8 }}>
+      <button
+        onClick={() => setOpen(v => !v)}
+        style={{
+          width: "100%", background: open ? accent + "11" : "transparent",
+          border: `1px solid ${open ? accent + "44" : "var(--border)"}`,
+          color: open ? accent : "var(--text3)",
+          padding: "5px 10px", borderRadius: 7,
+          fontSize: 9, letterSpacing: 1, fontFamily: "inherit",
+          cursor: "pointer", display: "flex",
+          alignItems: "center", justifyContent: "space-between",
+          transition: "all 0.15s",
+        }}
+      >
+        <span>🔥 APROXIMAMIENTO — {weight}kg × {reps}</span>
+        <span>{open ? "▲" : "▼"}</span>
+      </button>
+
+      {open && (
+        <div style={{
+          background: "var(--bg3)", border: "1px solid var(--border)",
+          borderTop: "none", borderRadius: "0 0 7px 7px",
+          padding: "8px 10px", animation: "slideDown 0.15s ease",
+        }}>
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 52px 44px 52px", gap: 5, marginBottom: 5 }}>
+            {["TIPO", "KG", "REPS", "%1RM"].map(h => (
+              <span key={h} style={{ fontSize: 8, color: "var(--text3)", letterSpacing: 1, textAlign: h !== "TIPO" ? "center" : "left" }}>{h}</span>
+            ))}
+          </div>
+          {warmup.map((w, i) => (
+            <div key={i} style={{ display: "grid", gridTemplateColumns: "1fr 52px 44px 52px", gap: 5, alignItems: "center", marginBottom: 5 }}>
+              <span style={{ fontSize: 11, color: "var(--text)" }}>{w.label}</span>
+              <span style={{ textAlign: "center", fontSize: 14, fontWeight: 300, color: accent }}>{w.weight}</span>
+              <span style={{ textAlign: "center", fontSize: 13, color: "var(--text)" }}>{w.reps}</span>
+              <span style={{ textAlign: "center" }}>
+                <span style={{ fontSize: 9, background: accent + "22", color: accent, padding: "2px 6px", borderRadius: 99 }}>{w.pct}%</span>
+              </span>
+            </div>
+          ))}
+          <div style={{ fontSize: 9, color: "var(--text3)", marginTop: 5, borderTop: "1px solid var(--border)", paddingTop: 5 }}>
+            💡 1-2 min descanso entre aproximaciones
+          </div>
         </div>
       )}
     </div>

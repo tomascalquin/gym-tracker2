@@ -170,3 +170,81 @@ textarea { resize: none; }
   0%, 100% { box-shadow: 0 0 10px currentColor; }
   50%       { box-shadow: 0 0 24px currentColor; }
 }
+
+/* --- EFECTO ISLA DINÁMICA DEL TEMPORIZADOR --- */
+.floating-timer {
+  position: fixed;
+  bottom: 85px; 
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(15, 23, 42, 0.7);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 50px;
+  width: 220px;
+  height: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  overflow: hidden;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.5), 0 0 15px rgba(96, 165, 250, 0.2);
+  animation: slideUpElastic 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+}
+
+.timer-background {
+  position: absolute;
+  left: 0;
+  top: 0;
+  height: 100%;
+  background: rgba(96, 165, 250, 0.2);
+  transition: width 1s linear;
+  z-index: 1;
+}
+
+.timer-content {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 0 16px;
+}
+
+.timer-text {
+  color: #fff;
+  font-weight: 600;
+  font-size: 15px;
+  flex-grow: 1;
+  text-align: center;
+  font-family: 'DM Mono', monospace;
+  letter-spacing: 1px;
+}
+
+.timer-close {
+  background: none;
+  border: none;
+  color: rgba(255,255,255,0.4);
+  font-size: 22px;
+  cursor: pointer;
+  padding: 0;
+}
+
+.timer-finished {
+  background: rgba(34, 197, 94, 0.9);
+  border-color: rgba(34, 197, 94, 1);
+  animation: pulseNeon 1.5s infinite;
+}
+
+@keyframes slideUpElastic {
+  0% { opacity: 0; transform: translate(-50%, 40px) scale(0.8); }
+  100% { opacity: 1; transform: translate(-50%, 0) scale(1); }
+}
+
+@keyframes pulseNeon {
+  0% { box-shadow: 0 0 15px rgba(34, 197, 94, 0.4); transform: translate(-50%, 0) scale(1); }
+  50% { box-shadow: 0 0 35px rgba(34, 197, 94, 0.8); transform: translate(-50%, 0) scale(1.05); }
+  100% { box-shadow: 0 0 15px rgba(34, 197, 94, 0.4); transform: translate(-50%, 0) scale(1); }
+}
