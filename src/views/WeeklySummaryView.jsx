@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { buildWeeklySummaryData, buildWeeklySummaryPrompt, calcFatigue, detectStagnation, MUSCLE_RANGES, calcWeeklyVolumeByMuscle } from "../utils/intelligence";
+import { callClaude } from "../utils/callClaude";
 import { tokens } from "../design";
 
 const FATIGUE_CONFIG = {
@@ -12,33 +13,25 @@ const FATIGUE_CONFIG = {
 export default function WeeklySummaryView({ logs, routine, onBack }) {
   const [summary, setSummary]   = useState(null);
   const [loading, setLoading]   = useState(false);
+  const [error, setError]       = useState(null);
   const [tab, setTab]           = useState("summary");
 
-  const data      = buildWeeklySummaryData(logs, routine);
-  const fatigue   = calcFatigue(logs);
+  const data       = buildWeeklySummaryData(logs, routine);
+  const fatigue    = calcFatigue(logs);
   const stagnation = detectStagnation(logs, routine);
   const muscleSets = calcWeeklyVolumeByMuscle(logs, routine);
-  const fc        = FATIGUE_CONFIG[fatigue.fatigueLevel];
+  const fc         = FATIGUE_CONFIG[fatigue.fatigueLevel];
 
   async function generateSummary() {
     setLoading(true);
     setSummary(null);
+    setError(null);
     try {
       const prompt = buildWeeklySummaryPrompt(data);
-      const res = await fetch("https://api.anthropic.com/v1/messages", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          model: "claude-sonnet-4-20250514",
-          max_tokens: 1000,
-          messages: [{ role: "user", content: prompt }],
-        }),
-      });
-      const json = await res.json();
-      const text = json.content?.map(b => b.text || "").join("") || "";
+      const text   = await callClaude(prompt, { maxTokens: 600 });
       setSummary(text.trim());
     } catch (err) {
-      setSummary("No se pudo generar el resumen. Revisa tu conexión.");
+      setError(err.message);
     }
     setLoading(false);
   }
@@ -156,13 +149,25 @@ export default function WeeklySummaryView({ logs, routine, onBack }) {
                   </div>
                 </div>
               )}
-              {!loading && summary && (
+              {!loading && error && (
+                <div>
+                  <div style={{ fontSize: 9, color: "#ef4444", letterSpacing: 2, marginBottom: 8 }}>⚠️ ERROR</div>
+                  <div style={{ fontSize: 11, color: "var(--text3)", marginBottom: 12, lineHeight: 1.6 }}>{error}</div>
+                  <button onClick={generateSummary} style={{
+                    width: "100%", background: "transparent",
+                    border: "1px dashed var(--border)", color: "var(--text3)",
+                    padding: "8px", borderRadius: 8,
+                    fontSize: 10, letterSpacing: 1, fontFamily: "inherit", cursor: "pointer",
+                  }}>↺ REINTENTAR</button>
+                </div>
+              )}
+              {!loading && !error && summary && (
                 <div>
                   <div style={{ fontSize: 9, color: "#a78bfa", letterSpacing: 2, marginBottom: 10 }}>🤖 ANÁLISIS IA</div>
                   <div style={{ fontSize: 13, color: "var(--text2)", lineHeight: 1.7 }}>{summary}</div>
                 </div>
               )}
-              {!loading && !summary && (
+              {!loading && !error && !summary && (
                 <div style={{ textAlign: "center", padding: "16px 0" }}>
                   <div style={{ fontSize: 11, color: "var(--text3)", marginBottom: 12, lineHeight: 1.6 }}>
                     Genera un resumen personalizado de tu semana con recomendaciones basadas en evidencia.
@@ -176,7 +181,7 @@ export default function WeeklySummaryView({ logs, routine, onBack }) {
               )}
             </div>
 
-            {summary && (
+            {summary && !error && (
               <button onClick={generateSummary} disabled={loading} style={{
                 width: "100%", background: "transparent",
                 border: "1px dashed var(--border)", color: "var(--text3)",
