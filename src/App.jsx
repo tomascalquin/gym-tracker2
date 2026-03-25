@@ -38,7 +38,7 @@ import { initPWAInstall, canInstall, installPWA, isInstalled } from "./utils/pwa
 import SessionTransition from "./components/SessionTransition";
 import { DAY_META } from "./data/routine";
 import EditRoutineView from "./views/EditRoutineView";
-import OnboardingView from "./views/OnboardingView";
+import OnboardingView from "./views/OnBoardingView";
 import WeeklySummaryView from "./views/WeeklySummaryView";
 import AchievementsView from "./views/AchievementsView";
 import { evaluateAchievements, getNewlyUnlocked, saveUnlockedAchievements, loadUnlockedAchievements } from "./utils/achievements";
