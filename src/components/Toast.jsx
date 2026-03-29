@@ -4,7 +4,7 @@ export default function Toast({ message, type = "success", duration = 2400 }) {
   const [visible, setVisible]   = useState(false);
   const [exiting, setExiting]   = useState(false);
   const [dragX, setDragX]       = useState(0);
-  const startX  = useRef(0);
+  const startX   = useRef(0);
   const timerRef = useRef();
 
   useEffect(() => {
@@ -25,9 +25,6 @@ export default function Toast({ message, type = "success", duration = 2400 }) {
   function onTouchEnd()    { Math.abs(dragX) > 80 ? dismiss() : setDragX(0); }
 
   if (!visible || !message) return null;
-
-  const color = type === "error" ? "#ef4444" : type === "pr" ? "#fbbf24" : "#22c55e";
-  const icon  = type === "error" ? "✕" : type === "pr" ? "🏆" : type === "xp" ? "⚡" : "✓";
 
   return (
     <>
@@ -52,17 +49,16 @@ export default function Toast({ message, type = "success", duration = 2400 }) {
         }}
       >
         <div style={{
-          background: "rgba(14,14,26,0.95)",
-          border: `1px solid ${color}44`,
-          borderLeft: `3px solid ${color}`,
-          borderRadius: 14, padding: "11px 16px",
+          background: "var(--text)",
+          borderRadius: 12, padding: "11px 18px",
           display: "flex", alignItems: "center", gap: 10,
-          boxShadow: `0 8px 32px rgba(0,0,0,0.5)`,
-          backdropFilter: "blur(20px)", WebkitBackdropFilter: "blur(20px)",
-          fontFamily: "DM Mono, monospace",
+          boxShadow: "0 8px 32px rgba(0,0,0,0.2)",
+          fontFamily: "inherit",
         }}>
-          <span style={{ fontSize: 15, color, flexShrink: 0 }}>{icon}</span>
-          <span style={{ fontSize: 12, color: "var(--text)", letterSpacing: 0.3 }}>{message}</span>
+          <span style={{ fontSize: 13, color: "var(--bg)", flexShrink: 0 }}>
+            {type === "error" ? "✕" : type === "pr" ? "🏆" : "✓"}
+          </span>
+          <span style={{ fontSize: 12, fontWeight: 600, color: "var(--bg)", letterSpacing: 0.3 }}>{message}</span>
         </div>
       </div>
     </>

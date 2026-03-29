@@ -1,7 +1,7 @@
 const THEME_KEY = "gymtracker_theme";
 
 export function getTheme() {
-  return localStorage.getItem(THEME_KEY) || "dark";
+  return localStorage.getItem(THEME_KEY) || "light";
 }
 
 export function setTheme(theme) {
@@ -18,34 +18,34 @@ export function toggleTheme() {
 
 export function applyTheme(theme) {
   const root = document.documentElement;
-  if (theme === "light") {
-    // Tema claro premium — gris cálido, no blanco puro
-    root.style.setProperty("--bg",     "#f0ede8");
-    root.style.setProperty("--bg2",    "#e8e4de");
-    root.style.setProperty("--bg3",    "#ddd9d2");
-    root.style.setProperty("--border", "#c8c3bb");
-    root.style.setProperty("--text",   "#1a1814");
-    root.style.setProperty("--text2",  "#4a4540");
-    root.style.setProperty("--text3",  "#7a7570");
-    root.style.setProperty("--accent", "#2563eb");
-    root.style.setProperty("--green",  "#16a34a");
-    root.style.setProperty("--red",    "#dc2626");
-    root.style.setProperty("--yellow", "#d97706");
-  } else {
-    root.style.setProperty("--bg",     "#080810");
-    root.style.setProperty("--bg2",    "#0e0e1a");
-    root.style.setProperty("--bg3",    "#0a0a14");
-    root.style.setProperty("--border", "#1a1a2a");
-    root.style.setProperty("--text",   "#f1f5f9");
-    root.style.setProperty("--text2",  "#94a3b8");
-    root.style.setProperty("--text3",  "#475569");
-    root.style.setProperty("--accent", "#60a5fa");
-    root.style.setProperty("--green",  "#22c55e");
-    root.style.setProperty("--red",    "#ef4444");
+  if (theme === "dark") {
+    root.style.setProperty("--bg",     "#111111");
+    root.style.setProperty("--bg2",    "#1a1a1a");
+    root.style.setProperty("--bg3",    "#222222");
+    root.style.setProperty("--border", "#2a2a2a");
+    root.style.setProperty("--text",   "#f5f5f0");
+    root.style.setProperty("--text2",  "#aaa9a0");
+    root.style.setProperty("--text3",  "#666660");
+    root.style.setProperty("--accent", "#f5f5f0");
+    root.style.setProperty("--green",  "#4ade80");
+    root.style.setProperty("--red",    "#f87171");
     root.style.setProperty("--yellow", "#fbbf24");
+    document.body.style.background = "#111111";
+  } else {
+    root.style.setProperty("--bg",     "#f5f5f0");
+    root.style.setProperty("--bg2",    "#ffffff");
+    root.style.setProperty("--bg3",    "#eeede8");
+    root.style.setProperty("--border", "#e0dfd8");
+    root.style.setProperty("--text",   "#111111");
+    root.style.setProperty("--text2",  "#555550");
+    root.style.setProperty("--text3",  "#99998a");
+    root.style.setProperty("--accent", "#111111");
+    root.style.setProperty("--green",  "#1a6b3a");
+    root.style.setProperty("--red",    "#c0392b");
+    root.style.setProperty("--yellow", "#b8860b");
+    document.body.style.background = "#f5f5f0";
   }
-  document.body.style.background = `var(--bg)`;
-  document.body.style.color      = `var(--text)`;
+  document.body.style.color = "var(--text)";
 }
 
 // Aplicar al importar

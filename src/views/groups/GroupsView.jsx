@@ -77,7 +77,7 @@ export default function GroupsView({ user, onBack, onOpenChat }) {
   ];
 
   return (
-    <div style={{ maxWidth: 460, margin: "0 auto", fontFamily: "DM Mono, monospace", animation: "fadeIn 0.25s ease" }}>
+    <div style={{ maxWidth: 460, margin: "0 auto", fontFamily: "inherit", animation: "fadeIn 0.25s ease" }}>
 
       {/* Header */}
       <div style={{ padding: "20px 18px 0" }}>

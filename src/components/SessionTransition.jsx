@@ -1,110 +1,75 @@
 import { useEffect, useRef } from "react";
 
 /**
- * Transición suave al abrir sesión.
- * Onda de luz que se expande elegantemente desde el centro.
+ * SessionTransition — Cortina editorial cream & black.
+ * Igual para todos los días: panel negro que sube desde abajo,
+ * pausa un instante, y luego se retira hacia arriba.
+ * Sofisticado, sin color — solo forma y movimiento.
  */
 export default function SessionTransition({ color, onDone }) {
-  const canvasRef = useRef();
-  const frameRef  = useRef();
+  const ref = useRef();
 
   useEffect(() => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
+    const el = ref.current;
+    if (!el) return;
 
-    const W   = window.innerWidth;
-    const H   = window.innerHeight;
-    const dpr = window.devicePixelRatio || 1;
-    canvas.width  = W * dpr;
-    canvas.height = H * dpr;
-    canvas.style.width  = `${W}px`;
-    canvas.style.height = `${H}px`;
+    // Fase 1: entrar (panel sube desde abajo)
+    // Fase 2: pausa breve
+    // Fase 3: salir (panel sube fuera de pantalla)
+    // Total: ~700ms
 
-    const ctx = canvas.getContext("2d");
-    ctx.scale(dpr, dpr);
+    el.style.transition = "none";
+    el.style.transform  = "translateY(100%)";
 
-    const cx   = W / 2;
-    const cy   = H / 2;
-    const maxR = Math.sqrt(cx * cx + cy * cy) * 1.1;
+    // Frame para asegurar que el estado inicial se pinte
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        // Entrar
+        el.style.transition = "transform 0.32s cubic-bezier(0.76, 0, 0.24, 1)";
+        el.style.transform  = "translateY(0%)";
 
-    const TOTAL_MS = 900;
-    let startTime  = null;
+        // Pausa + salir
+        setTimeout(() => {
+          el.style.transition = "transform 0.32s cubic-bezier(0.76, 0, 0.24, 1)";
+          el.style.transform  = "translateY(-100%)";
 
-    function easeInOutCubic(t) {
-      return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
-    }
-
-    function hexToRgb(hex) {
-      const r = parseInt(hex.slice(1, 3), 16);
-      const g = parseInt(hex.slice(3, 5), 16);
-      const b = parseInt(hex.slice(5, 7), 16);
-      return `${r},${g},${b}`;
-    }
-
-    const rgb = hexToRgb(color.length === 7 ? color : "#60a5fa");
-
-    function draw(ts) {
-      if (!startTime) startTime = ts;
-      const elapsed = ts - startTime;
-      const t       = Math.min(elapsed / TOTAL_MS, 1);
-      const ease    = easeInOutCubic(t);
-
-      ctx.clearRect(0, 0, W, H);
-
-      // Primera mitad: expansión suave
-      if (t < 0.55) {
-        const expandT = t / 0.55;
-        const r       = maxR * easeInOutCubic(expandT);
-        const alpha   = 0.85 * (1 - expandT * 0.3);
-
-        const grd = ctx.createRadialGradient(cx, cy, 0, cx, cy, r);
-        grd.addColorStop(0,    `rgba(${rgb}, ${alpha})`);
-        grd.addColorStop(0.5,  `rgba(${rgb}, ${alpha * 0.6})`);
-        grd.addColorStop(0.85, `rgba(${rgb}, ${alpha * 0.15})`);
-        grd.addColorStop(1,    `rgba(${rgb}, 0)`);
-
-        ctx.beginPath();
-        ctx.arc(cx, cy, r, 0, Math.PI * 2);
-        ctx.fillStyle = grd;
-        ctx.fill();
-
-        // Anillo suave en el borde
-        if (expandT > 0.1) {
-          const ringAlpha = Math.sin(expandT * Math.PI) * 0.5;
-          ctx.beginPath();
-          ctx.arc(cx, cy, r * 0.98, 0, Math.PI * 2);
-          ctx.strokeStyle = `rgba(255,255,255,${ringAlpha})`;
-          ctx.lineWidth   = 1.5;
-          ctx.stroke();
-        }
-      }
-
-      // Segunda mitad: fade out completo
-      else {
-        const fadeT = (t - 0.55) / 0.45;
-        const alpha = Math.max(0, 1 - easeInOutCubic(fadeT)) * 0.4;
-
-        ctx.fillStyle = `rgba(${rgb}, ${alpha})`;
-        ctx.fillRect(0, 0, W, H);
-      }
-
-      if (t >= 1) {
-        cancelAnimationFrame(frameRef.current);
-        onDone?.();
-        return;
-      }
-
-      frameRef.current = requestAnimationFrame(draw);
-    }
-
-    frameRef.current = requestAnimationFrame(draw);
-    return () => cancelAnimationFrame(frameRef.current);
+          setTimeout(() => {
+            onDone?.();
+          }, 340);
+        }, 180);
+      });
+    });
   }, []);
 
   return (
-    <canvas ref={canvasRef} style={{
-      position: "fixed", inset: 0, zIndex: 999,
-      pointerEvents: "none",
-    }} />
+    <div
+      ref={ref}
+      style={{
+        position: "fixed", inset: 0, zIndex: 999,
+        background: "var(--text)",
+        pointerEvents: "none",
+        display: "flex", alignItems: "center", justifyContent: "center",
+        transform: "translateY(100%)",
+      }}
+    >
+      {/* Logo / marca centrada — aparece durante la transición */}
+      <div style={{
+        display: "flex", flexDirection: "column",
+        alignItems: "center", gap: 12,
+        animation: "fadeIn 0.15s ease 0.1s both",
+      }}>
+        <div style={{
+          fontSize: 32, color: "var(--bg)",
+          fontFamily: "-apple-system, BlinkMacSystemFont, sans-serif",
+          fontWeight: 900, letterSpacing: -1,
+        }}>◆</div>
+        <div style={{
+          fontSize: 9, color: "var(--bg)",
+          opacity: 0.5,
+          fontFamily: "-apple-system, BlinkMacSystemFont, sans-serif",
+          letterSpacing: 4, fontWeight: 700,
+        }}>GYM TRACKER</div>
+      </div>
+    </div>
   );
 }

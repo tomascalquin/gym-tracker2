@@ -33,7 +33,7 @@ export default function FriendProfile({ friend, myUid, onBack, onRemove }) {
   const daysThisWeek = [...new Set(weekSessions.map(s => s.day))];
 
   return (
-    <div style={{ maxWidth: 440, margin: "0 auto", padding: "24px 18px", fontFamily: "DM Mono, monospace" }}>
+    <div style={{ maxWidth: 440, margin: "0 auto", padding: "24px 18px", fontFamily: "inherit" }}>
       {/* Header */}
       <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 20 }}>
         <button onClick={onBack} className="nbtn" style={{ color: "#475569", fontSize: 13, letterSpacing: 1 }}>← AMIGOS</button>
@@ -104,8 +104,8 @@ export default function FriendProfile({ friend, myUid, onBack, onRemove }) {
 
               {/* Días entrenados */}
               <div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 6, marginBottom: 16 }}>
-                {DAY_ORDER.map(day => {
-                  const c = DAY_META[day];
+                {Object.keys(routine).map(day => {
+                  const c = DAY_META[day] || { accent: "#60a5fa", dim: "#1e3a5f", tag: "DÍA" };
                   const done = daysThisWeek.includes(day);
                   return (
                     <div key={day} className="card" style={{
@@ -127,7 +127,7 @@ export default function FriendProfile({ friend, myUid, onBack, onRemove }) {
                 </div>
               )}
               {weekSessions.sort((a, b) => b.date.localeCompare(a.date)).map((s, i) => {
-                const c = DAY_META[s.day];
+                const c = DAY_META[s.day] || { accent: "#60a5fa", dim: "#1e3a5f", tag: "DÍA" };
                 return (
                   <div key={i} className="card" style={{ borderLeft: `3px solid ${c.accent}`, padding: "12px 14px", marginBottom: 8 }}>
                     <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
@@ -150,8 +150,8 @@ export default function FriendProfile({ friend, myUid, onBack, onRemove }) {
           {/* ── RUTINA ── */}
           {tab === "rutina" && (
             <div>
-              {DAY_ORDER.map(day => {
-                const c = DAY_META[day];
+              {Object.keys(routine).map(day => {
+                const c = DAY_META[day] || { accent: "#60a5fa", dim: "#1e3a5f", tag: "DÍA" };
                 const exercises = routine[day]?.exercises || [];
                 return (
                   <div key={day} className="card" style={{ marginBottom: 12, borderLeft: `3px solid ${c.accent}` }}>
@@ -206,7 +206,8 @@ function StatCard({ label, value, accent }) {
 }
 
 function CompareTab({ friend, friendLogs, friendRoutine }) {
-  const [selectedDay, setSelectedDay] = useState("Upper A");
+  const routineDays = Object.keys(friendRoutine || {});
+  const [selectedDay, setSelectedDay] = useState(routineDays[0] || "");
   const [selectedEx, setSelectedEx]   = useState(null);
 
   const exercises = friendRoutine[selectedDay]?.exercises || [];
@@ -243,8 +244,8 @@ function CompareTab({ friend, friendLogs, friendRoutine }) {
 
       {/* Selector día */}
       <div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 6, marginBottom: 12 }}>
-        {DAY_ORDER.map(d => {
-          const c = DAY_META[d];
+        {Object.keys(friendRoutine).map(d => {
+          const c = DAY_META[d] || { accent: "#60a5fa", dim: "#1e3a5f", tag: "DÍA" };
           const active = selectedDay === d;
           return (
             <button key={d} onClick={() => setSelectedDay(d)} style={{

@@ -32,7 +32,7 @@ export default function ProgressionView({ logs, routine, onBack }) {
   const analysis = selEx && selDay ? analyzeProgression(logs, routine, selDay, selEx) : null;
 
   return (
-    <div style={{ maxWidth: 460, margin: "0 auto", fontFamily: "DM Mono, monospace", animation: "fadeIn 0.25s ease" }}>
+    <div style={{ maxWidth: 460, margin: "0 auto", fontFamily: "inherit", animation: "fadeIn 0.25s ease" }}>
 
       {/* Header */}
       <div style={{ padding: "20px 18px 0" }}>
@@ -40,7 +40,7 @@ export default function ProgressionView({ logs, routine, onBack }) {
           <button onClick={onBack} className="nbtn" style={{ color: "var(--text3)", fontSize: 20, padding: "0 4px" }}>←</button>
           <div>
             <div style={{ fontSize: 9, color: "var(--text3)", letterSpacing: 3 }}>ANÁLISIS</div>
-            <h2 style={{ margin: 0, fontSize: 18, fontWeight: 300, color: "var(--text)" }}>Progresión</h2>
+            <h2 style={{ margin: 0, fontSize: 18, fontWeight: 400, color: "var(--text)" }}>Progresión</h2>
           </div>
         </div>
 
@@ -179,7 +179,7 @@ export default function ProgressionView({ logs, routine, onBack }) {
                   <div style={{ fontSize: 9, color: "var(--text3)", letterSpacing: 3, marginBottom: 8 }}>TENDENCIA — {selEx}</div>
                   <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
                     <div>
-                      <div style={{ fontSize: 22, fontWeight: 300, color: analysis.trend === "up" ? "#22c55e" : analysis.trend === "down" ? "#ef4444" : "var(--yellow)" }}>
+                      <div style={{ fontSize: 22, fontWeight: 400, color: analysis.trend === "up" ? "#22c55e" : analysis.trend === "down" ? "#ef4444" : "var(--yellow)" }}>
                         {analysis.trend === "up" ? "↑" : analysis.trend === "down" ? "↓" : "→"}
                         {" "}{analysis.rmGain > 0 ? "+" : ""}{analysis.rmGain} kg 1RM
                       </div>
@@ -256,7 +256,7 @@ function InputField({ label, value, onChange, placeholder, accent }) {
         width: "100%", background: "var(--bg3)", border: "1px solid var(--border)",
         color: accent || "var(--text)", padding: "10px", borderRadius: 10,
         fontSize: 16, fontFamily: "inherit", outline: "none",
-        textAlign: "center", fontWeight: 300, transition: "border-color 0.15s",
+        textAlign: "center", fontWeight: 400, transition: "border-color 0.15s",
       }} />
     </div>
   );

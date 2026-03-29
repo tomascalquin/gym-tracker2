@@ -90,7 +90,7 @@ export default function GroupDetail({ group, user, onBack, onLeave, onDelete, on
   ];
 
   return (
-    <div style={{ maxWidth: 460, margin: "0 auto", fontFamily: "DM Mono, monospace", animation: "fadeIn 0.25s ease" }}>
+    <div style={{ maxWidth: 460, margin: "0 auto", fontFamily: "inherit", animation: "fadeIn 0.25s ease" }}>
 
       {/* Hero header */}
       <div style={{

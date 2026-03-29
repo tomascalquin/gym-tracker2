@@ -41,7 +41,9 @@ import EditRoutineView from "./views/EditRoutineView";
 import OnboardingView from "./views/OnBoardingView";
 import WeeklySummaryView from "./views/WeeklySummaryView";
 import AchievementsView from "./views/AchievementsView";
+import TravelModeView from "./views/TravelModeView";
 import { evaluateAchievements, getNewlyUnlocked, saveUnlockedAchievements, loadUnlockedAchievements } from "./utils/achievements";
+import { registerOnlineListener, getPendingCount } from "./utils/offlineQueue";
 
 export default function App() {
   const [user, setUser]                     = useState(undefined);
@@ -68,14 +70,26 @@ export default function App() {
   const [timerVisible, setTimerVisible]     = useState(false);
   const [timerState, setTimerState]         = useState({ selected: 90, timeLeft: null, running: false, endTime: null }); // { oldRank, newRank, xpGained, prs }
 
+  const [isOffline, setIsOffline]           = useState(!navigator.onLine);
+
+  useEffect(() => {
+    const handleOnline  = () => setIsOffline(false);
+    const handleOffline = () => setIsOffline(true);
+    window.addEventListener("online",  handleOnline);
+    window.addEventListener("offline", handleOffline);
+    return () => {
+      window.removeEventListener("online",  handleOnline);
+      window.removeEventListener("offline", handleOffline);
+    };
+  }, []);
+
   useEffect(() => {
     const unsub = onAuthChange(fb => { setUser(fb); setAuthReady(true); });
     checkRedirectResult().catch(console.error);
     registerServiceWorker();
-    applyTheme(getTheme());
+    const saved = getTheme();
+    applyTheme(saved);
     checkInviteParam();
-    const savedTheme = getTheme();
-    document.body.style.background = savedTheme === "light" ? "#f1f5f9" : "#080810";
     return unsub;
   }, []);
 
@@ -108,9 +122,7 @@ export default function App() {
   function handleToggleTheme() {
     const next = theme === "dark" ? "light" : "dark";
     setTheme(next);
-    // tema guardado en localStorage por setTheme
-    // Aplicar clase al body
-    document.body.style.background = next === "light" ? "#f1f5f9" : "#080810";
+    applyTheme(next);
   }
 
   function handleProfileUpdated(updated) {
@@ -292,6 +304,19 @@ export default function App() {
     <>
       <Toast message={toastMsg} />
 
+      {/* Offline banner */}
+      {isOffline && (
+        <div style={{
+          position: "fixed", top: 0, left: 0, right: 0, zIndex: 999,
+          background: "#111", borderBottom: "1px solid #333",
+          padding: "8px 18px", textAlign: "center",
+          fontSize: 10, color: "#f5f5f0", letterSpacing: 2, fontWeight: 700,
+          fontFamily: "inherit",
+        }}>
+          SIN CONEXIÓN — los cambios se guardarán cuando vuelva internet
+        </div>
+      )}
+
       {rankUpData && (
         <RankUpModal
           oldRank={rankUpData.oldRank}
@@ -359,6 +384,7 @@ export default function App() {
             )}
             {currentView === "weeklySummary" && <WeeklySummaryView logs={logs} routine={routine} onBack={() => setView("home")} />}
             {currentView === "achievements"  && <AchievementsView logs={logs} routine={routine} userXP={userXP} onBack={() => setView("profile")} />}
+            {currentView === "travelMode"    && <TravelModeView onBack={() => setView("home")} />}
             {currentView === "editRoutine"   && (
               <EditRoutineView user={user} routine={routine} onBack={() => setView("home")}
                 onRoutineUpdated={(updated) => { setRoutine(updated); setView("home"); }}
@@ -388,11 +414,11 @@ function Splash({ text }) {
       position: "fixed", inset: 0,
       display: "flex", flexDirection: "column",
       alignItems: "center", justifyContent: "center",
-      gap: 16, background: "#080810",
-      color: "#475569", fontFamily: "DM Mono, monospace",
+      gap: 16, background: "var(--bg)",
+      fontFamily: "-apple-system, BlinkMacSystemFont, sans-serif",
     }}>
-      <div style={{ fontSize: 28, animation: "blink 1s infinite", color: "#60a5fa" }}>◆</div>
-      <div style={{ fontSize: 11, letterSpacing: 4 }}>{text}</div>
+      <div style={{ fontSize: 28, animation: "blink 1s infinite", color: "var(--text)" }}>◆</div>
+      <div style={{ fontSize: 10, letterSpacing: 4, fontWeight: 700, color: "var(--text3)" }}>{text}</div>
     </div>
   );
 }

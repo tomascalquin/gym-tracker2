@@ -24,14 +24,14 @@ export default function AchievementsView({ logs, routine, userXP, onBack }) {
   const unlockedCount = ACHIEVEMENTS.filter(a => unlocked.has(a.id)).length;
 
   return (
-    <div style={{ maxWidth: 460, margin: "0 auto", fontFamily: "DM Mono, monospace", animation: "fadeIn 0.25s ease" }}>
+    <div style={{ maxWidth: 460, margin: "0 auto", fontFamily: "inherit", animation: "fadeIn 0.25s ease" }}>
       {/* Header */}
       <div style={{ padding: "20px 18px 0" }}>
         <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 16 }}>
           <button onClick={onBack} className="nbtn" style={{ color: "var(--text3)", fontSize: 20, padding: "0 4px" }}>←</button>
           <div>
             <div style={{ fontSize: 9, color: "var(--text3)", letterSpacing: 3 }}>PERFIL</div>
-            <h2 style={{ margin: 0, fontSize: 18, fontWeight: 300, color: "var(--text)" }}>Logros</h2>
+            <h2 style={{ margin: 0, fontSize: 22, fontWeight: 900, color: "var(--text)", letterSpacing: -0.8 }}>Logros</h2>
           </div>
           <div style={{ marginLeft: "auto", textAlign: "right" }}>
             <div style={{ fontSize: 22, fontWeight: 300, color: "var(--text)" }}>{unlockedCount}</div>

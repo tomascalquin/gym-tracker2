@@ -37,14 +37,14 @@ export default function WeeklySummaryView({ logs, routine, onBack }) {
   }
 
   return (
-    <div style={{ maxWidth: 460, margin: "0 auto", fontFamily: "DM Mono, monospace", animation: "fadeIn 0.25s ease" }}>
+    <div style={{ maxWidth: 460, margin: "0 auto", fontFamily: "inherit", animation: "fadeIn 0.25s ease" }}>
       {/* Header */}
       <div style={{ padding: "20px 18px 0" }}>
         <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 20 }}>
           <button onClick={onBack} className="nbtn" style={{ color: "var(--text3)", fontSize: 20, padding: "0 4px" }}>←</button>
           <div>
             <div style={{ fontSize: 9, color: "var(--text3)", letterSpacing: 3 }}>INTELIGENCIA</div>
-            <h2 style={{ margin: 0, fontSize: 18, fontWeight: 300, color: "var(--text)" }}>Semana actual</h2>
+            <h2 style={{ margin: 0, fontSize: 22, fontWeight: 900, color: "var(--text)", letterSpacing: -0.8 }}>Semana actual</h2>
           </div>
         </div>
 
