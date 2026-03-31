@@ -76,7 +76,7 @@ export default function ChallengesView({ user, myLogs, myRoutine, onBack }) {
   const finished = challenges.filter(c => c.status !== "active");
 
   return (
-    <div style={{ maxWidth: 460, margin: "0 auto", fontFamily: "DM Mono, monospace", animation: "fadeIn 0.25s ease" }}>
+    <div style={{ maxWidth: 460, margin: "0 auto", fontFamily: "inherit", animation: "fadeIn 0.25s ease" }}>
 
       {/* Header */}
       <div style={{ padding: "20px 18px 0" }}>
@@ -84,7 +84,7 @@ export default function ChallengesView({ user, myLogs, myRoutine, onBack }) {
           <button onClick={onBack} className="nbtn" style={{ color: "var(--text3)", fontSize: 20, padding: "0 4px" }}>←</button>
           <div style={{ flex: 1 }}>
             <div style={{ fontSize: 9, color: "var(--text3)", letterSpacing: 3 }}>COMPETENCIA</div>
-            <h2 style={{ margin: 0, fontSize: 18, fontWeight: 300, color: "var(--text)" }}>Retos 1v1</h2>
+            <h2 style={{ margin: 0, fontSize: 22, fontWeight: 900, color: "var(--text)", letterSpacing: -0.8 }}>Retos 1v1</h2>
           </div>
           <button onClick={() => setShowCreate(v => !v)} style={{
             background: showCreate ? "transparent" : ACCENT,

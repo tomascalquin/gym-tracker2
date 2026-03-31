@@ -107,12 +107,12 @@ export default function EditRoutineView({ user, routine, onBack, onRoutineUpdate
   }
 
   return (
-    <div style={{ maxWidth: 500, margin: "0 auto", paddingBottom: 100, fontFamily: "DM Mono, monospace", animation: "fadeIn 0.25s ease" }}>
+    <div style={{ maxWidth: 500, margin: "0 auto", paddingBottom: 100, fontFamily: "inherit", animation: "fadeIn 0.25s ease" }}>
 
       {/* Header sticky */}
       <div style={{
         position: "sticky", top: 0, zIndex: 20,
-        background: "rgba(8,8,16,0.95)", backdropFilter: "blur(20px)",
+        background: "rgba(245,245,240,0.97)", backdropFilter: "blur(20px)",
         WebkitBackdropFilter: "blur(20px)",
         borderBottom: "1px solid var(--border)",
         padding: "12px 18px",

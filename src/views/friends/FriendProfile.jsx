@@ -36,7 +36,7 @@ export default function FriendProfile({ friend, myUid, onBack, onRemove }) {
     <div style={{ maxWidth: 440, margin: "0 auto", padding: "24px 18px", fontFamily: "inherit" }}>
       {/* Header */}
       <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 20 }}>
-        <button onClick={onBack} className="nbtn" style={{ color: "#475569", fontSize: 13, letterSpacing: 1 }}>← AMIGOS</button>
+        <button onClick={onBack} className="nbtn" style={{ color: "var(--text3)", fontSize: 13, letterSpacing: 1 }}>← AMIGOS</button>
         <div style={{ marginLeft: "auto", display: "flex", gap: 8 }}>
           {!confirmRemove ? (
             <button onClick={() => setConfirmRemove(true)} className="nbtn" style={{
@@ -50,7 +50,7 @@ export default function FriendProfile({ friend, myUid, onBack, onRemove }) {
                 padding: "5px 10px", borderRadius: 6, fontSize: 10, cursor: "pointer", fontFamily: "inherit",
               }}>¿SEGURO?</button>
               <button onClick={() => setConfirmRemove(false)} className="nbtn" style={{
-                border: "1px solid #1a1a2a", color: "#475569",
+                border: "1px solid #1a1a2a", color: "var(--text3)",
                 padding: "5px 10px", borderRadius: 6, fontSize: 10,
               }}>CANCELAR</button>
             </>
@@ -67,8 +67,8 @@ export default function FriendProfile({ friend, myUid, onBack, onRemove }) {
           fontSize: 22, color: "#60a5fa", fontWeight: 500,
         }}>{initial}</div>
         <div>
-          <div style={{ fontSize: 18, color: "#f1f5f9", fontWeight: 400 }}>{friend.displayName}</div>
-          <div style={{ fontSize: 12, color: "#475569" }}>{friend.email}</div>
+          <div style={{ fontSize: 18, color: "var(--text)", fontWeight: 400 }}>{friend.displayName}</div>
+          <div style={{ fontSize: 12, color: "var(--text3)" }}>{friend.email}</div>
         </div>
       </div>
 
@@ -90,7 +90,7 @@ export default function FriendProfile({ friend, myUid, onBack, onRemove }) {
       </div>
 
       {loading ? (
-        <div style={{ textAlign: "center", color: "#475569", padding: "40px 0", fontSize: 13 }}>Cargando...</div>
+        <div style={{ textAlign: "center", color: "var(--text3)", padding: "40px 0", fontSize: 13 }}>Cargando...</div>
       ) : (
         <>
           {/* ── SEMANA ── */}
@@ -122,7 +122,7 @@ export default function FriendProfile({ friend, myUid, onBack, onRemove }) {
 
               {/* Sesiones de la semana */}
               {weekSessions.length === 0 && (
-                <div style={{ textAlign: "center", color: "#475569", padding: "20px 0", fontSize: 13 }}>
+                <div style={{ textAlign: "center", color: "var(--text3)", padding: "20px 0", fontSize: 13 }}>
                   {friend.displayName.split(" ")[0]} no ha entrenado esta semana todavía.
                 </div>
               )}
@@ -132,15 +132,15 @@ export default function FriendProfile({ friend, myUid, onBack, onRemove }) {
                   <div key={i} className="card" style={{ borderLeft: `3px solid ${c.accent}`, padding: "12px 14px", marginBottom: 8 }}>
                     <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
                       <div>
-                        <div style={{ fontSize: 13, color: "#f1f5f9" }}>{s.day}</div>
-                        <div style={{ fontSize: 11, color: "#475569" }}>{s.date}</div>
+                        <div style={{ fontSize: 13, color: "var(--text)" }}>{s.day}</div>
+                        <div style={{ fontSize: 11, color: "var(--text3)" }}>{s.date}</div>
                       </div>
                       <div style={{ textAlign: "right" }}>
                         <div style={{ fontSize: 13, color: c.accent }}>{sessionVolume(s.sets).toLocaleString()} kg</div>
-                        <div style={{ fontSize: 10, color: "#475569" }}>{Object.values(s.completed || {}).filter(Boolean).length} sets ✓</div>
+                        <div style={{ fontSize: 10, color: "var(--text3)" }}>{Object.values(s.completed || {}).filter(Boolean).length} sets ✓</div>
                       </div>
                     </div>
-                    {s.note && <div style={{ fontSize: 11, color: "#475569", marginTop: 6, fontStyle: "italic" }}>"{s.note}"</div>}
+                    {s.note && <div style={{ fontSize: 11, color: "var(--text3)", marginTop: 6, fontStyle: "italic" }}>"{s.note}"</div>}
                   </div>
                 );
               })}
@@ -156,7 +156,7 @@ export default function FriendProfile({ friend, myUid, onBack, onRemove }) {
                 return (
                   <div key={day} className="card" style={{ marginBottom: 12, borderLeft: `3px solid ${c.accent}` }}>
                     <div style={{ padding: "10px 14px", borderBottom: "1px solid #1a1a2a", display: "flex", justifyContent: "space-between" }}>
-                      <span style={{ fontSize: 13, color: "#f1f5f9" }}>{day}</span>
+                      <span style={{ fontSize: 13, color: "var(--text)" }}>{day}</span>
                       <span style={{ fontSize: 10, color: c.accent }}>{exercises.length} ejercicios</span>
                     </div>
                     <div style={{ padding: "10px 14px" }}>
@@ -200,7 +200,7 @@ function StatCard({ label, value, accent }) {
   return (
     <div className="card" style={{ padding: "14px", textAlign: "center", borderLeft: `2px solid ${accent}` }}>
       <div style={{ fontSize: 20, fontWeight: 400, color: accent }}>{value}</div>
-      <div style={{ fontSize: 9, color: "#475569", letterSpacing: 1, marginTop: 3 }}>{label}</div>
+      <div style={{ fontSize: 9, color: "var(--text3)", letterSpacing: 1, marginTop: 3 }}>{label}</div>
     </div>
   );
 }
@@ -238,7 +238,7 @@ function CompareTab({ friend, friendLogs, friendRoutine }) {
 
   return (
     <div>
-      <div style={{ fontSize: 11, color: "#475569", marginBottom: 12 }}>
+      <div style={{ fontSize: 11, color: "var(--text3)", marginBottom: 12 }}>
         Comparando el mejor 1RM estimado (Epley) por ejercicio.
       </div>
 
@@ -261,8 +261,8 @@ function CompareTab({ friend, friendLogs, friendRoutine }) {
 
       {/* Selector ejercicio */}
       <select value={selectedEx || ""} onChange={e => setSelectedEx(e.target.value)} style={{
-        width: "100%", background: "#0e0e1a", border: "1px solid #1a1a2a",
-        color: "#94a3b8", padding: "9px 12px", borderRadius: 8,
+        width: "100%", background: "var(--bg2)", border: "1px solid #1a1a2a",
+        color: "var(--text2)", padding: "9px 12px", borderRadius: 8,
         fontSize: 13, fontFamily: "inherit", outline: "none", marginBottom: 16,
       }}>
         {exercises.map(ex => <option key={ex.name} value={ex.name}>{ex.name}</option>)}
@@ -281,7 +281,7 @@ function CompareTab({ friend, friendLogs, friendRoutine }) {
           />
 
           {friendBest === 0 && (
-            <div style={{ fontSize: 11, color: "#475569", textAlign: "center", marginTop: 8 }}>
+            <div style={{ fontSize: 11, color: "var(--text3)", textAlign: "center", marginTop: 8 }}>
               {friend.displayName.split(" ")[0]} aún no tiene registros de este ejercicio.
             </div>
           )}

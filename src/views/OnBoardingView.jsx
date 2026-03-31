@@ -278,7 +278,7 @@ export default function OnboardingView({ user, onRoutineReady }) {
   if (step === "choose") return (
     <div style={{
       maxWidth: 460, margin: "0 auto", padding: "32px 18px",
-      fontFamily: "DM Mono, monospace", minHeight: "100vh",
+      fontFamily: "inherit", minHeight: "100vh",
       background: "var(--bg)", animation: "fadeIn 0.3s ease",
     }}>
       {/* Skip arriba — primera opción visible */}
@@ -394,14 +394,14 @@ export default function OnboardingView({ user, onRoutineReady }) {
     return (
       <div style={{
         maxWidth: 460, margin: "0 auto", padding: "20px 18px",
-        fontFamily: "DM Mono, monospace", animation: "fadeIn 0.25s ease",
+        fontFamily: "inherit", animation: "fadeIn 0.25s ease",
       }}>
         {/* Header */}
         <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 20 }}>
           <button onClick={() => setStep("choose")} className="nbtn" style={{ color: "var(--text3)", fontSize: 20, padding: "0 4px" }}>←</button>
           <div>
             <div style={{ fontSize: 9, color: "var(--text3)", letterSpacing: 3 }}>VISTA PREVIA</div>
-            <h2 style={{ margin: 0, fontSize: 18, fontWeight: 300, color: "var(--text)" }}>{selected}</h2>
+            <h2 style={{ margin: 0, fontSize: 22, fontWeight: 900, color: "var(--text)", letterSpacing: -0.8 }}>{selected}</h2>
           </div>
         </div>
 

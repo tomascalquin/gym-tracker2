@@ -96,7 +96,7 @@ export default function FriendsView({ user, myProfile, onBack, onOpenChat }) {
           <button onClick={onBack} className="nbtn" style={{ color: "var(--text3)", fontSize: 20, padding: "0 4px" }}>←</button>
           <div>
             <div style={{ fontSize: 9, color: "var(--text3)", letterSpacing: 3 }}>SOCIAL</div>
-            <h2 style={{ margin: 0, fontSize: 18, fontWeight: 300, color: "var(--text)" }}>Amigos</h2>
+            <h2 style={{ margin: 0, fontSize: 22, fontWeight: 900, color: "var(--text)", letterSpacing: -0.8 }}>Amigos</h2>
           </div>
           {requests.length > 0 && (
             <div style={{

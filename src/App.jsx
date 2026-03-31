@@ -38,7 +38,7 @@ import { initPWAInstall, canInstall, installPWA, isInstalled } from "./utils/pwa
 import SessionTransition from "./components/SessionTransition";
 import { DAY_META } from "./data/routine";
 import EditRoutineView from "./views/EditRoutineView";
-import OnboardingView from "./views/OnBoardingView";
+import OnboardingView from "./views/OnboardingView";
 import WeeklySummaryView from "./views/WeeklySummaryView";
 import AchievementsView from "./views/AchievementsView";
 import TravelModeView from "./views/TravelModeView";
@@ -64,11 +64,11 @@ export default function App() {
   const [chatTarget, setChatTarget]         = useState(null);
   const [showConfetti, setShowConfetti]     = useState(false);
   const [sessionTransition, setSessionTransition] = useState(null);
-  const [showInstall, setShowInstall]         = useState(false); // { id, title, accent }
+  const [showInstall, setShowInstall]         = useState(false); 
   const [theme, setTheme]                   = useState(getTheme);
   const [timerOpen, setTimerOpen]           = useState(false);
   const [timerVisible, setTimerVisible]     = useState(false);
-  const [timerState, setTimerState]         = useState({ selected: 90, timeLeft: null, running: false, endTime: null }); // { oldRank, newRank, xpGained, prs }
+  const [timerState, setTimerState]         = useState({ selected: 90, timeLeft: null, running: false, endTime: null }); 
 
   const [isOffline, setIsOffline]           = useState(!navigator.onLine);
 
@@ -167,13 +167,15 @@ export default function App() {
       setSessionData(draft.sessionData);
       setCompletedSets(draft.completedSets);
       setSessionNote(draft.sessionNote || "");
-      // Mostrar transición épica
-    const meta  = DAY_META[day];
-    const color = meta?.accent || "#60a5fa";
-    setSessionTransition(color);
-    setTimeout(() => {
-      setActiveDay(day); setView("session");
-    }, 350);
+      
+      const meta  = DAY_META[day];
+      const color = meta?.accent || "#60a5fa";
+      setSessionTransition(color);
+      setTimeout(() => {
+        window.scrollTo(0, 0); 
+        setActiveDay(day); 
+        setView("session");
+      }, 350);
       return;
     }
 
@@ -190,12 +192,15 @@ export default function App() {
       });
       setSessionData(defaults); setCompletedSets({}); setSessionNote("");
     }
+    
     // Mostrar transición épica
     const meta  = DAY_META[day];
     const color = meta?.accent || "#60a5fa";
     setSessionTransition(color);
     setTimeout(() => {
-      setActiveDay(day); setView("session");
+      window.scrollTo(0, 0); 
+      setActiveDay(day); 
+      setView("session");
     }, 350);
   }
 

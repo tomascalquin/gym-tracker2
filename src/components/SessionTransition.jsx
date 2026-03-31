@@ -13,43 +13,46 @@ export default function SessionTransition({ color, onDone }) {
     const el = ref.current;
     if (!el) return;
 
-    // Fase 1: entrar (panel sube desde abajo)
-    // Fase 2: pausa breve
-    // Fase 3: salir (panel sube fuera de pantalla)
-    // Total: ~700ms
-
+    // Estado inicial
     el.style.transition = "none";
     el.style.transform  = "translateY(100%)";
 
     // Frame para asegurar que el estado inicial se pinte
     requestAnimationFrame(() => {
       requestAnimationFrame(() => {
-        // Entrar
-        el.style.transition = "transform 0.32s cubic-bezier(0.76, 0, 0.24, 1)";
+        // Fase 1: Entrar (panel sube fluido desde abajo usando GPU)
+        el.style.transition = "transform 0.3s cubic-bezier(0.85, 0, 0.15, 1)";
         el.style.transform  = "translateY(0%)";
 
-        // Pausa + salir
+        // Fase 2: Pausa extendida.
+        // App.jsx cambia la vista internamente a los 350ms. 
+        // Esperamos hasta los 550ms para asegurar que el renderizado pesado de React 
+        // haya terminado detrás del panel negro sin que el usuario lo note.
         setTimeout(() => {
-          el.style.transition = "transform 0.32s cubic-bezier(0.76, 0, 0.24, 1)";
+          // Fase 3: Salir hacia arriba
+          el.style.transition = "transform 0.35s cubic-bezier(0.85, 0, 0.15, 1)";
           el.style.transform  = "translateY(-100%)";
 
+          // Limpiar el componente
           setTimeout(() => {
             onDone?.();
-          }, 340);
-        }, 180);
+          }, 400); // Dar tiempo seguro a que termine de salir
+        }, 550);
       });
     });
-  }, []);
+  }, [onDone]);
 
   return (
     <div
       ref={ref}
       style={{
-        position: "fixed", inset: 0, zIndex: 999,
+        position: "fixed", inset: 0, zIndex: 9999,
         background: "var(--text)",
-        pointerEvents: "none",
+        pointerEvents: "all", // CRUCIAL: Bloquea toques accidentales mientras transiciona
+        touchAction: "none",  // CRUCIAL: Evita el pull-to-refresh o scroll fantasma en iOS/Android
         display: "flex", alignItems: "center", justifyContent: "center",
         transform: "translateY(100%)",
+        willChange: "transform", // CRUCIAL: Fuerza la aceleración por hardware (cero tirones)
       }}
     >
       {/* Logo / marca centrada — aparece durante la transición */}

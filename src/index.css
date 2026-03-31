@@ -131,3 +131,9 @@ textarea { resize: none; }
 .divider { height: 1px; background: var(--border); margin: 12px 0; }
 .section-label { font-size: 9px; letter-spacing: 2.5px; color: var(--text3); margin-bottom: 8px; text-transform: uppercase; font-weight: 700; }
 @keyframes glow-pulse { 0%,100%{opacity:1} 50%{opacity:0.6} }
+
+/* ── Fix navbar jump during page transitions ── */
+.scroll-view {
+  position: relative;
+  overflow-x: hidden;
+}

@@ -48,19 +48,19 @@ export default function ActiveSessionBanner({ activeDay, sessionDate, completedS
       `}</style>
 
       <div style={{
-        background: "rgba(8,8,16,0.92)",
+        background: "var(--bg)",
         backdropFilter: "blur(20px)", WebkitBackdropFilter: "blur(20px)",
-        border: `1.5px solid ${c.accent}66`,
+        border: "1.5px solid var(--text)",
         borderRadius: 16, padding: "12px 14px",
         display: "flex", alignItems: "center", gap: 10,
         animation: "activePulse 2s ease-in-out infinite",
       }}>
         {/* Indicador pulsante */}
         <div style={{ position: "relative", flexShrink: 0 }}>
-          <div style={{ width: 10, height: 10, borderRadius: "50%", background: c.accent }} />
+          <div style={{ width: 10, height: 10, borderRadius: "50%", background: "var(--text)" }} />
           <div style={{
             position: "absolute", inset: -3, borderRadius: "50%",
-            border: `1.5px solid ${c.accent}`,
+            border: "1.5px solid var(--text3)",
             animation: "ping 1.2s ease-in-out infinite",
           }} />
         </div>
@@ -71,7 +71,7 @@ export default function ActiveSessionBanner({ activeDay, sessionDate, completedS
           textAlign: "left", fontFamily: "inherit", padding: 0,
           WebkitTapHighlightColor: "transparent",
         }}>
-          <div style={{ fontSize: 12, color: c.accent, letterSpacing: 1 }}>
+          <div style={{ fontSize: 12, color: "var(--text)", letterSpacing: 1 }}>
             {activeDay} · EN PROGRESO
           </div>
           <div style={{ fontSize: 10, color: "var(--text3)", marginTop: 2 }}>
@@ -83,17 +83,17 @@ export default function ActiveSessionBanner({ activeDay, sessionDate, completedS
         <div style={{ width: 48, flexShrink: 0 }}>
           <div style={{ background: "var(--border)", borderRadius: 99, height: 4, overflow: "hidden" }}>
             <div style={{
-              height: "100%", borderRadius: 99, background: c.accent,
+              height: "100%", borderRadius: 99, background: "var(--text)",
               width: `${pct}%`, transition: "width 0.4s ease",
               boxShadow: `0 0 6px ${c.accent}88`,
             }} />
           </div>
-          <div style={{ fontSize: 9, color: c.accent, textAlign: "right", marginTop: 3 }}>{pct}%</div>
+          <div style={{ fontSize: 9, color: "var(--text)", textAlign: "right", marginTop: 3 }}>{pct}%</div>
         </div>
 
         {/* Continuar */}
         <button onClick={handleResume} style={{
-          background: c.accent, color: "#000",
+          background: "var(--text)", color: "#000",
           padding: "6px 10px", borderRadius: 99,
           fontSize: 10, fontWeight: 700, letterSpacing: 1,
           border: "none", cursor: "pointer", fontFamily: "inherit",
@@ -104,7 +104,7 @@ export default function ActiveSessionBanner({ activeDay, sessionDate, completedS
         {/* Descartar ✕ */}
         <button onClick={handleDiscard} style={{
           background: "transparent",
-          border: "1px solid #3f1010",
+          border: "1px solid var(--border)",
           color: "var(--red)",
           width: 28, height: 28, borderRadius: 8,
           cursor: "pointer", fontSize: 12,
