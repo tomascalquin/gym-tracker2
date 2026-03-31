@@ -45,7 +45,6 @@ export default function ProfileView({ user, myProfile, userXP, logs, onBack, onP
     const next = toggleTheme();
     setThemeState(next);
     haptics.light();
-    document.body.style.background = next === "light" ? "#f5f5f0" : "#f5f5f0";
   }
 
   async function handleCopyInvite() {

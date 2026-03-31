@@ -42,6 +42,7 @@ import OnboardingView from "./views/OnboardingView";
 import WeeklySummaryView from "./views/WeeklySummaryView";
 import AchievementsView from "./views/AchievementsView";
 import TravelModeView from "./views/TravelModeView";
+import ToolsView from "./views/ToolsView";
 import { evaluateAchievements, getNewlyUnlocked, saveUnlockedAchievements, loadUnlockedAchievements } from "./utils/achievements";
 import { registerOnlineListener, getPendingCount } from "./utils/offlineQueue";
 
@@ -175,7 +176,7 @@ export default function App() {
         window.scrollTo(0, 0); 
         setActiveDay(day); 
         setView("session");
-      }, 350);
+      }, 280);
       return;
     }
 
@@ -193,7 +194,7 @@ export default function App() {
       setSessionData(defaults); setCompletedSets({}); setSessionNote("");
     }
     
-    // Mostrar transición épica
+    // Panel negro cubre pantalla en 280ms, luego swapeamos vista
     const meta  = DAY_META[day];
     const color = meta?.accent || "#60a5fa";
     setSessionTransition(color);
@@ -201,7 +202,7 @@ export default function App() {
       window.scrollTo(0, 0); 
       setActiveDay(day); 
       setView("session");
-    }, 350);
+    }, 280);
   }
 
   async function saveSession() {
@@ -390,6 +391,7 @@ export default function App() {
             {currentView === "weeklySummary" && <WeeklySummaryView logs={logs} routine={routine} onBack={() => setView("home")} />}
             {currentView === "achievements"  && <AchievementsView logs={logs} routine={routine} userXP={userXP} onBack={() => setView("profile")} />}
             {currentView === "travelMode"    && <TravelModeView onBack={() => setView("home")} />}
+            {currentView === "tools"          && <ToolsView onBack={() => setView("home")} />}
             {currentView === "editRoutine"   && (
               <EditRoutineView user={user} routine={routine} onBack={() => setView("home")}
                 onRoutineUpdated={(updated) => { setRoutine(updated); setView("home"); }}

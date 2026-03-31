@@ -1,10 +1,17 @@
 import { useState, useEffect, useRef } from "react";
 
+// Pares de vistas que tienen su propia transición (SessionTransition),
+// por lo que PageTransition NO debe animar entre ellas.
+const SILENT_PAIRS = new Set([
+  "home→session",
+  "session→home",
+]);
+
 const VIEW_HIERARCHY = [
   "home",
   "history", "progress", "progression", "friends", "leaderboard",
   "session", "profile", "editRoutine", "challenges",
-  "groups", "chat",
+  "groups", "chat", "tools",
 ];
 
 function getDirection(from, to) {
@@ -24,9 +31,20 @@ export default function PageTransition({ view, children }) {
     if (isFirstRender.current) { isFirstRender.current = false; return; }
     if (view === displayView) return;
 
+    const pair = `${prevViewRef.current}→${view}`;
+    const silent = SILENT_PAIRS.has(pair);
+
+    if (silent) {
+      // Swap instantáneo: SessionTransition ya cubre la transición visual
+      prevViewRef.current = view;
+      setDisplayView(view);
+      setAnimClass("");
+      return;
+    }
+
     const direction  = getDirection(prevViewRef.current, view);
     const enterClass = direction === "right" ? "slide-enter-right" : "slide-enter-left";
-    const exitClass  = direction === "right" ? "slide-exit-left"  : "slide-exit-right";
+    const exitClass  = direction === "right" ? "slide-exit-left"   : "slide-exit-right";
 
     setAnimClass(exitClass);
     setTimeout(() => {
@@ -51,14 +69,10 @@ export default function PageTransition({ view, children }) {
         @keyframes slideOutRight { from{transform:translateX(0);opacity:1} to{transform:translateX(30px);opacity:0} }
       `}</style>
 
-      {/* 
-        position:absolute + overflow:hidden en el padre (scroll-view)
-        asegura que la animación nunca afecte el layout de la TabBar 
-      */}
       <div
         key={displayView}
         className={animClass}
-        style={{ willChange: "transform, opacity" }}
+        style={{ willChange: "transform, opacity", minHeight: "100%" }}
       >
         {children(displayView)}
       </div>

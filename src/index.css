@@ -1,26 +1,46 @@
 * { box-sizing: border-box; margin: 0; padding: 0; }
 
 :root {
-  --bg:      #f5f5f0;
-  --bg2:     #ffffff;
-  --bg3:     #eeede8;
-  --border:  #e0dfd8;
-  --text:    #111111;
-  --text2:   #555550;
-  --text3:   #99998a;
-  --accent:  #111111;
-  --green:   #1a6b3a;
-  --red:     #c0392b;
-  --yellow:  #b8860b;
+  /* ── Liquid Glass Dark ── */
+  --bg:      #080810;
+  --bg2:     rgba(255,255,255,0.07);
+  --bg3:     rgba(255,255,255,0.04);
+  --border:  rgba(255,255,255,0.12);
+  --border2: rgba(255,255,255,0.20);
+  --text:    #f0f0f0;
+  --text2:   rgba(240,240,240,0.55);
+  --text3:   rgba(240,240,240,0.30);
+  --accent:  #f0f0f0;
+  --green:   #4ade80;
+  --red:     #f87171;
+  --yellow:  #fbbf24;
+
+  /* Glass surfaces */
+  --glass-bg:       rgba(255,255,255,0.08);
+  --glass-bg-hover: rgba(255,255,255,0.12);
+  --glass-bg-done:  rgba(255,255,255,0.88);
+  --glass-border:   rgba(255,255,255,0.14);
+  --glass-border2:  rgba(255,255,255,0.22);
+  --glass-blur:     blur(40px) saturate(180%);
+  --glass-blur-sm:  blur(20px) saturate(160%);
+
+  /* Safe area */
   --sat: env(safe-area-inset-top);
   --sab: env(safe-area-inset-bottom);
   --sal: env(safe-area-inset-left);
   --sar: env(safe-area-inset-right);
-  --tab-height: 64px;
-  --bottom-pad: calc(var(--tab-height) + var(--sab) + 24px);
+
+  /* Layout */
+  --tab-height: 72px;
+  --bottom-pad: calc(var(--tab-height) + var(--sab) + 32px);
+
+  /* Gradient orbs */
+  --orb1: radial-gradient(ellipse 60% 50% at 20% 10%, rgba(88,56,230,0.45) 0%, transparent 70%);
+  --orb2: radial-gradient(ellipse 50% 60% at 80% 30%, rgba(14,100,200,0.35) 0%, transparent 70%);
+  --orb3: radial-gradient(ellipse 55% 45% at 50% 85%, rgba(120,40,180,0.30) 0%, transparent 70%);
 }
 
-html, body { min-height: 100%; }
+html, body { height: 100%; overflow: hidden; }
 
 body {
   background: var(--bg);
@@ -33,20 +53,40 @@ body {
   touch-action: manipulation;
 }
 
-.mono { font-family: "DM Mono", monospace; }
+/* ── Fondo global con gradientes animados ── */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  background:
+    var(--orb1),
+    var(--orb2),
+    var(--orb3),
+    #080810;
+  pointer-events: none;
+}
 
 #root {
-  min-height: 100%;
+  position: relative;
+  z-index: 1;
+  height: 100%;
   display: flex;
   flex-direction: column;
   padding-top: var(--sat);
-  background: var(--bg);
+  overflow: hidden;
 }
+
+.mono { font-family: "DM Mono", monospace; }
 
 .scroll-view {
   flex: 1;
   padding-bottom: var(--bottom-pad);
   width: 100%;
+  overflow-y: auto;
+  overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
+  position: relative;
 }
 
 input, textarea, select, button {
@@ -62,24 +102,48 @@ button {
 }
 
 input[type="number"]::-webkit-inner-spin-button { opacity: 0.3; }
-input[type="date"]::-webkit-calendar-picker-indicator { opacity: 0.4; }
+input[type="date"]::-webkit-calendar-picker-indicator { opacity: 0.3; }
+input[type="date"] { color-scheme: dark; }
 textarea { resize: none; }
 
 ::-webkit-scrollbar { display: none; }
 * { scrollbar-width: none; }
 
+/* ── Glass card ── */
 .card {
-  background: var(--bg2);
-  border: 1px solid var(--border);
+  background: var(--glass-bg);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  border: 1px solid var(--glass-border);
+  border-radius: 20px;
+}
+
+.card-sm {
+  background: var(--glass-bg);
+  backdrop-filter: var(--glass-blur-sm);
+  -webkit-backdrop-filter: var(--glass-blur-sm);
+  border: 1px solid var(--glass-border);
   border-radius: 16px;
+}
+
+/* Invert card (done state) */
+.card-done {
+  background: rgba(255,255,255,0.90);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  border: 1px solid rgba(255,255,255,0.95);
+  border-radius: 20px;
 }
 
 .card-dark {
-  background: var(--text);
+  background: rgba(0,0,0,0.55);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  border: 1px solid var(--glass-border);
   border-radius: 16px;
 }
 
-.rule { height: 1.5px; background: var(--text); }
+.rule       { height: 1px; background: var(--border); }
 .rule-light { height: 1px; background: var(--border); }
 
 .nbtn {
@@ -92,6 +156,7 @@ textarea { resize: none; }
   min-height: 44px;
   display: inline-flex;
   align-items: center;
+  color: var(--text);
 }
 
 .dot-btn {
@@ -107,8 +172,12 @@ textarea { resize: none; }
   line-height: 1 !important;
 }
 
+/* ── Skeleton glass ── */
 .skeleton {
-  background: linear-gradient(90deg, var(--bg3) 25%, var(--border) 50%, var(--bg3) 75%);
+  background: linear-gradient(90deg,
+    rgba(255,255,255,0.05) 25%,
+    rgba(255,255,255,0.10) 50%,
+    rgba(255,255,255,0.05) 75%);
   background-size: 200% 100%;
   animation: skeleton-shimmer 1.4s infinite;
   border-radius: 8px;
@@ -118,22 +187,73 @@ textarea { resize: none; }
   100% { background-position: -200% 0; }
 }
 
-@keyframes slideDown { from { opacity:0; transform:translateY(-6px); } to { opacity:1; transform:translateY(0); } }
+/* ── Animations ── */
+@keyframes slideDown { from { opacity:0; transform:translateY(-8px); } to { opacity:1; transform:translateY(0); } }
 @keyframes slideUp   { from { opacity:0; transform:translateY(20px); } to { opacity:1; transform:translateY(0); } }
 @keyframes blink     { 0%,100%{opacity:1} 50%{opacity:0.15} }
 @keyframes fadeIn    { from { opacity:0; } to { opacity:1; } }
 @keyframes scaleIn   { from { opacity:0; transform:scale(0.96); } to { opacity:1; transform:scale(1); } }
-@keyframes pageEnter { from { opacity:0; transform:translateY(10px); } to { opacity:1; transform:translateY(0); } }
-
-.page-enter { animation: pageEnter 0.22s ease both; }
-.btn-press { transition: transform 0.1s ease; -webkit-tap-highlight-color: transparent; }
-.btn-press:active { transform: scale(0.97); }
-.divider { height: 1px; background: var(--border); margin: 12px 0; }
-.section-label { font-size: 9px; letter-spacing: 2.5px; color: var(--text3); margin-bottom: 8px; text-transform: uppercase; font-weight: 700; }
+@keyframes pageEnter { from { opacity:0; transform:translateY(12px); } to { opacity:1; transform:translateY(0); } }
+@keyframes glassIn   { from { opacity:0; transform:scale(0.97) translateY(6px); } to { opacity:1; transform:scale(1) translateY(0); } }
 @keyframes glow-pulse { 0%,100%{opacity:1} 50%{opacity:0.6} }
 
-/* ── Fix navbar jump during page transitions ── */
-.scroll-view {
-  position: relative;
-  overflow-x: hidden;
+.page-enter  { animation: pageEnter 0.28s cubic-bezier(0.22,1,0.36,1) both; }
+.glass-enter { animation: glassIn 0.32s cubic-bezier(0.22,1,0.36,1) both; }
+
+.btn-press { transition: transform 0.12s ease; -webkit-tap-highlight-color: transparent; }
+.btn-press:active { transform: scale(0.97); }
+
+.divider { height: 1px; background: var(--border); margin: 12px 0; }
+.section-label {
+  font-size: 9px; letter-spacing: 2.5px;
+  color: var(--text3);
+  margin-bottom: 8px;
+  text-transform: uppercase; font-weight: 700;
 }
+
+/* ── DayRow animation ── */
+.day-row-btn { animation: slideDown 0.22s ease both; }
+
+/* ── Glass input override ── */
+input[type="text"],
+input[type="number"],
+input[type="email"],
+input[type="password"],
+input[type="date"],
+textarea,
+select {
+  background: rgba(255,255,255,0.08) !important;
+  border: 1px solid rgba(255,255,255,0.14) !important;
+  color: #f0f0f0 !important;
+  border-radius: 12px !important;
+}
+input::placeholder { color: rgba(240,240,240,0.3) !important; }
+select option { background: #111122; color: #f0f0f0; }
+
+/* ── Glass button overrides ── */
+.glass-btn {
+  background: rgba(255,255,255,0.09);
+  backdrop-filter: var(--glass-blur-sm);
+  -webkit-backdrop-filter: var(--glass-blur-sm);
+  border: 1px solid var(--glass-border);
+  border-radius: 14px;
+  color: var(--text);
+  cursor: pointer;
+  font-family: inherit;
+  transition: background 0.15s, border-color 0.15s, transform 0.1s;
+  -webkit-tap-highlight-color: transparent;
+}
+.glass-btn:active { transform: scale(0.97); background: rgba(255,255,255,0.14); }
+
+.glass-btn-primary {
+  background: rgba(255,255,255,0.92);
+  border: 1px solid rgba(255,255,255,0.95);
+  border-radius: 14px;
+  color: #080810;
+  font-weight: 700;
+  cursor: pointer;
+  font-family: inherit;
+  transition: all 0.15s;
+  -webkit-tap-highlight-color: transparent;
+}
+.glass-btn-primary:active { transform: scale(0.97); background: rgba(255,255,255,0.80); }

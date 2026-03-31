@@ -11,53 +11,81 @@ const TABS = [
 export const TAB_VIEWS = TABS.map(t => t.key);
 
 export default function TabBar({ currentView, onNavigate }) {
+  const [pressed, setPressed] = useState(null);
+
   return (
     <div style={{
-      position: "fixed", bottom: 0, left: 0, right: 0, zIndex: 100,
-      background: "var(--bg)",
-      borderTop: "1.5px solid var(--text)",
-      display: "flex",
-      paddingBottom: "env(safe-area-inset-bottom)",
-      height: "calc(64px + env(safe-area-inset-bottom))",
+      position: "fixed",
+      bottom: "calc(env(safe-area-inset-bottom) + 16px)",
+      left: "50%",
+      transform: "translateX(-50%)",
+      zIndex: 100,
+      width: "calc(100% - 40px)",
+      maxWidth: 420,
     }}>
-      {TABS.map(tab => {
-        const active = currentView === tab.key;
-        return (
-          <button
-            key={tab.key}
-            onClick={() => onNavigate(tab.key)}
-            style={{
-              flex: 1, display: "flex", flexDirection: "column",
-              alignItems: "center", justifyContent: "center",
-              gap: 3, padding: "8px 4px 0",
-              background: "none", border: "none",
-              cursor: "pointer", fontFamily: "inherit",
-              WebkitTapHighlightColor: "transparent",
-              position: "relative",
-            }}
-          >
-            {active && (
-              <div style={{
-                position: "absolute", top: 0, left: "50%",
-                transform: "translateX(-50%)",
-                width: 28, height: 2,
-                background: "var(--text)",
-              }} />
-            )}
-            <span style={{
-              fontSize: 18, lineHeight: 1,
-              color: active ? "var(--text)" : "var(--border)",
-              transition: "color 0.15s",
-            }}>{tab.icon}</span>
-            <span style={{
-              fontSize: 8, letterSpacing: 1.5,
-              color: active ? "var(--text)" : "var(--text3)",
-              fontWeight: active ? 700 : 400,
-              transition: "color 0.15s",
-            }}>{tab.label.toUpperCase()}</span>
-          </button>
-        );
-      })}
+      <div style={{
+        display: "flex",
+        background: "rgba(12,12,28,0.65)",
+        backdropFilter: "blur(40px) saturate(180%)",
+        WebkitBackdropFilter: "blur(40px) saturate(180%)",
+        border: "1px solid rgba(255,255,255,0.14)",
+        borderRadius: 99,
+        padding: "6px",
+        gap: 2,
+      }}>
+        {TABS.map(tab => {
+          const active = currentView === tab.key;
+          const isPressed = pressed === tab.key;
+          return (
+            <button
+              key={tab.key}
+              onClick={() => onNavigate(tab.key)}
+              onTouchStart={() => setPressed(tab.key)}
+              onTouchEnd={() => setPressed(null)}
+              onMouseDown={() => setPressed(tab.key)}
+              onMouseUp={() => setPressed(null)}
+              onMouseLeave={() => setPressed(null)}
+              style={{
+                flex: 1,
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+                justifyContent: "center",
+                gap: 2,
+                padding: "8px 4px",
+                background: active
+                  ? "rgba(255,255,255,0.15)"
+                  : isPressed
+                    ? "rgba(255,255,255,0.08)"
+                    : "transparent",
+                border: "none",
+                borderRadius: 99,
+                cursor: "pointer",
+                fontFamily: "inherit",
+                WebkitTapHighlightColor: "transparent",
+                transition: "background 0.15s",
+                transform: isPressed ? "scale(0.94)" : "scale(1)",
+              }}
+            >
+              <span style={{
+                fontSize: 18,
+                lineHeight: 1,
+                color: active ? "#fff" : "rgba(240,240,240,0.30)",
+                transition: "color 0.15s, transform 0.15s",
+                transform: active ? "scale(1.08)" : "scale(1)",
+                display: "block",
+              }}>{tab.icon}</span>
+              <span style={{
+                fontSize: 7,
+                letterSpacing: 1.2,
+                color: active ? "rgba(255,255,255,0.9)" : "rgba(240,240,240,0.25)",
+                fontWeight: active ? 700 : 400,
+                transition: "color 0.15s",
+              }}>{tab.label.toUpperCase()}</span>
+            </button>
+          );
+        })}
+      </div>
     </div>
   );
 }
