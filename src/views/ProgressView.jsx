@@ -108,17 +108,27 @@ function EjerciciosSection({ logs, routine, routineDays }) {
   return (
     <div>
       {/* Selector de día */}
-      <div style={{ display: "flex", gap: 6, flexWrap: "wrap", marginBottom: 16 }}>
+      <div style={{
+        display: "flex", gap: 6, flexWrap: "wrap", marginBottom: 16,
+        background: "rgba(255,255,255,0.05)",
+        backdropFilter: "blur(20px)", WebkitBackdropFilter: "blur(20px)",
+        border: "1px solid rgba(255,255,255,0.10)",
+        borderRadius: 14, padding: 6,
+      }}>
         {routineDays.map(d => {
           const active = selectedDay === d;
           return (
             <button key={d} onClick={() => handleDayChange(d)} style={{
-              background: active ? "rgba(255,255,255,0.90)" : "rgba(255,255,255,0.06)",
-              border: `1px solid ${active ? "rgba(255,255,255,0.95)" : "rgba(255,255,255,0.12)"}`,
-              color: active ? "#080810" : "rgba(240,240,240,0.40)",
-              padding: "6px 14px", borderRadius: 99, cursor: "pointer",
-              fontSize: 10, letterSpacing: 1.5, fontWeight: 700,
-              fontFamily: "inherit", transition: "all 0.15s",
+              flex: 1,
+              background: active ? "rgba(255,255,255,0.14)" : "transparent",
+              backdropFilter: active ? "blur(20px)" : "none",
+              WebkitBackdropFilter: active ? "blur(20px)" : "none",
+              border: active ? "1px solid rgba(255,255,255,0.22)" : "1px solid transparent",
+              color: active ? "#fff" : "rgba(240,240,240,0.35)",
+              padding: "7px 10px", borderRadius: 10, cursor: "pointer",
+              fontSize: 10, letterSpacing: 1.5, fontWeight: active ? 700 : 400,
+              fontFamily: "inherit", transition: "all 0.2s",
+              WebkitTapHighlightColor: "transparent",
             }}>{d}</button>
           );
         })}
@@ -135,11 +145,20 @@ function EjerciciosSection({ logs, routine, routineDays }) {
               key={ex.name}
               onClick={() => setSelectedEx(ex.name)}
               style={{
-                width: "100%", background: selectedEx === ex.name ? "rgba(255,255,255,0.12)" : "transparent",
-                border: "none", borderBottom: "1px solid var(--glass-border)",
-                padding: "12px 0", cursor: "pointer", fontFamily: "inherit",
+                width: "100%",
+                background: selectedEx === ex.name ? "rgba(255,255,255,0.10)" : "transparent",
+                backdropFilter: selectedEx === ex.name ? "blur(20px)" : "none",
+                WebkitBackdropFilter: selectedEx === ex.name ? "blur(20px)" : "none",
+                border: selectedEx === ex.name
+                  ? "1px solid rgba(255,255,255,0.18)"
+                  : "1px solid transparent",
+                borderRadius: selectedEx === ex.name ? 14 : 0,
+                borderBottom: selectedEx === ex.name ? undefined : "1px solid rgba(255,255,255,0.07)",
+                padding: "12px 12px", marginBottom: selectedEx === ex.name ? 4 : 0,
+                cursor: "pointer", fontFamily: "inherit",
                 display: "flex", alignItems: "center", justifyContent: "space-between",
                 WebkitTapHighlightColor: "transparent",
+                transition: "all 0.18s",
               }}
             >
               <div style={{ display: "flex", alignItems: "center", gap: 10 }}>

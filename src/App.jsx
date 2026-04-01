@@ -12,7 +12,7 @@ import { calcStreak } from "./utils/streak";
 import { registerServiceWorker, showLocalNotification } from "./utils/notifications";
 import { applyTheme, getTheme } from "./utils/theme";
 import { checkInviteParam, processPendingInvite } from "./utils/invite";
-import { saveDraft, loadDraft, clearDraft } from "./utils/sessionDraft";
+import { saveDraft, loadDraft, clearDraft, registerDraftGuard } from "./utils/sessionDraft";
 import ChatView from "./components/ChatView";
 import { getDMChatId, getGroupChatId } from "./utils/chat";
 import AuthScreen from "./components/AuthScreen";
@@ -138,12 +138,21 @@ export default function App() {
     }, 3000);
   }, []);
 
-  // Auto-guardar borrador de sesión en localStorage
+  // Auto-guardar borrador en localStorage cuando cambian los datos
   useEffect(() => {
     if (view === "session" && activeDay && user) {
       saveDraft(user.uid, { activeDay, sessionDate, sessionData, completedSets, sessionNote });
     }
   }, [sessionData, completedSets, sessionNote, view, activeDay]);
+
+  // Guardar borrador cuando la app va al fondo o se cierra
+  useEffect(() => {
+    if (view !== "session" || !activeDay || !user) return;
+    const unregister = registerDraftGuard(() => ({
+      uid: user.uid, activeDay, sessionDate, sessionData, completedSets, sessionNote,
+    }));
+    return unregister;
+  }, [view, activeDay, user, sessionDate, sessionData, completedSets, sessionNote]);
 
   async function handleLogout() {
     await logout();

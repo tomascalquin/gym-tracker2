@@ -14,7 +14,12 @@ import { DAY_ORDER } from "../data/routine";
 import { enqueue, isOnline } from "./offlineQueue";
 
 export function getSessionKey(day, date) { return `${day}__${date}`; }
-export function todayStr() { return new Date().toISOString().split("T")[0]; }
+export function todayStr() {
+  const d = new Date();
+  const offset = d.getTimezoneOffset(); // minutos
+  const local = new Date(d.getTime() - offset * 60000);
+  return local.toISOString().split("T")[0];
+}
 
 function logsCol(uid)         { return collection(db, "users", uid, "gym_logs"); }
 function logDoc(uid, key)     { return doc(db, "users", uid, "gym_logs", key); }
