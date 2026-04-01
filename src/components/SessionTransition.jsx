@@ -1,16 +1,5 @@
 import { useEffect, useRef } from "react";
 
-/**
- * SessionTransition — Panel negro que cubre la pantalla mientras
- * React renderiza la nueva vista detrás. Sin slide lateral: solo
- * entra desde abajo, pausa, y sale hacia arriba.
- *
- * Timing coordinado con App.jsx (startSession):
- *   0ms     — Panel empieza a subir desde abajo
- *   280ms   — Panel cubre toda la pantalla (App.jsx cambia la vista en este momento)
- *   600ms   — Panel empieza a salir hacia arriba
- *   880ms   — Panel terminó de salir → onDone()
- */
 export default function SessionTransition({ onDone }) {
   const ref = useRef();
 
@@ -18,25 +7,18 @@ export default function SessionTransition({ onDone }) {
     const el = ref.current;
     if (!el) return;
 
-    // Estado inicial: fuera de pantalla abajo
     el.style.transition = "none";
     el.style.transform  = "translateY(100%)";
 
     requestAnimationFrame(() => {
       requestAnimationFrame(() => {
-        // Fase 1: Entrar — 280ms
         el.style.transition = "transform 0.28s cubic-bezier(0.76, 0, 0.24, 1)";
         el.style.transform  = "translateY(0%)";
 
-        // Fase 2: Pausa — la vista ya fue swapeada detrás del panel
-        // Fase 3: Salir — a los 600ms
         setTimeout(() => {
           el.style.transition = "transform 0.32s cubic-bezier(0.76, 0, 0.24, 1)";
           el.style.transform  = "translateY(-100%)";
-
-          setTimeout(() => {
-            onDone?.();
-          }, 350);
+          setTimeout(() => onDone?.(), 350);
         }, 600);
       });
     });
@@ -47,7 +29,7 @@ export default function SessionTransition({ onDone }) {
       ref={ref}
       style={{
         position: "fixed", inset: 0, zIndex: 9999,
-        background: "rgba(255,255,255,0.90)",
+        background: "#080810",
         pointerEvents: "all",
         touchAction: "none",
         display: "flex", alignItems: "center", justifyContent: "center",
@@ -55,18 +37,25 @@ export default function SessionTransition({ onDone }) {
         willChange: "transform",
       }}
     >
+      {/* Orbs de fondo igual que el resto de la app */}
       <div style={{
+        position: "absolute", inset: 0,
+        background: "radial-gradient(ellipse 60% 50% at 20% 10%, rgba(88,56,230,0.45) 0%, transparent 70%), radial-gradient(ellipse 50% 60% at 80% 30%, rgba(14,100,200,0.35) 0%, transparent 70%), radial-gradient(ellipse 55% 45% at 50% 85%, rgba(120,40,180,0.30) 0%, transparent 70%)",
+        pointerEvents: "none",
+      }} />
+      <div style={{
+        position: "relative",
         display: "flex", flexDirection: "column",
         alignItems: "center", gap: 12,
         animation: "fadeIn 0.2s ease 0.15s both",
       }}>
         <div style={{
-          fontSize: 28, color: "#080810",
+          fontSize: 28, color: "rgba(255,255,255,0.90)",
           fontWeight: 900, letterSpacing: -1,
           fontFamily: "-apple-system, BlinkMacSystemFont, sans-serif",
         }}>◆</div>
         <div style={{
-          fontSize: 9, color: "#080810", opacity: 0.4,
+          fontSize: 9, color: "rgba(255,255,255,0.30)",
           letterSpacing: 4, fontWeight: 700,
           fontFamily: "-apple-system, BlinkMacSystemFont, sans-serif",
         }}>GYM TRACKER</div>
