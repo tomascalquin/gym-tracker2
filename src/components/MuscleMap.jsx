@@ -331,7 +331,7 @@ export default function MuscleMap({ logs, routine }) {
           {/* Top músculos */}
           {top.length > 0 ? (
             <div style={{ marginBottom: 14 }}>
-              <div style={{ fontSize: 8, color: "var(--text3)", letterSpacing: 2, marginBottom: 8 }}>
+              <div style={{ fontSize: 8, color: "rgba(240,240,240,0.30)", letterSpacing: 2, marginBottom: 8 }}>
                 MÁS TRABAJADOS
               </div>
               {top.map(([id, v]) => {
@@ -339,10 +339,10 @@ export default function MuscleMap({ logs, routine }) {
                 return (
                   <div key={id} style={{ marginBottom: 7 }}>
                     <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 2 }}>
-                      <span style={{ fontSize: 9, color: "var(--text2)" }}>{LABELS[id]||id}</span>
+                      <span style={{ fontSize: 9, color: "rgba(240,240,240,0.55)" }}>{LABELS[id]||id}</span>
                       <span style={{ fontSize: 9, color: c }}>{Math.round(v*100)}%</span>
                     </div>
-                    <div style={{ height: 3, background: "var(--border)", borderRadius: 99, overflow: "hidden" }}>
+                    <div style={{ height: 3, background: "rgba(255,255,255,0.12)", borderRadius: 99, overflow: "hidden" }}>
                       <div style={{
                         height: "100%", width: `${v*100}%`,
                         background: c, borderRadius: 99,
@@ -357,11 +357,11 @@ export default function MuscleMap({ logs, routine }) {
           ) : (
             <div style={{
               padding: "16px 10px", textAlign: "center",
-              background: "var(--bg3)", borderRadius: 10,
+              background: "rgba(255,255,255,0.05)", borderRadius: 10,
               marginBottom: 14,
             }}>
               <div style={{ fontSize: 20, marginBottom: 6 }}>💪</div>
-              <div style={{ fontSize: 10, color: "var(--text3)", lineHeight: 1.6 }}>
+              <div style={{ fontSize: 10, color: "rgba(240,240,240,0.30)", lineHeight: 1.6 }}>
                 Sin sesiones en este período. ¡Empieza a entrenar!
               </div>
             </div>
@@ -369,7 +369,7 @@ export default function MuscleMap({ logs, routine }) {
 
           {/* Leyenda */}
           <div>
-            <div style={{ fontSize: 8, color: "var(--text3)", letterSpacing: 2, marginBottom: 6 }}>
+            <div style={{ fontSize: 8, color: "rgba(240,240,240,0.30)", letterSpacing: 2, marginBottom: 6 }}>
               INTENSIDAD
             </div>
             {[
@@ -386,7 +386,7 @@ export default function MuscleMap({ logs, routine }) {
                   border: s.c === "#1a1a2e" ? "1px solid #333" : "none",
                   flexShrink: 0,
                 }} />
-                <span style={{ fontSize: 10, color: "var(--text3)" }}>{s.l}</span>
+                <span style={{ fontSize: 10, color: "rgba(240,240,240,0.30)" }}>{s.l}</span>
               </div>
             ))}
           </div>

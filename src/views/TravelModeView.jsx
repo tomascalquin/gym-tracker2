@@ -58,16 +58,16 @@ export default function TravelModeView({ onBack, onStartTravelSession }) {
       {/* Header */}
       <div style={{ padding: "20px 18px 0" }}>
         <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 20 }}>
-          <button onClick={onBack} className="nbtn" style={{ color: "var(--text3)", fontSize: 20, padding: "0 4px" }}>←</button>
+          <button onClick={onBack} className="nbtn" style={{ color: "rgba(240,240,240,0.30)", fontSize: 20, padding: "0 4px" }}>←</button>
           <div>
-            <div style={{ fontSize: 9, color: "var(--text3)", letterSpacing: 3 }}>SIN GYM</div>
+            <div style={{ fontSize: 9, color: "rgba(240,240,240,0.30)", letterSpacing: 3 }}>SIN GYM</div>
             <h2 style={{ margin: 0, fontSize: 22, fontWeight: 900, color: "var(--text)", letterSpacing: -0.8 }}>Modo Viaje ✈️</h2>
           </div>
         </div>
 
         <div style={{
           background: "#0c1a2e", border: "1px solid #185fa544",
-          borderRadius: tokens.radius.md, padding: "10px 14px", marginBottom: 20,
+          borderRadius: 12, padding: "10px 14px", marginBottom: 20,
           fontSize: 11, color: "#60a5fa", lineHeight: 1.6,
         }}>
           💡 Beardsley: el músculo responde al esfuerzo relativo, no al tipo de resistencia. Entrena cerca del fallo y el estímulo es equivalente.
@@ -78,15 +78,15 @@ export default function TravelModeView({ onBack, onStartTravelSession }) {
         {/* Selector de día */}
         {!selected && (
           <div style={{ animation: "fadeIn 0.2s ease" }}>
-            <div style={{ fontSize: 9, color: "var(--text3)", letterSpacing: 2, marginBottom: 12 }}>ELIGE TU SESIÓN</div>
+            <div style={{ fontSize: 9, color: "rgba(240,240,240,0.30)", letterSpacing: 2, marginBottom: 12 }}>ELIGE TU SESIÓN</div>
             {days.map(day => {
               const r = TRAVEL_ROUTINES[day];
               return (
                 <button key={day} onClick={() => setSelected(day)} style={{
-                  width: "100%", background: "var(--bg2)",
+                  width: "100%", background: "rgba(255,255,255,0.07)", backdropFilter: "blur(40px)", WebkitBackdropFilter: "blur(40px)",
                   border: `1px solid ${r.accent}33`,
                   borderLeft: `3px solid ${r.accent}`,
-                  borderRadius: tokens.radius.lg,
+                  borderRadius: 18,
                   padding: "16px", marginBottom: 10,
                   cursor: "pointer", fontFamily: "inherit", textAlign: "left",
                   display: "flex", alignItems: "center", justifyContent: "space-between",
@@ -95,11 +95,11 @@ export default function TravelModeView({ onBack, onStartTravelSession }) {
                 }}>
                   <div>
                     <div style={{ fontSize: 13, color: r.accent, marginBottom: 4 }}>{day}</div>
-                    <div style={{ fontSize: 10, color: "var(--text3)" }}>
+                    <div style={{ fontSize: 10, color: "rgba(240,240,240,0.30)" }}>
                       {r.exercises.length} ejercicios · Sin equipamiento
                     </div>
                   </div>
-                  <span style={{ color: "var(--text3)", fontSize: 16 }}>→</span>
+                  <span style={{ color: "rgba(240,240,240,0.30)", fontSize: 16 }}>→</span>
                 </button>
               );
             })}
@@ -110,7 +110,7 @@ export default function TravelModeView({ onBack, onStartTravelSession }) {
         {selected && (
           <div style={{ animation: "fadeIn 0.2s ease" }}>
             <button onClick={() => setSelected(null)} style={{
-              background: "none", border: "none", color: "var(--text3)",
+              background: "none", border: "none", color: "rgba(240,240,240,0.30)",
               fontSize: 12, cursor: "pointer", fontFamily: "inherit",
               marginBottom: 14, padding: 0, display: "flex", alignItems: "center", gap: 6,
             }}>← Volver</button>
@@ -127,9 +127,9 @@ export default function TravelModeView({ onBack, onStartTravelSession }) {
 
               return (
                 <div key={i} style={{
-                  background: "var(--bg2)", border: `1px solid var(--border)`,
+                  background: "rgba(255,255,255,0.07)", backdropFilter: "blur(40px)", WebkitBackdropFilter: "blur(40px)", border: `1px solid var(--glass-border)`,
                   borderLeft: `3px solid ${accent}`,
-                  borderRadius: tokens.radius.md,
+                  borderRadius: 12,
                   padding: "12px 14px", marginBottom: 8,
                 }}>
                   <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 6 }}>
@@ -146,9 +146,9 @@ export default function TravelModeView({ onBack, onStartTravelSession }) {
                   </div>
                   <div style={{ display: "flex", gap: 16, marginBottom: 6 }}>
                     <span style={{ fontSize: 11, color: accent }}>{ex.sets} series</span>
-                    <span style={{ fontSize: 11, color: "var(--text2)" }}>{ex.reps} reps</span>
+                    <span style={{ fontSize: 11, color: "rgba(240,240,240,0.55)" }}>{ex.reps} reps</span>
                   </div>
-                  <div style={{ fontSize: 10, color: "var(--text3)", lineHeight: 1.5 }}>
+                  <div style={{ fontSize: 10, color: "rgba(240,240,240,0.30)", lineHeight: 1.5 }}>
                     💡 {ex.tip}
                   </div>
                 </div>
@@ -162,7 +162,7 @@ export default function TravelModeView({ onBack, onStartTravelSession }) {
                 background: TRAVEL_ROUTINES[selected].accent + "22",
                 border: `1px solid ${TRAVEL_ROUTINES[selected].accent}44`,
                 color: TRAVEL_ROUTINES[selected].accent,
-                padding: "14px", borderRadius: tokens.radius.lg,
+                padding: "14px", borderRadius: 18,
                 fontSize: 11, letterSpacing: 2, fontFamily: "inherit",
                 cursor: "pointer",
               }}

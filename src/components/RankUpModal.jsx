@@ -39,7 +39,7 @@ export default function RankUpModal({ oldRank, newRank, xpGained, prs, onClose }
         position: "fixed", top: "50%", left: "50%",
         transform: `translate(-50%, ${visible ? "-50%" : "-44%"})`,
         zIndex: 202, width: "88%", maxWidth: 360,
-        background: "linear-gradient(145deg, #0e0e1a 0%, #12102a 100%)",
+        background: "rgba(8,8,20,0.85)", backdropFilter: "blur(40px)", WebkitBackdropFilter: "blur(40px)",
         border: `1.5px solid ${newRank.color}55`,
         borderRadius: 24, padding: "32px 24px",
         textAlign: "center", fontFamily: "DM Mono, monospace",
@@ -62,7 +62,7 @@ export default function RankUpModal({ oldRank, newRank, xpGained, prs, onClose }
             <div style={{ fontSize: 30 }}>{oldRank.emoji}</div>
             <div style={{ fontSize: 9, color: oldRank.color, marginTop: 4 }}>{oldRank.name}</div>
           </div>
-          <div style={{ color: "var(--text3)", fontSize: 18 }}>→</div>
+          <div style={{ color: "rgba(240,240,240,0.30)", fontSize: 18 }}>→</div>
           <div style={{ textAlign: "center" }}>
             <div style={{ fontSize: 58, animation: "rankPulse 2s ease-in-out infinite", display: "inline-block" }}>
               {newRank.emoji}
@@ -80,7 +80,7 @@ export default function RankUpModal({ oldRank, newRank, xpGained, prs, onClose }
         }}>
           <div style={{ fontSize: 28, color: newRank.color, fontWeight: 300 }}>+{xpGained} XP</div>
           {prs?.length > 0 && (
-            <div style={{ fontSize: 11, color: "var(--text3)", marginTop: 4 }}>
+            <div style={{ fontSize: 11, color: "rgba(240,240,240,0.30)", marginTop: 4 }}>
               🏆 PR en {prs.join(", ")}
             </div>
           )}

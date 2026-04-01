@@ -28,20 +28,20 @@ export default function AchievementsView({ logs, routine, userXP, onBack }) {
       {/* Header */}
       <div style={{ padding: "20px 18px 0" }}>
         <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 16 }}>
-          <button onClick={onBack} className="nbtn" style={{ color: "var(--text3)", fontSize: 20, padding: "0 4px" }}>←</button>
+          <button onClick={onBack} className="nbtn" style={{ color: "rgba(240,240,240,0.30)", fontSize: 20, padding: "0 4px" }}>←</button>
           <div>
-            <div style={{ fontSize: 9, color: "var(--text3)", letterSpacing: 3 }}>PERFIL</div>
+            <div style={{ fontSize: 9, color: "rgba(240,240,240,0.30)", letterSpacing: 3 }}>PERFIL</div>
             <h2 style={{ margin: 0, fontSize: 22, fontWeight: 900, color: "var(--text)", letterSpacing: -0.8 }}>Logros</h2>
           </div>
           <div style={{ marginLeft: "auto", textAlign: "right" }}>
             <div style={{ fontSize: 22, fontWeight: 300, color: "var(--text)" }}>{unlockedCount}</div>
-            <div style={{ fontSize: 9, color: "var(--text3)" }}>/ {ACHIEVEMENTS.length}</div>
+            <div style={{ fontSize: 9, color: "rgba(240,240,240,0.30)" }}>/ {ACHIEVEMENTS.length}</div>
           </div>
         </div>
 
         {/* Barra progreso global */}
         <div style={{ marginBottom: 16 }}>
-          <div style={{ height: 3, background: "var(--border)", borderRadius: 2, overflow: "hidden" }}>
+          <div style={{ height: 3, background: "rgba(255,255,255,0.12)", borderRadius: 2, overflow: "hidden" }}>
             <div style={{
               height: "100%", borderRadius: 2,
               width: `${Math.round((unlockedCount / ACHIEVEMENTS.length) * 100)}%`,
@@ -49,7 +49,7 @@ export default function AchievementsView({ logs, routine, userXP, onBack }) {
               transition: "width 0.6s ease",
             }} />
           </div>
-          <div style={{ fontSize: 9, color: "var(--text3)", marginTop: 4, textAlign: "right" }}>
+          <div style={{ fontSize: 9, color: "rgba(240,240,240,0.30)", marginTop: 4, textAlign: "right" }}>
             {Math.round((unlockedCount / ACHIEVEMENTS.length) * 100)}% completado
           </div>
         </div>
@@ -79,7 +79,7 @@ export default function AchievementsView({ logs, routine, userXP, onBack }) {
               <div key={ach.id} style={{
                 background: done ? rc.bg : "var(--bg2)",
                 border: `1px solid ${done ? rc.border : "var(--border)"}`,
-                borderRadius: tokens.radius.lg,
+                borderRadius: 18,
                 padding: "14px 12px",
                 opacity: done ? 1 : 0.45,
                 transition: "all 0.2s",
@@ -102,7 +102,7 @@ export default function AchievementsView({ logs, routine, userXP, onBack }) {
                 </div>
 
                 {/* Desc */}
-                <div style={{ fontSize: 9, color: "var(--text3)", lineHeight: 1.5 }}>
+                <div style={{ fontSize: 9, color: "rgba(240,240,240,0.30)", lineHeight: 1.5 }}>
                   {done ? ach.desc : "???"}
                 </div>
 

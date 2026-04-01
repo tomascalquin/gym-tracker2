@@ -11,7 +11,7 @@ export default function SplashScreen({ text = "CARGANDO" }) {
   return (
     <div style={{
       position: "fixed", inset: 0, zIndex: 999,
-      background: "var(--bg)",
+      background: "transparent",
       display: "flex", flexDirection: "column",
       alignItems: "center", justifyContent: "center",
       gap: 20, fontFamily: "DM Mono, monospace",
@@ -45,7 +45,7 @@ export default function SplashScreen({ text = "CARGANDO" }) {
 
       {/* Nombre */}
       <div style={{
-        fontSize: 13, letterSpacing: 6, color: "var(--text2)",
+        fontSize: 13, letterSpacing: 6, color: "rgba(240,240,240,0.55)",
         animation: "splashText 0.4s ease 0.3s both",
       }}>GYM TRACKER</div>
 
@@ -61,7 +61,7 @@ export default function SplashScreen({ text = "CARGANDO" }) {
 
       {text !== "CARGANDO" && (
         <div style={{
-          fontSize: 11, color: "var(--text3)", letterSpacing: 2,
+          fontSize: 11, color: "rgba(240,240,240,0.30)", letterSpacing: 2,
           animation: "splashText 0.3s ease 0.6s both",
         }}>{text}</div>
       )}

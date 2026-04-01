@@ -31,10 +31,10 @@ export default function SessionView({
       {/* ── Header sticky editorial ── */}
       <div style={{
         position: "sticky", top: 0, zIndex: 20,
-        background: "rgba(245,245,240,0.97)",
+        background: "rgba(8,8,16,0.75)",
         backdropFilter: "blur(20px)",
         WebkitBackdropFilter: "blur(20px)",
-        borderBottom: "1.5px solid var(--text)",
+        borderBottom: "1px solid var(--glass-border)",
         padding: "14px 20px 12px",
       }}>
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 12 }}>
@@ -46,7 +46,7 @@ export default function SessionView({
           }}>←</button>
 
           <div style={{ textAlign: "center" }}>
-            <div style={{ fontSize: 9, letterSpacing: 3, color: "var(--text3)", fontWeight: 700, marginBottom: 2 }}>SESIÓN</div>
+            <div style={{ fontSize: 9, letterSpacing: 3, color: "rgba(240,240,240,0.30)", fontWeight: 700, marginBottom: 2 }}>SESIÓN</div>
             <div style={{ fontSize: 16, color: "var(--text)", fontWeight: 800, letterSpacing: -0.3 }}>{activeDay}</div>
           </div>
 
@@ -55,14 +55,14 @@ export default function SessionView({
 
         {/* Barra de progreso — blanca sobre crema */}
         <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-          <div style={{ flex: 1, height: 2, background: "var(--border)", borderRadius: 2, overflow: "hidden" }}>
+          <div style={{ flex: 1, height: 2, background: "rgba(255,255,255,0.12)", borderRadius: 2, overflow: "hidden" }}>
             <div style={{
-              height: "100%", background: "var(--text)",
+              height: "100%", background: "rgba(255,255,255,0.80)",
               width: `${progress}%`, transition: "width 0.4s ease",
               borderRadius: 2,
             }} />
           </div>
-          <div style={{ fontSize: 9, color: "var(--text3)", fontWeight: 700, letterSpacing: 1, flexShrink: 0 }}>
+          <div style={{ fontSize: 9, color: "rgba(240,240,240,0.30)", fontWeight: 700, letterSpacing: 1, flexShrink: 0 }}>
             {doneSets}/{totalSets}
           </div>
         </div>
@@ -72,7 +72,7 @@ export default function SessionView({
       <div style={{ padding: "16px 20px", maxWidth: 460, margin: "0 auto" }}>
 
         {/* Fecha pequeña */}
-        <div style={{ fontSize: 10, color: "var(--text3)", textAlign: "center", marginBottom: 16, letterSpacing: 1 }}>
+        <div style={{ fontSize: 10, color: "rgba(240,240,240,0.30)", textAlign: "center", marginBottom: 16, letterSpacing: 1 }}>
           {sessionDate}
         </div>
 
@@ -92,7 +92,7 @@ export default function SessionView({
 
         {/* Nota de sesión */}
         <div style={{ marginBottom: 16 }}>
-          <div style={{ fontSize: 9, color: "var(--text3)", letterSpacing: 2.5, fontWeight: 700, marginBottom: 8 }}>
+          <div style={{ fontSize: 9, color: "rgba(240,240,240,0.30)", letterSpacing: 2.5, fontWeight: 700, marginBottom: 8 }}>
             NOTA DE SESIÓN
           </div>
           <textarea
@@ -101,10 +101,10 @@ export default function SessionView({
             placeholder="¿Cómo fue la sesión?"
             rows={2}
             style={{
-              width: "100%", background: "var(--bg3)",
-              border: "1px solid var(--border)",
+              width: "100%", background: "rgba(255,255,255,0.05)",
+              border: "1px solid var(--glass-border)",
               color: "var(--text)", padding: "11px 14px",
-              borderRadius: tokens.radius.md,
+              borderRadius: 12,
               fontSize: 13, fontFamily: "inherit", outline: "none",
               lineHeight: 1.5,
             }}
@@ -114,8 +114,8 @@ export default function SessionView({
         {/* Agregar ejercicio */}
         <button onClick={() => setModalOpen(true)} style={{
           width: "100%", background: "transparent",
-          border: "1.5px dashed var(--border)", color: "var(--text3)",
-          padding: "13px", borderRadius: tokens.radius.lg,
+          border: "1.5px dashed var(--border)", color: "rgba(240,240,240,0.30)",
+          padding: "13px", borderRadius: 18,
           fontSize: 10, letterSpacing: 2.5, fontWeight: 700,
           fontFamily: "inherit", cursor: "pointer", marginBottom: 12,
           display: "flex", alignItems: "center", justifyContent: "center", gap: 8,
@@ -133,7 +133,7 @@ export default function SessionView({
         bottom: "calc(72px + env(safe-area-inset-bottom))",
         right: 20,
         width: 52, height: 52, borderRadius: "50%",
-        background: "var(--text)", border: "none",
+        background: "rgba(8,8,16,0.70)", backdropFilter: "blur(30px)", WebkitBackdropFilter: "blur(30px)", border: "none",
         boxShadow: "0 4px 20px rgba(0,0,0,0.2)",
         display: "flex", alignItems: "center", justifyContent: "center",
         fontSize: 20, cursor: "pointer", zIndex: 50,
@@ -165,9 +165,10 @@ function SaveButton({ onClick, saving, full }) {
       onMouseUp={() => setPressed(false)}
       style={{
         width: full ? "100%" : "auto",
-        background: saving ? "var(--bg3)" : pressed ? "#333" : "var(--text)",
-        border: "none",
-        color: saving ? "var(--text3)" : "var(--bg)",
+        background: saving ? "rgba(255,255,255,0.07)" : pressed ? "rgba(255,255,255,0.75)" : "rgba(255,255,255,0.92)",
+        backdropFilter: "blur(20px)", WebkitBackdropFilter: "blur(20px)",
+        border: "1px solid rgba(255,255,255,0.30)",
+        color: saving ? "rgba(240,240,240,0.30)" : "#080810",
         padding: full ? "14px" : "9px 16px",
         borderRadius: full ? tokens.radius.lg : tokens.radius.md,
         cursor: saving ? "default" : "pointer",

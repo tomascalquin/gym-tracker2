@@ -13,7 +13,7 @@ export default function ProgressView({ logs, routine, onBack }) {
     <div style={{ maxWidth: 460, margin: "0 auto", padding: "24px 20px", fontFamily: "inherit" }}>
       <button onClick={onBack} className="nbtn" style={{ color: "var(--text)", fontSize: 20 }}>←</button>
       <div style={{ textAlign: "center", padding: "80px 20px" }}>
-        <div style={{ fontSize: 14, color: "var(--text2)", fontWeight: 600 }}>Sin rutina configurada</div>
+        <div style={{ fontSize: 14, color: "rgba(240,240,240,0.55)", fontWeight: 600 }}>Sin rutina configurada</div>
       </div>
     </div>
   );
@@ -22,11 +22,11 @@ export default function ProgressView({ logs, routine, onBack }) {
     <div style={{ maxWidth: 460, margin: "0 auto", fontFamily: "inherit", animation: "fadeIn 0.25s ease" }}>
 
       {/* Header */}
-      <div style={{ padding: "24px 20px 0", borderBottom: "1.5px solid var(--text)" }}>
+      <div style={{ padding: "24px 20px 0", borderBottom: "1px solid var(--glass-border)" }}>
         <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 20 }}>
           <button onClick={onBack} className="nbtn" style={{ color: "var(--text)", fontSize: 20, padding: "0 4px" }}>←</button>
           <div>
-            <div style={{ fontSize: 9, color: "var(--text3)", letterSpacing: 3, fontWeight: 700 }}>ANÁLISIS</div>
+            <div style={{ fontSize: 9, color: "rgba(240,240,240,0.30)", letterSpacing: 3, fontWeight: 700 }}>ANÁLISIS</div>
             <div style={{ fontSize: 22, fontWeight: 900, color: "var(--text)", letterSpacing: -0.8 }}>Progreso</div>
           </div>
         </div>
@@ -40,7 +40,7 @@ export default function ProgressView({ logs, routine, onBack }) {
           ].map(t => (
             <button key={t.key} onClick={() => setSection(t.key)} style={{
               flex: 1, background: "none", border: "none",
-              borderBottom: `2px solid ${section === t.key ? "var(--text)" : "transparent"}`,
+              borderBottom: `2px solid ${section === t.key ? "rgba(255,255,255,0.8)" : "transparent"}`,
               color: section === t.key ? "var(--text)" : "var(--text3)",
               padding: "10px 4px", cursor: "pointer",
               fontSize: 8, letterSpacing: 2, fontWeight: 700,
@@ -54,8 +54,8 @@ export default function ProgressView({ logs, routine, onBack }) {
         {section === "ejercicios" && <EjerciciosSection logs={logs} routine={routine} routineDays={routineDays} />}
         {section === "cuerpo"     && <VolumenSection logs={logs} />}
         {section === "musculos"   && (
-          <div style={{ background: "var(--bg2)", border: "1px solid var(--border)", borderRadius: 16, padding: 16 }}>
-            <div style={{ fontSize: 9, color: "var(--text3)", letterSpacing: 2.5, fontWeight: 700, marginBottom: 14 }}>GRUPOS MUSCULARES TRABAJADOS</div>
+          <div style={{ background: "rgba(255,255,255,0.07)", backdropFilter: "blur(40px)", WebkitBackdropFilter: "blur(40px)", border: "1px solid rgba(255,255,255,0.12)", borderRadius: 18, padding: 16 }}>
+            <div style={{ fontSize: 9, color: "rgba(240,240,240,0.30)", letterSpacing: 2.5, fontWeight: 700, marginBottom: 14 }}>GRUPOS MUSCULARES TRABAJADOS</div>
             <MuscleMap logs={logs} routine={routine} />
           </div>
         )}
@@ -126,17 +126,17 @@ function EjerciciosSection({ logs, routine, routineDays }) {
 
       {/* Grid PRs de todos los ejercicios del día */}
       <div style={{ marginBottom: 20 }}>
-        <div style={{ fontSize: 9, color: "var(--text3)", letterSpacing: 2.5, fontWeight: 700, marginBottom: 12 }}>
+        <div style={{ fontSize: 9, color: "rgba(240,240,240,0.30)", letterSpacing: 2.5, fontWeight: 700, marginBottom: 12 }}>
           RÉCORDS — {selectedDay}
         </div>
-        <div style={{ borderTop: "1.5px solid var(--text)" }}>
+        <div style={{ borderTop: "1px solid var(--glass-border)" }}>
           {dayPRs.map((ex, i) => (
             <button
               key={ex.name}
               onClick={() => setSelectedEx(ex.name)}
               style={{
                 width: "100%", background: selectedEx === ex.name ? "var(--text)" : "transparent",
-                border: "none", borderBottom: "1px solid var(--border)",
+                border: "none", borderBottom: "1px solid var(--glass-border)",
                 padding: "12px 0", cursor: "pointer", fontFamily: "inherit",
                 display: "flex", alignItems: "center", justifyContent: "space-between",
                 WebkitTapHighlightColor: "transparent",
@@ -172,29 +172,29 @@ function EjerciciosSection({ logs, routine, routineDays }) {
 
       {/* Gráfico del ejercicio seleccionado */}
       {selectedEx && history.length > 0 && (
-        <div style={{ background: "var(--bg2)", border: "1px solid var(--border)", borderRadius: 16, padding: "16px", marginBottom: 16 }}>
+        <div style={{ background: "rgba(255,255,255,0.07)", backdropFilter: "blur(40px)", WebkitBackdropFilter: "blur(40px)", border: "1px solid rgba(255,255,255,0.12)", borderRadius: 18, padding: "16px", marginBottom: 16 }}>
           {/* Stats del ejercicio */}
-          <div style={{ display: "flex", gap: 0, marginBottom: 16, borderBottom: "1px solid var(--border)", paddingBottom: 14 }}>
+          <div style={{ display: "flex", gap: 0, marginBottom: 16, borderBottom: "1px solid var(--glass-border)", paddingBottom: 14 }}>
             <div style={{ flex: 1, textAlign: "center" }}>
               <div className="mono" style={{ fontSize: 22, fontWeight: 900, color: "var(--text)", letterSpacing: -1 }}>{maxRM}</div>
-              <div style={{ fontSize: 8, color: "var(--text3)", letterSpacing: 2, fontWeight: 700, marginTop: 2 }}>MEJOR</div>
+              <div style={{ fontSize: 8, color: "rgba(240,240,240,0.30)", letterSpacing: 2, fontWeight: 700, marginTop: 2 }}>MEJOR</div>
             </div>
-            <div style={{ width: 1, background: "var(--border)" }} />
+            <div style={{ width: 1, background: "rgba(255,255,255,0.12)" }} />
             <div style={{ flex: 1, textAlign: "center" }}>
               <div className="mono" style={{ fontSize: 22, fontWeight: 900, color: "var(--text)", letterSpacing: -1 }}>{lastRM}</div>
-              <div style={{ fontSize: 8, color: "var(--text3)", letterSpacing: 2, fontWeight: 700, marginTop: 2 }}>ÚLTIMO</div>
+              <div style={{ fontSize: 8, color: "rgba(240,240,240,0.30)", letterSpacing: 2, fontWeight: 700, marginTop: 2 }}>ÚLTIMO</div>
             </div>
-            <div style={{ width: 1, background: "var(--border)" }} />
+            <div style={{ width: 1, background: "rgba(255,255,255,0.12)" }} />
             <div style={{ flex: 1, textAlign: "center" }}>
               <div className="mono" style={{
                 fontSize: 22, fontWeight: 900, letterSpacing: -1,
                 color: gain > 0 ? "var(--green)" : gain < 0 ? "var(--red)" : "var(--text3)",
               }}>{gain > 0 ? `+${gain}` : gain}</div>
-              <div style={{ fontSize: 8, color: "var(--text3)", letterSpacing: 2, fontWeight: 700, marginTop: 2 }}>GANANCIA</div>
+              <div style={{ fontSize: 8, color: "rgba(240,240,240,0.30)", letterSpacing: 2, fontWeight: 700, marginTop: 2 }}>GANANCIA</div>
             </div>
           </div>
 
-          <div style={{ fontSize: 9, color: "var(--text3)", letterSpacing: 2.5, fontWeight: 700, marginBottom: 10 }}>
+          <div style={{ fontSize: 9, color: "rgba(240,240,240,0.30)", letterSpacing: 2.5, fontWeight: 700, marginBottom: 10 }}>
             EVOLUCIÓN 1RM — {selectedEx}
           </div>
           <ResponsiveContainer width="100%" height={140}>
@@ -209,7 +209,7 @@ function EjerciciosSection({ logs, routine, routineDays }) {
               <XAxis dataKey="date" tick={{ fill: "var(--text3)", fontSize: 8, fontFamily: "inherit" }} />
               <YAxis tick={{ fill: "var(--text3)", fontSize: 8, fontFamily: "inherit" }} />
               <Tooltip
-                contentStyle={{ background: "var(--bg2)", border: "1px solid var(--border)", borderRadius: 10, fontSize: 11, fontFamily: "inherit", color: "var(--text)" }}
+                contentStyle={{ background: "rgba(8,8,20,0.90)", backdropFilter: "blur(20px)", border: "1px solid rgba(255,255,255,0.15)", borderRadius: 12, fontSize: 11, fontFamily: "inherit", color: "#f0f0f0" }}
                 labelStyle={{ fontWeight: 700 }}
               />
               <Area type="monotone" dataKey="rm" stroke="var(--text)" strokeWidth={2} fill="url(#rmGrad)" dot={{ fill: "var(--text)", r: 3, strokeWidth: 0 }} name="1RM real" />
@@ -225,10 +225,10 @@ function EjerciciosSection({ logs, routine, routineDays }) {
                 { label: "+90d", val: prediction.predictions?.find(p => p.label === "+90d")?.rm },
               ].filter(p => p.val).map(p => (
                 <div key={p.label} style={{
-                  flex: 1, background: "var(--bg3)", borderRadius: 10, padding: "10px 8px", textAlign: "center"
+                  flex: 1, background: "rgba(255,255,255,0.07)", backdropFilter: "blur(20px)", WebkitBackdropFilter: "blur(20px)", border: "1px solid rgba(255,255,255,0.10)", borderRadius: 14, padding: "10px 8px", textAlign: "center"
                 }}>
                   <div className="mono" style={{ fontSize: 16, fontWeight: 900, color: "var(--text)" }}>{p.val}</div>
-                  <div style={{ fontSize: 8, color: "var(--text3)", letterSpacing: 1.5, fontWeight: 700, marginTop: 2 }}>{p.label}</div>
+                  <div style={{ fontSize: 8, color: "rgba(240,240,240,0.30)", letterSpacing: 1.5, fontWeight: 700, marginTop: 2 }}>{p.label}</div>
                 </div>
               ))}
             </div>
@@ -237,17 +237,17 @@ function EjerciciosSection({ logs, routine, routineDays }) {
       )}
 
       {selectedEx && history.length === 0 && (
-        <div style={{ textAlign: "center", padding: "40px 20px", background: "var(--bg2)", border: "1px solid var(--border)", borderRadius: 16, marginBottom: 16 }}>
+        <div style={{ textAlign: "center", padding: "40px 20px", background: "rgba(255,255,255,0.07)", backdropFilter: "blur(40px)", WebkitBackdropFilter: "blur(40px)", border: "1px solid var(--glass-border)", borderRadius: 16, marginBottom: 16 }}>
           <div style={{ fontSize: 32, marginBottom: 10 }}>📊</div>
-          <div style={{ fontSize: 13, fontWeight: 700, color: "var(--text2)" }}>Sin datos para {selectedEx}</div>
-          <div style={{ fontSize: 11, color: "var(--text3)", marginTop: 6 }}>Registra al menos una sesión</div>
+          <div style={{ fontSize: 13, fontWeight: 700, color: "rgba(240,240,240,0.55)" }}>Sin datos para {selectedEx}</div>
+          <div style={{ fontSize: 11, color: "rgba(240,240,240,0.30)", marginTop: 6 }}>Registra al menos una sesión</div>
         </div>
       )}
 
       {/* Calculadora objetivo */}
       {history.length >= 2 && (
-        <div style={{ background: "var(--bg2)", border: "1px solid var(--border)", borderRadius: 16, padding: "16px" }}>
-          <div style={{ fontSize: 9, color: "var(--text3)", letterSpacing: 2.5, fontWeight: 700, marginBottom: 12 }}>
+        <div style={{ background: "rgba(255,255,255,0.07)", backdropFilter: "blur(40px)", WebkitBackdropFilter: "blur(40px)", border: "1px solid rgba(255,255,255,0.12)", borderRadius: 18, padding: "16px" }}>
+          <div style={{ fontSize: 9, color: "rgba(240,240,240,0.30)", letterSpacing: 2.5, fontWeight: 700, marginBottom: 12 }}>
             ¿CUÁNDO LLEGO A...?
           </div>
           <div style={{ display: "flex", gap: 10, alignItems: "center", marginBottom: 12 }}>
@@ -257,26 +257,26 @@ function EjerciciosSection({ logs, routine, routineDays }) {
               onChange={e => setTargetWeight(e.target.value)}
               placeholder="Objetivo en kg"
               style={{
-                flex: 1, background: "var(--bg3)", border: "1px solid var(--border)",
-                color: "var(--text)", padding: "11px 14px", borderRadius: tokens.radius.md,
+                flex: 1, background: "rgba(255,255,255,0.07)", backdropFilter: "blur(20px)", WebkitBackdropFilter: "blur(20px)", border: "1px solid rgba(255,255,255,0.12)",
+                color: "var(--text)", padding: "11px 14px", borderRadius: 12,
                 fontSize: 14, fontFamily: "inherit", outline: "none",
               }}
             />
-            <div style={{ fontSize: 11, color: "var(--text3)", fontWeight: 700 }}>kg</div>
+            <div style={{ fontSize: 11, color: "rgba(240,240,240,0.30)", fontWeight: 700 }}>kg</div>
           </div>
           {targetWeight && forecast !== null && (
             <div style={{
-              background: "var(--text)", borderRadius: 12, padding: "16px",
+              background: "rgba(255,255,255,0.90)", borderRadius: 12, padding: "16px",
               textAlign: "center", animation: "scaleIn 0.2s ease",
             }}>
               {forecast === 0
-                ? <div style={{ fontSize: 14, fontWeight: 900, color: "var(--bg)" }}>🏆 ¡Ya lo lograste!</div>
+                ? <div style={{ fontSize: 14, fontWeight: 900, color: "#080810" }}>🏆 ¡Ya lo lograste!</div>
                 : prediction?.slope <= 0
-                  ? <div style={{ fontSize: 12, color: "rgba(245,245,240,0.7)" }}>Progresión insuficiente — aumenta carga o frecuencia</div>
+                  ? <div style={{ fontSize: 12, color: "rgba(255,255,255,0.65)" }}>Progresión insuficiente — aumenta carga o frecuencia</div>
                   : <>
-                      <div style={{ fontSize: 9, color: "rgba(245,245,240,0.5)", letterSpacing: 2.5, fontWeight: 700, marginBottom: 4 }}>ESTIMADO EN</div>
-                      <div className="mono" style={{ fontSize: 40, fontWeight: 900, color: "var(--bg)", letterSpacing: -2 }}>{forecast.days}</div>
-                      <div style={{ fontSize: 11, color: "rgba(245,245,240,0.6)", marginTop: 2 }}>días · {forecast.date}</div>
+                      <div style={{ fontSize: 9, color: "rgba(255,255,255,0.45)", letterSpacing: 2.5, fontWeight: 700, marginBottom: 4 }}>ESTIMADO EN</div>
+                      <div className="mono" style={{ fontSize: 40, fontWeight: 900, color: "#080810", letterSpacing: -2 }}>{forecast.days}</div>
+                      <div style={{ fontSize: 11, color: "rgba(255,255,255,0.55)", marginTop: 2 }}>días · {forecast.date}</div>
                     </>
               }
             </div>
@@ -313,32 +313,32 @@ function VolumenSection({ logs }) {
   return (
     <div>
       {/* Stats globales */}
-      <div style={{ borderTop: "1.5px solid var(--text)", borderBottom: "1.5px solid var(--text)", display: "flex", marginBottom: 20 }}>
-        <div style={{ flex: 1, textAlign: "center", padding: "14px 0", borderRight: "1px solid var(--border)" }}>
+      <div style={{ borderTop: "1px solid var(--glass-border)", borderBottom: "1px solid var(--glass-border)", display: "flex", marginBottom: 20 }}>
+        <div style={{ flex: 1, textAlign: "center", padding: "14px 0", borderRight: "1px solid var(--glass-border)" }}>
           <div className="mono" style={{ fontSize: 22, fontWeight: 900, color: "var(--text)", letterSpacing: -1 }}>
             {(totalVolume / 1000).toFixed(1)}t
           </div>
-          <div style={{ fontSize: 8, color: "var(--text3)", letterSpacing: 2.5, fontWeight: 700, marginTop: 3 }}>TOTAL</div>
+          <div style={{ fontSize: 8, color: "rgba(240,240,240,0.30)", letterSpacing: 2.5, fontWeight: 700, marginTop: 3 }}>TOTAL</div>
         </div>
-        <div style={{ flex: 1, textAlign: "center", padding: "14px 0", borderRight: "1px solid var(--border)" }}>
+        <div style={{ flex: 1, textAlign: "center", padding: "14px 0", borderRight: "1px solid var(--glass-border)" }}>
           <div className="mono" style={{ fontSize: 22, fontWeight: 900, color: "var(--text)", letterSpacing: -1 }}>
             {(avgVolume / 1000).toFixed(1)}t
           </div>
-          <div style={{ fontSize: 8, color: "var(--text3)", letterSpacing: 2.5, fontWeight: 700, marginTop: 3 }}>SEMANAL</div>
+          <div style={{ fontSize: 8, color: "rgba(240,240,240,0.30)", letterSpacing: 2.5, fontWeight: 700, marginTop: 3 }}>SEMANAL</div>
         </div>
         <div style={{ flex: 1, textAlign: "center", padding: "14px 0" }}>
           <div className="mono" style={{ fontSize: 22, fontWeight: 900, color: "var(--text)", letterSpacing: -1 }}>
             {totalSessions}
           </div>
-          <div style={{ fontSize: 8, color: "var(--text3)", letterSpacing: 2.5, fontWeight: 700, marginTop: 3 }}>SESIONES</div>
+          <div style={{ fontSize: 8, color: "rgba(240,240,240,0.30)", letterSpacing: 2.5, fontWeight: 700, marginTop: 3 }}>SESIONES</div>
         </div>
       </div>
 
       {weeklyData.length > 0 ? (
         <>
           {/* Gráfico tonelaje semanal */}
-          <div style={{ background: "var(--bg2)", border: "1px solid var(--border)", borderRadius: 16, padding: "16px", marginBottom: 14 }}>
-            <div style={{ fontSize: 9, color: "var(--text3)", letterSpacing: 2.5, fontWeight: 700, marginBottom: 14 }}>
+          <div style={{ background: "rgba(255,255,255,0.07)", backdropFilter: "blur(40px)", WebkitBackdropFilter: "blur(40px)", border: "1px solid rgba(255,255,255,0.12)", borderRadius: 18, padding: "16px", marginBottom: 14 }}>
+            <div style={{ fontSize: 9, color: "rgba(240,240,240,0.30)", letterSpacing: 2.5, fontWeight: 700, marginBottom: 14 }}>
               TONELAJE — ÚLTIMAS 12 SEMANAS
             </div>
             <ResponsiveContainer width="100%" height={150}>
@@ -354,7 +354,7 @@ function VolumenSection({ logs }) {
                 <YAxis tickFormatter={v => `${(v/1000).toFixed(0)}t`} tick={{ fill: "var(--text3)", fontSize: 8, fontFamily: "inherit" }} />
                 <Tooltip
                   formatter={(v) => [`${(v/1000).toFixed(2)}t`, "Tonelaje"]}
-                  contentStyle={{ background: "var(--bg2)", border: "1px solid var(--border)", borderRadius: 10, fontSize: 11, fontFamily: "inherit", color: "var(--text)" }}
+                  contentStyle={{ background: "rgba(8,8,20,0.90)", backdropFilter: "blur(20px)", border: "1px solid rgba(255,255,255,0.15)", borderRadius: 12, fontSize: 11, fontFamily: "inherit", color: "#f0f0f0" }}
                 />
                 <Area type="monotone" dataKey="volume" stroke="var(--text)" strokeWidth={2} fill="url(#volGrad)" dot={false} />
               </AreaChart>
@@ -363,16 +363,16 @@ function VolumenSection({ logs }) {
 
           {/* Mejor semana */}
           {bestWeek && (
-            <div style={{ background: "var(--text)", borderRadius: 16, padding: "16px", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+            <div style={{ background: "rgba(255,255,255,0.90)", borderRadius: 16, padding: "16px", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
               <div>
-                <div style={{ fontSize: 9, color: "rgba(245,245,240,0.5)", letterSpacing: 2.5, fontWeight: 700, marginBottom: 4 }}>MEJOR SEMANA</div>
-                <div className="mono" style={{ fontSize: 28, fontWeight: 900, color: "var(--bg)", letterSpacing: -1 }}>
+                <div style={{ fontSize: 9, color: "rgba(255,255,255,0.45)", letterSpacing: 2.5, fontWeight: 700, marginBottom: 4 }}>MEJOR SEMANA</div>
+                <div className="mono" style={{ fontSize: 28, fontWeight: 900, color: "#080810", letterSpacing: -1 }}>
                   {(bestWeek.volume / 1000).toFixed(2)}t
                 </div>
-                <div style={{ fontSize: 10, color: "rgba(245,245,240,0.5)", marginTop: 2 }}>semana {bestWeek.week}</div>
+                <div style={{ fontSize: 10, color: "rgba(255,255,255,0.45)", marginTop: 2 }}>semana {bestWeek.week}</div>
               </div>
               <div style={{ textAlign: "right" }}>
-                <div className="mono" style={{ fontSize: 32, fontWeight: 900, color: "var(--bg)", opacity: 0.4 }}>🏆</div>
+                <div className="mono" style={{ fontSize: 32, fontWeight: 900, color: "#080810", opacity: 0.4 }}>🏆</div>
               </div>
             </div>
           )}
@@ -380,7 +380,7 @@ function VolumenSection({ logs }) {
       ) : (
         <div style={{ textAlign: "center", padding: "60px 20px" }}>
           <div style={{ fontSize: 32, marginBottom: 10 }}>📊</div>
-          <div style={{ fontSize: 13, fontWeight: 700, color: "var(--text2)" }}>Sin sesiones registradas</div>
+          <div style={{ fontSize: 13, fontWeight: 700, color: "rgba(240,240,240,0.55)" }}>Sin sesiones registradas</div>
         </div>
       )}
     </div>

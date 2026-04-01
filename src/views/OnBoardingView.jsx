@@ -279,13 +279,13 @@ export default function OnboardingView({ user, onRoutineReady }) {
     <div style={{
       maxWidth: 460, margin: "0 auto", padding: "32px 18px",
       fontFamily: "inherit", minHeight: "100vh",
-      background: "var(--bg)", animation: "fadeIn 0.3s ease",
+      background: "transparent", animation: "fadeIn 0.3s ease",
     }}>
       {/* Skip arriba — primera opción visible */}
       <div style={{ display: "flex", justifyContent: "flex-end", marginBottom: 20 }}>
         <button onClick={() => onRoutineReady({ "Mi Rutina": { exercises: [] } })} style={{
           background: "transparent", border: "none",
-          color: "var(--text3)", cursor: "pointer",
+          color: "rgba(240,240,240,0.30)", cursor: "pointer",
           fontSize: 12, letterSpacing: 1, fontFamily: "inherit",
           display: "flex", alignItems: "center", gap: 6, padding: "4px 0",
         }}>
@@ -294,18 +294,18 @@ export default function OnboardingView({ user, onRoutineReady }) {
       </div>
 
       <div style={{ marginBottom: 32 }}>
-        <div style={{ fontSize: 9, letterSpacing: 4, color: "var(--text3)", marginBottom: 8 }}>BIENVENIDO</div>
+        <div style={{ fontSize: 9, letterSpacing: 4, color: "rgba(240,240,240,0.30)", marginBottom: 8 }}>BIENVENIDO</div>
         <h1 style={{ fontSize: 26, fontWeight: 300, color: "var(--text)", margin: 0, letterSpacing: -1 }}>
           Hola, {firstName} 👋
         </h1>
-        <p style={{ fontSize: 13, color: "var(--text3)", marginTop: 8, lineHeight: 1.6 }}>
+        <p style={{ fontSize: 13, color: "rgba(240,240,240,0.30)", marginTop: 8, lineHeight: 1.6 }}>
           Elige un split de entrenamiento. Ya viene con ejercicios para todos los músculos — puedes editarlos después.
         </p>
       </div>
 
       {/* Splits predeterminados */}
       <div style={{ marginBottom: 16 }}>
-        <div style={{ fontSize: 9, color: "var(--text3)", letterSpacing: 3, marginBottom: 12 }}>SPLITS PREDETERMINADOS</div>
+        <div style={{ fontSize: 9, color: "rgba(240,240,240,0.30)", letterSpacing: 3, marginBottom: 12 }}>SPLITS PREDETERMINADOS</div>
         {Object.entries(PRESET_ROUTINES).map(([name, data], i) => {
           const isSelected = selected === name;
           return (
@@ -324,8 +324,8 @@ export default function OnboardingView({ user, onRoutineReady }) {
                 <div style={{ fontSize: 14, color: isSelected ? ACCENT : "var(--text)", marginBottom: 3, fontWeight: 400 }}>
                   {name}
                 </div>
-                <div style={{ fontSize: 11, color: "var(--text3)" }}>{data.description}</div>
-                <div style={{ fontSize: 10, color: "var(--text3)", marginTop: 4 }}>
+                <div style={{ fontSize: 11, color: "rgba(240,240,240,0.30)" }}>{data.description}</div>
+                <div style={{ fontSize: 10, color: "rgba(240,240,240,0.30)", marginTop: 4 }}>
                   {Object.keys(data.days).join(" · ")}
                 </div>
               </div>
@@ -348,7 +348,7 @@ export default function OnboardingView({ user, onRoutineReady }) {
         <div style={{ animation: "slideDown 0.2s ease" }}>
           <button onClick={() => setStep("preview")} style={{
             width: "100%", padding: "14px",
-            background: "var(--bg2)", border: `1px solid ${ACCENT}44`,
+            background: "rgba(255,255,255,0.07)", backdropFilter: "blur(40px)", WebkitBackdropFilter: "blur(40px)", border: `1px solid ${ACCENT}44`,
             color: ACCENT, borderRadius: 14, cursor: "pointer",
             fontSize: 11, letterSpacing: 2, fontFamily: "inherit",
             marginBottom: 10, minHeight: 50,
@@ -370,13 +370,13 @@ export default function OnboardingView({ user, onRoutineReady }) {
       )}
 
       <div style={{ textAlign: "center", marginTop: 20 }}>
-        <div style={{ fontSize: 10, color: "var(--text3)", marginBottom: 12 }}>
+        <div style={{ fontSize: 10, color: "rgba(240,240,240,0.30)", marginBottom: 12 }}>
           Puedes editar los ejercicios y pesos después desde la app.
         </div>
         <button onClick={() => onRoutineReady({ "Mi Rutina": { exercises: [] } })} style={{
           background: "transparent",
-          border: "1px solid var(--border)",
-          color: "var(--text3)", padding: "12px 24px",
+          border: "1px solid var(--glass-border)",
+          color: "rgba(240,240,240,0.30)", padding: "12px 24px",
           borderRadius: 12, cursor: "pointer",
           fontSize: 11, letterSpacing: 2, fontFamily: "inherit",
           width: "100%", minHeight: 46,
@@ -398,23 +398,23 @@ export default function OnboardingView({ user, onRoutineReady }) {
       }}>
         {/* Header */}
         <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 20 }}>
-          <button onClick={() => setStep("choose")} className="nbtn" style={{ color: "var(--text3)", fontSize: 20, padding: "0 4px" }}>←</button>
+          <button onClick={() => setStep("choose")} className="nbtn" style={{ color: "rgba(240,240,240,0.30)", fontSize: 20, padding: "0 4px" }}>←</button>
           <div>
-            <div style={{ fontSize: 9, color: "var(--text3)", letterSpacing: 3 }}>VISTA PREVIA</div>
+            <div style={{ fontSize: 9, color: "rgba(240,240,240,0.30)", letterSpacing: 3 }}>VISTA PREVIA</div>
             <h2 style={{ margin: 0, fontSize: 22, fontWeight: 900, color: "var(--text)", letterSpacing: -0.8 }}>{selected}</h2>
           </div>
         </div>
 
         {Object.entries(routine.days).map(([day, data], di) => (
           <div key={day} style={{
-            background: "var(--bg2)", border: "1px solid var(--border)",
+            background: "rgba(255,255,255,0.07)", backdropFilter: "blur(40px)", WebkitBackdropFilter: "blur(40px)", border: "1px solid var(--glass-border)",
             borderLeft: `3px solid ${ACCENT}`, borderRadius: 14,
             marginBottom: 10, overflow: "hidden",
             animation: `slideDown 0.2s ease ${di * 0.05}s both`,
           }}>
             <div style={{
-              padding: "11px 14px", background: "var(--bg3)",
-              borderBottom: "1px solid var(--border)",
+              padding: "11px 14px", background: "rgba(255,255,255,0.05)",
+              borderBottom: "1px solid var(--glass-border)",
               display: "flex", justifyContent: "space-between", alignItems: "center",
             }}>
               <span style={{ fontSize: 13, color: "var(--text)", fontWeight: 400 }}>{day}</span>
@@ -425,10 +425,10 @@ export default function OnboardingView({ user, onRoutineReady }) {
                 <div key={ei} style={{
                   display: "flex", justifyContent: "space-between", alignItems: "center",
                   marginBottom: 8, paddingBottom: 8,
-                  borderBottom: ei < data.exercises.length - 1 ? "1px solid var(--border)" : "none",
+                  borderBottom: ei < data.exercises.length - 1 ? "1px solid rgba(255,255,255,0.08)" : "none",
                 }}>
-                  <span style={{ fontSize: 12, color: "var(--text2)" }}>{ex.name}</span>
-                  <span style={{ fontSize: 11, color: "var(--text3)" }}>
+                  <span style={{ fontSize: 12, color: "rgba(240,240,240,0.55)" }}>{ex.name}</span>
+                  <span style={{ fontSize: 11, color: "rgba(240,240,240,0.30)" }}>
                     {ex.sets.length}×{ex.sets[0].reps} · {ex.sets[0].weight > 0 ? `${ex.sets[0].weight}kg` : "peso corp."}
                   </span>
                 </div>
@@ -439,8 +439,8 @@ export default function OnboardingView({ user, onRoutineReady }) {
 
         <button onClick={handleUsePreset} disabled={saving} style={{
           width: "100%", padding: "14px",
-          background: saving ? "var(--bg2)" : ACCENT,
-          border: "none", color: saving ? "var(--text3)" : "#000",
+          background: saving ? "rgba(255,255,255,0.07)" : ACCENT,
+          border: saving ? "1px solid rgba(255,255,255,0.12)" : "none", color: saving ? "rgba(240,240,240,0.30)" : "#000",
           borderRadius: 14, cursor: saving ? "default" : "pointer",
           fontSize: 11, fontWeight: 700, letterSpacing: 2, fontFamily: "inherit",
           minHeight: 52, boxShadow: saving ? "none" : `0 4px 20px ${ACCENT}44`,

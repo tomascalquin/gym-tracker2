@@ -42,7 +42,7 @@ export default function SessionView({
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 12 }}>
           <button onClick={onBack} style={{
             background: "none", border: "none", cursor: "pointer",
-            color: "var(--text3)", fontSize: 20, display: "flex", alignItems: "center",
+            color: "rgba(240,240,240,0.30)", fontSize: 20, display: "flex", alignItems: "center",
             gap: 6, fontFamily: "inherit", minHeight: 44, padding: "0 4px",
             WebkitTapHighlightColor: "transparent",
           }}>←</button>
@@ -58,10 +58,10 @@ export default function SessionView({
         {/* Barra de progreso */}
         <div style={{ marginBottom: 0 }}>
           <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 5 }}>
-            <span style={{ fontSize: 9, color: "var(--text3)", letterSpacing: 1 }}>PROGRESO</span>
+            <span style={{ fontSize: 9, color: "rgba(240,240,240,0.30)", letterSpacing: 1 }}>PROGRESO</span>
             <span style={{ fontSize: 9, color: c.accent }}>{doneSets}/{totalSets} series</span>
           </div>
-          <div style={{ height: 3, background: "var(--border)", borderRadius: 2, marginBottom: 12, overflow: "hidden" }}>
+          <div style={{ height: 3, background: "rgba(255,255,255,0.12)", borderRadius: 2, marginBottom: 12, overflow: "hidden" }}>
             <div style={{
               height: "100%", borderRadius: 2, background: c.accent,
               width: `${progress}%`, transition: "width 0.4s ease",
@@ -74,7 +74,7 @@ export default function SessionView({
       {/* Contenido */}
       <div style={{ padding: "16px 18px", maxWidth: 460, margin: "0 auto" }}>
         {/* Fecha */}
-        <div style={{ marginBottom: 14, fontSize: 11, color: "var(--text3)", textAlign: "center" }}>
+        <div style={{ marginBottom: 14, fontSize: 11, color: "rgba(240,240,240,0.30)", textAlign: "center" }}>
           📅 {sessionDate}
         </div>
 
@@ -94,15 +94,15 @@ export default function SessionView({
 
         {/* Nota */}
         <div style={{ marginBottom: 16 }}>
-          <div style={{ fontSize: 9, color: "var(--text3)", letterSpacing: 2, marginBottom: 6 }}>NOTA DE SESIÓN</div>
+          <div style={{ fontSize: 9, color: "rgba(240,240,240,0.30)", letterSpacing: 2, marginBottom: 6 }}>NOTA DE SESIÓN</div>
           <textarea
             value={sessionNote}
             onChange={e => onChangeNote(e.target.value)}
             placeholder="¿Cómo fue la sesión? ¿Algo que destacar?"
             rows={2}
             style={{
-              width: "100%", background: "var(--bg2)", border: "1px solid var(--border)",
-              color: "var(--text)", padding: "11px 14px", borderRadius: tokens.radius.md,
+              width: "100%", background: "rgba(255,255,255,0.07)", backdropFilter: "blur(40px)", WebkitBackdropFilter: "blur(40px)", border: "1px solid var(--glass-border)",
+              color: "var(--text)", padding: "11px 14px", borderRadius: 12,
               fontSize: 13, fontFamily: "inherit", outline: "none",
               lineHeight: 1.5,
             }}
@@ -113,7 +113,7 @@ export default function SessionView({
         <button onClick={() => setModalOpen(true)} style={{
           width: "100%", background: "transparent",
           border: `1px dashed ${c.accent}44`, color: c.accent,
-          padding: "13px", borderRadius: tokens.radius.lg,
+          padding: "13px", borderRadius: 18,
           fontSize: 11, letterSpacing: 2, fontFamily: "inherit",
           cursor: "pointer", marginBottom: 12,
           display: "flex", alignItems: "center", justifyContent: "center", gap: 8,

@@ -164,16 +164,16 @@ export default function AIRoutineBuilder({ onRoutineReady, onBack }) {
     <div style={{
       maxWidth: 480, margin: "0 auto", padding: "28px 18px",
       fontFamily: "DM Mono, monospace", minHeight: "100vh",
-      background: "var(--bg)",
+      background: "transparent",
     }}>
       {/* Header */}
       <div style={{ marginBottom: 24 }}>
-        <button onClick={onBack} className="nbtn" style={{ color: "var(--text3)", fontSize: 12, marginBottom: 16 }}>← VOLVER</button>
-        <div style={{ fontSize: 10, letterSpacing: 3, color: "var(--text3)", marginBottom: 6 }}>CONFIGURACIÓN INICIAL</div>
+        <button onClick={onBack} className="nbtn" style={{ color: "rgba(240,240,240,0.30)", fontSize: 12, marginBottom: 16 }}>← VOLVER</button>
+        <div style={{ fontSize: 10, letterSpacing: 3, color: "rgba(240,240,240,0.30)", marginBottom: 6 }}>CONFIGURACIÓN INICIAL</div>
         <h1 style={{ fontSize: 22, fontWeight: 400, color: "var(--text)", margin: 0 }}>
           Crear rutina con IA 🤖
         </h1>
-        <p style={{ fontSize: 13, color: "var(--text3)", marginTop: 8, lineHeight: 1.6 }}>
+        <p style={{ fontSize: 13, color: "rgba(240,240,240,0.30)", marginTop: 8, lineHeight: 1.6 }}>
           Pega tu rutina en cualquier formato. La IA entiende pesos decimales, RIR, notas de máquina, formatos mezclados, abreviaciones — exactamente como lo tienes anotado.
         </p>
       </div>
@@ -182,21 +182,21 @@ export default function AIRoutineBuilder({ onRoutineReady, onBack }) {
       {!preview && (
         <>
           <div style={{ marginBottom: 12 }}>
-            <div style={{ fontSize: 10, letterSpacing: 2, color: "var(--text3)", marginBottom: 8 }}>TU RUTINA</div>
+            <div style={{ fontSize: 10, letterSpacing: 2, color: "rgba(240,240,240,0.30)", marginBottom: 8 }}>TU RUTINA</div>
             <textarea
               value={input}
               onChange={e => { setInput(e.target.value); setError(""); setAttempt(0); }}
               placeholder={EXAMPLE}
               rows={12}
               style={{
-                width: "100%", background: "var(--bg2)",
+                width: "100%", background: "rgba(255,255,255,0.07)", backdropFilter: "blur(40px)", WebkitBackdropFilter: "blur(40px)",
                 border: `1px solid ${error ? "var(--red)" : "var(--border)"}`,
                 color: "var(--text)", padding: "12px 14px", borderRadius: 10,
                 fontSize: 12, fontFamily: "inherit", outline: "none",
                 lineHeight: 1.7, boxSizing: "border-box",
               }}
             />
-            <div style={{ fontSize: 10, color: "var(--text3)", marginTop: 4, textAlign: "right" }}>
+            <div style={{ fontSize: 10, color: "rgba(240,240,240,0.30)", marginTop: 4, textAlign: "right" }}>
               {input.length} caracteres
             </div>
           </div>
@@ -225,10 +225,10 @@ export default function AIRoutineBuilder({ onRoutineReady, onBack }) {
           {/* Tips */}
           <div style={{
             marginTop: 14, padding: "14px 16px",
-            background: "var(--bg2)", border: "1px solid var(--border)",
-            borderRadius: 10, fontSize: 11, color: "var(--text3)", lineHeight: 1.8,
+            background: "rgba(255,255,255,0.07)", backdropFilter: "blur(40px)", WebkitBackdropFilter: "blur(40px)", border: "1px solid var(--glass-border)",
+            borderRadius: 10, fontSize: 11, color: "rgba(240,240,240,0.30)", lineHeight: 1.8,
           }}>
-            <div style={{ color: "var(--text2)", fontSize: 12, marginBottom: 8 }}>💡 La IA entiende:</div>
+            <div style={{ color: "rgba(240,240,240,0.55)", fontSize: 12, marginBottom: 8 }}>💡 La IA entiende:</div>
             <div>✓ Pesos decimales: 14,7kg → 14.7kg</div>
             <div>✓ "x lado", "por lado" → lo agrega como nota</div>
             <div>✓ RIR, al fallo, ajustes de máquina</div>
@@ -249,11 +249,11 @@ export default function AIRoutineBuilder({ onRoutineReady, onBack }) {
             display: "flex", justifyContent: "space-between", alignItems: "center",
           }}>
             <div style={{ fontSize: 11, color: "#22c55e", letterSpacing: 1 }}>✓ RUTINA DETECTADA</div>
-            <div style={{ fontSize: 11, color: "var(--text3)" }}>
+            <div style={{ fontSize: 11, color: "rgba(240,240,240,0.30)" }}>
               {previewStats.days}d · {previewStats.exercises}ex · {previewStats.sets} series
             </div>
             <button onClick={() => setPreview(null)} className="nbtn" style={{
-              fontSize: 11, color: "var(--text3)", border: "1px solid var(--border)",
+              fontSize: 11, color: "rgba(240,240,240,0.30)", border: "1px solid var(--glass-border)",
               padding: "4px 10px", borderRadius: 6,
             }}>EDITAR</button>
           </div>
@@ -261,18 +261,18 @@ export default function AIRoutineBuilder({ onRoutineReady, onBack }) {
           {/* Días */}
           {Object.entries(preview).map(([day, data]) => (
             <div key={day} style={{
-              background: "var(--bg2)", border: "1px solid var(--border)",
+              background: "rgba(255,255,255,0.07)", backdropFilter: "blur(40px)", WebkitBackdropFilter: "blur(40px)", border: "1px solid var(--glass-border)",
               borderLeft: "3px solid #7c3aed", borderRadius: 10,
               marginBottom: 10, overflow: "hidden",
             }}>
-              <div style={{ padding: "10px 14px", borderBottom: "1px solid var(--border)", display: "flex", justifyContent: "space-between" }}>
+              <div style={{ padding: "10px 14px", borderBottom: "1px solid var(--glass-border)", display: "flex", justifyContent: "space-between" }}>
                 <span style={{ fontSize: 14, color: "var(--text)" }}>{day}</span>
                 <span style={{ fontSize: 11, color: "#7c3aed" }}>{data.exercises?.length || 0} ejercicios</span>
               </div>
               <div style={{ padding: "10px 14px" }}>
                 {(data.exercises || []).map((ex, i) => (
                   <div key={i} style={{ marginBottom: 10 }}>
-                    <div style={{ fontSize: 13, color: "var(--text2)", marginBottom: 4 }}>{ex.name}</div>
+                    <div style={{ fontSize: 13, color: "rgba(240,240,240,0.55)", marginBottom: 4 }}>{ex.name}</div>
                     <div style={{ display: "flex", gap: 5, flexWrap: "wrap" }}>
                       {(ex.sets || []).map((set, si) => (
                         <span key={si} style={{

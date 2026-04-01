@@ -93,9 +93,9 @@ export default function FriendsView({ user, myProfile, onBack, onOpenChat }) {
       {/* Header */}
       <div style={{ padding: "20px 18px 0" }}>
         <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 20 }}>
-          <button onClick={onBack} className="nbtn" style={{ color: "var(--text3)", fontSize: 20, padding: "0 4px" }}>←</button>
+          <button onClick={onBack} className="nbtn" style={{ color: "rgba(240,240,240,0.30)", fontSize: 20, padding: "0 4px" }}>←</button>
           <div>
-            <div style={{ fontSize: 9, color: "var(--text3)", letterSpacing: 3 }}>SOCIAL</div>
+            <div style={{ fontSize: 9, color: "rgba(240,240,240,0.30)", letterSpacing: 3 }}>SOCIAL</div>
             <h2 style={{ margin: 0, fontSize: 22, fontWeight: 900, color: "var(--text)", letterSpacing: -0.8 }}>Amigos</h2>
           </div>
           {requests.length > 0 && (
@@ -108,7 +108,7 @@ export default function FriendsView({ user, myProfile, onBack, onOpenChat }) {
         </div>
 
         {/* Tabs */}
-        <div style={{ display: "flex", gap: 0, marginBottom: 0, borderBottom: "1px solid var(--border)" }}>
+        <div style={{ display: "flex", gap: 0, marginBottom: 0, borderBottom: "1px solid var(--glass-border)" }}>
           {TABS.map(t => (
             <button key={t.key} onClick={() => setTab(t.key)} style={{
               flex: 1, background: "none", border: "none",
@@ -141,8 +141,8 @@ export default function FriendsView({ user, myProfile, onBack, onOpenChat }) {
             {!loading && !friends.length && (
               <div style={{ textAlign: "center", padding: "50px 20px" }}>
                 <div style={{ fontSize: 36, marginBottom: 12 }}>👥</div>
-                <div style={{ fontSize: 14, color: "var(--text2)" }}>Sin amigos aún</div>
-                <div style={{ fontSize: 12, color: "var(--text3)", marginTop: 4 }}>Agrega uno con su código o email</div>
+                <div style={{ fontSize: 14, color: "rgba(240,240,240,0.55)" }}>Sin amigos aún</div>
+                <div style={{ fontSize: 12, color: "rgba(240,240,240,0.30)", marginTop: 4 }}>Agrega uno con su código o email</div>
               </div>
             )}
             {friends.map((f, i) => (
@@ -151,7 +151,7 @@ export default function FriendsView({ user, myProfile, onBack, onOpenChat }) {
                 animation: `slideDown 0.2s ease ${i * 0.04}s both`,
               }}>
                 <button onClick={() => setSelectedFriend(f)} style={{
-                  flex: 1, background: "var(--bg2)", border: "1px solid var(--border)",
+                  flex: 1, background: "rgba(255,255,255,0.07)", backdropFilter: "blur(40px)", WebkitBackdropFilter: "blur(40px)", border: "1px solid var(--glass-border)",
                   borderRadius: 14, padding: "12px 14px", cursor: "pointer",
                   textAlign: "left", fontFamily: "inherit",
                   display: "flex", alignItems: "center", gap: 12,
@@ -159,7 +159,7 @@ export default function FriendsView({ user, myProfile, onBack, onOpenChat }) {
                 }}>
                   <div style={{
                     width: 40, height: 40, borderRadius: "50%", flexShrink: 0,
-                    background: "#60a5fa22", border: "1.5px solid #60a5fa33",
+                    background: "#60a5fa22", border: "1px solid rgba(96,165,250,0.20)",
                     display: "flex", alignItems: "center", justifyContent: "center",
                     overflow: "hidden",
                   }}>
@@ -170,9 +170,9 @@ export default function FriendsView({ user, myProfile, onBack, onOpenChat }) {
                   </div>
                   <div>
                     <div style={{ fontSize: 14, color: "var(--text)" }}>{f.displayName}</div>
-                    <div style={{ fontSize: 11, color: "var(--text3)", marginTop: 1 }}>{f.email}</div>
+                    <div style={{ fontSize: 11, color: "rgba(240,240,240,0.30)", marginTop: 1 }}>{f.email}</div>
                   </div>
-                  <span style={{ marginLeft: "auto", color: "var(--text3)", fontSize: 16 }}>›</span>
+                  <span style={{ marginLeft: "auto", color: "rgba(240,240,240,0.30)", fontSize: 16 }}>›</span>
                 </button>
                 {onOpenChat && (
                   <button onClick={() => onOpenChat(f.uid, f.displayName)} style={{
@@ -191,13 +191,13 @@ export default function FriendsView({ user, myProfile, onBack, onOpenChat }) {
         {/* AGREGAR */}
         {tab === "add" && (
           <div>
-            <div style={{ fontSize: 10, color: "var(--text3)", letterSpacing: 2, marginBottom: 10 }}>BUSCAR POR CÓDIGO O EMAIL</div>
+            <div style={{ fontSize: 10, color: "rgba(240,240,240,0.30)", letterSpacing: 2, marginBottom: 10 }}>BUSCAR POR CÓDIGO O EMAIL</div>
             <div style={{ display: "flex", gap: 8, marginBottom: 12 }}>
               <input value={searchInput} onChange={e => { setSearchInput(e.target.value); setSearchError(""); setSearchResult(null); }}
                 onKeyDown={e => e.key === "Enter" && handleSearch()}
                 placeholder="Código de 6 letras o email..."
                 style={{
-                  flex: 1, background: "var(--bg2)", border: `1px solid ${searchError ? "var(--red)" : "var(--border)"}`,
+                  flex: 1, background: "rgba(255,255,255,0.07)", backdropFilter: "blur(40px)", WebkitBackdropFilter: "blur(40px)", border: `1px solid ${searchError ? "var(--red)" : "var(--border)"}`,
                   color: "var(--text)", padding: "11px 14px", borderRadius: 12,
                   fontSize: 13, fontFamily: "inherit", outline: "none",
                 }}
@@ -215,14 +215,14 @@ export default function FriendsView({ user, myProfile, onBack, onOpenChat }) {
 
             {searchResult && (
               <div style={{
-                background: "var(--bg2)", border: "1px solid #22c55e33",
+                background: "rgba(255,255,255,0.07)", backdropFilter: "blur(40px)", WebkitBackdropFilter: "blur(40px)", border: "1px solid #22c55e33",
                 borderRadius: 14, padding: "14px 16px",
                 display: "flex", alignItems: "center", gap: 12,
                 animation: "scaleIn 0.2s ease",
               }}>
                 <div style={{
                   width: 44, height: 44, borderRadius: "50%", flexShrink: 0,
-                  background: "#22c55e22", border: "1.5px solid #22c55e33",
+                  background: "#22c55e22", border: "1px solid rgba(34,197,94,0.20)",
                   display: "flex", alignItems: "center", justifyContent: "center",
                   overflow: "hidden",
                 }}>
@@ -233,7 +233,7 @@ export default function FriendsView({ user, myProfile, onBack, onOpenChat }) {
                 </div>
                 <div style={{ flex: 1 }}>
                   <div style={{ fontSize: 14, color: "var(--text)" }}>{searchResult.displayName}</div>
-                  <div style={{ fontSize: 11, color: "var(--text3)" }}>{searchResult.email}</div>
+                  <div style={{ fontSize: 11, color: "rgba(240,240,240,0.30)" }}>{searchResult.email}</div>
                 </div>
                 <button onClick={handleSendRequest} disabled={sendingReq} style={{
                   background: sendingReq ? "#14532d" : "#22c55e",
@@ -252,19 +252,19 @@ export default function FriendsView({ user, myProfile, onBack, onOpenChat }) {
             {!requests.length && (
               <div style={{ textAlign: "center", padding: "50px 20px" }}>
                 <div style={{ fontSize: 36, marginBottom: 12 }}>📬</div>
-                <div style={{ fontSize: 14, color: "var(--text2)" }}>Sin solicitudes pendientes</div>
+                <div style={{ fontSize: 14, color: "rgba(240,240,240,0.55)" }}>Sin solicitudes pendientes</div>
               </div>
             )}
             {requests.map((r, i) => (
               <div key={r.uid} style={{
-                background: "var(--bg2)", border: "1px solid var(--border)",
+                background: "rgba(255,255,255,0.07)", backdropFilter: "blur(40px)", WebkitBackdropFilter: "blur(40px)", border: "1px solid var(--glass-border)",
                 borderRadius: 14, padding: "14px 16px", marginBottom: 8,
                 display: "flex", alignItems: "center", gap: 12,
                 animation: `slideDown 0.2s ease ${i * 0.05}s both`,
               }}>
                 <div style={{
                   width: 44, height: 44, borderRadius: "50%", flexShrink: 0,
-                  background: "#a78bfa22", border: "1.5px solid #a78bfa33",
+                  background: "#a78bfa22", border: "1px solid rgba(167,139,250,0.20)",
                   display: "flex", alignItems: "center", justifyContent: "center",
                   overflow: "hidden",
                 }}>
@@ -275,7 +275,7 @@ export default function FriendsView({ user, myProfile, onBack, onOpenChat }) {
                 </div>
                 <div style={{ flex: 1 }}>
                   <div style={{ fontSize: 14, color: "var(--text)" }}>{r.displayName}</div>
-                  <div style={{ fontSize: 11, color: "var(--text3)" }}>{r.email}</div>
+                  <div style={{ fontSize: 11, color: "rgba(240,240,240,0.30)" }}>{r.email}</div>
                 </div>
                 <div style={{ display: "flex", gap: 6 }}>
                   <button onClick={() => handleAccept(r.uid)} style={{
@@ -284,7 +284,7 @@ export default function FriendsView({ user, myProfile, onBack, onOpenChat }) {
                     fontSize: 11, fontWeight: 700, fontFamily: "inherit", minHeight: 38,
                   }}>✓</button>
                   <button onClick={() => handleReject(r.uid)} style={{
-                    background: "var(--bg3)", border: "1px solid var(--border)", color: "var(--red)",
+                    background: "rgba(255,255,255,0.05)", border: "1px solid var(--glass-border)", color: "var(--red)",
                     padding: "8px 14px", borderRadius: 10, cursor: "pointer",
                     fontSize: 11, fontFamily: "inherit", minHeight: 38,
                   }}>✕</button>

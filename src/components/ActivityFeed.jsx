@@ -9,7 +9,7 @@ export default function ActivityFeed({ activity, onDismiss }) {
 
   return (
     <div style={{
-      background: "#0e0e1a", border: "1px solid #1e3a5f",
+      background: "rgba(255,255,255,0.07)", backdropFilter: "blur(40px)", WebkitBackdropFilter: "blur(40px)", border: "1px solid rgba(255,255,255,0.12)",
       borderLeft: "3px solid #60a5fa", borderRadius: 10,
       padding: "12px 14px", marginBottom: 16,
       animation: "slideDown 0.3s ease",
@@ -31,7 +31,7 @@ export default function ActivityFeed({ activity, onDismiss }) {
             {/* Avatar */}
             <div style={{
               width: 28, height: 28, borderRadius: "50%",
-              background: "#1a1a2e", border: "1px solid #60a5fa33",
+              background: "rgba(255,255,255,0.06)", border: "1px solid rgba(96,165,250,0.20)",
               display: "flex", alignItems: "center", justifyContent: "center",
               fontSize: 12, color: "#60a5fa", flexShrink: 0,
             }}>

@@ -52,8 +52,9 @@ export default function AddExerciseModal({ accent, onAdd, onClose }) {
       <div style={{
         position: "fixed", bottom: 0, left: "50%", transform: "translateX(-50%)",
         width: "100%", maxWidth: 500, zIndex: 101,
-        background: "#0e0e1a", borderTop: `2px solid ${accent}`,
-        borderRadius: "16px 16px 0 0", padding: "20px 20px 32px",
+        background: "rgba(8,8,22,0.85)", backdropFilter: "blur(40px) saturate(180%)", WebkitBackdropFilter: "blur(40px) saturate(180%)",
+        borderTop: `1px solid ${accent}55`, borderLeft: "1px solid rgba(255,255,255,0.10)", borderRight: "1px solid rgba(255,255,255,0.10)",
+        borderRadius: "20px 20px 0 0", padding: "20px 20px 32px",
         animation: "slideUp 0.25s ease",
       }}>
         <style>{`@keyframes slideUp { from { transform: translateX(-50%) translateY(40px); opacity:0; } to { transform: translateX(-50%) translateY(0); opacity:1; } }`}</style>
@@ -61,20 +62,20 @@ export default function AddExerciseModal({ accent, onAdd, onClose }) {
         {/* Header */}
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 18 }}>
           <div style={{ fontSize: 14, letterSpacing: 3, color: accent }}>+ NUEVO EJERCICIO</div>
-          <button onClick={onClose} className="nbtn" style={{ color: "#475569", fontSize: 16, lineHeight: 1 }}>✕</button>
+          <button onClick={onClose} className="nbtn" style={{ color: "rgba(240,240,240,0.40)", fontSize: 16, lineHeight: 1 }}>✕</button>
         </div>
 
         {/* Nombre */}
         <div style={{ marginBottom: 16 }}>
-          <div style={{ fontSize: 12, letterSpacing: 2, color: "#64748b", marginBottom: 5 }}>NOMBRE</div>
+          <div style={{ fontSize: 12, letterSpacing: 2, color: "rgba(240,240,240,0.40)", marginBottom: 5 }}>NOMBRE</div>
           <input
             autoFocus
             value={name}
             onChange={(e) => { setName(e.target.value); setError(""); }}
             placeholder="Ej: Press inclinado, Face pull..."
             style={{
-              width: "100%", background: "#0a0a14", border: `1px solid ${error ? "#ef4444" : "#1a1a2a"}`,
-              color: "#f1f5f9", padding: "10px 12px", borderRadius: 8,
+              width: "100%", background: "rgba(255,255,255,0.08)", border: `1px solid ${error ? "#f87171" : "rgba(255,255,255,0.14)"}`,
+              color: "#f0f0f0", padding: "10px 12px", borderRadius: 12,
               fontSize: 15, fontFamily: "inherit", outline: "none",
             }}
           />
@@ -83,14 +84,14 @@ export default function AddExerciseModal({ accent, onAdd, onClose }) {
 
         {/* Sets base */}
         <div style={{ marginBottom: 16 }}>
-          <div style={{ fontSize: 12, letterSpacing: 2, color: "#64748b", marginBottom: 8 }}>SETS BASE</div>
+          <div style={{ fontSize: 12, letterSpacing: 2, color: "rgba(240,240,240,0.40)", marginBottom: 8 }}>SETS BASE</div>
 
           {/* Column labels */}
           <div style={{ display: "grid", gridTemplateColumns: "18px 1fr 72px 72px 24px", gap: 5, marginBottom: 5 }}>
             <span />
-            <span style={{ fontSize: 12, color: "#64748b", letterSpacing: 1 }}>NOTA</span>
-            <span style={{ fontSize: 12, color: "#64748b", letterSpacing: 1, textAlign: "center" }}>KG</span>
-            <span style={{ fontSize: 12, color: "#64748b", letterSpacing: 1, textAlign: "center" }}>REPS</span>
+            <span style={{ fontSize: 12, color: "rgba(240,240,240,0.40)", letterSpacing: 1 }}>NOTA</span>
+            <span style={{ fontSize: 12, color: "rgba(240,240,240,0.40)", letterSpacing: 1, textAlign: "center" }}>KG</span>
+            <span style={{ fontSize: 12, color: "rgba(240,240,240,0.40)", letterSpacing: 1, textAlign: "center" }}>REPS</span>
             <span />
           </div>
 
@@ -102,7 +103,7 @@ export default function AddExerciseModal({ accent, onAdd, onClose }) {
                 onChange={(e) => updateSet(i, "note", e.target.value)}
                 placeholder="—"
                 style={{
-                  background: "#060610", border: "1px solid #1a1a2a", color: "#475569",
+                  background: "#060610", border: "1px solid rgba(255,255,255,0.12)", color: "rgba(240,240,240,0.40)",
                   padding: "5px 7px", borderRadius: 5, fontSize: 13,
                   fontFamily: "inherit", width: "100%", outline: "none",
                 }}
@@ -112,7 +113,7 @@ export default function AddExerciseModal({ accent, onAdd, onClose }) {
                 value={set.weight}
                 onChange={(e) => updateSet(i, "weight", parseFloat(e.target.value) || 0)}
                 style={{
-                  background: "#060610", border: "1px solid #1a1a2a", color: accent,
+                  background: "#060610", border: "1px solid rgba(255,255,255,0.12)", color: accent,
                   padding: "6px 4px", borderRadius: 5, fontSize: 16, fontWeight: 500,
                   textAlign: "center", fontFamily: "inherit", width: "100%", outline: "none",
                 }}
@@ -122,7 +123,7 @@ export default function AddExerciseModal({ accent, onAdd, onClose }) {
                 value={set.reps}
                 onChange={(e) => updateSet(i, "reps", parseInt(e.target.value) || 0)}
                 style={{
-                  background: "#060610", border: "1px solid #1a1a2a", color: "#f1f5f9",
+                  background: "#060610", border: "1px solid rgba(255,255,255,0.12)", color: "#f1f5f9",
                   padding: "6px 4px", borderRadius: 5, fontSize: 16, fontWeight: 500,
                   textAlign: "center", fontFamily: "inherit", width: "100%", outline: "none",
                 }}

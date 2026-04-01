@@ -23,10 +23,11 @@ export default function ExerciseCardCompact({
 
   return (
     <div style={{
-      background: allDone ? accent + "0d" : "var(--bg2)",
-      border: `1px solid ${allDone ? accent + "44" : "var(--border)"}`,
-      borderLeft: `3px solid ${allDone ? accent : "var(--border)"}`,
-      borderRadius: 12, marginBottom: 6, overflow: "hidden",
+      background: allDone ? accent + "18" : "var(--glass-bg)",
+      backdropFilter: "var(--glass-blur)", WebkitBackdropFilter: "var(--glass-blur)",
+      border: `1px solid ${allDone ? accent + "55" : "var(--glass-border)"}`,
+      borderLeft: `3px solid ${allDone ? accent : "rgba(255,255,255,0.15)"}`,
+      borderRadius: 16, marginBottom: 8, overflow: "hidden",
       transition: "all 0.2s ease",
     }}>
       {/* Header compacto */}
@@ -45,7 +46,7 @@ export default function ExerciseCardCompact({
             overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap",
             transition: "color 0.2s",
           }}>{exercise.name}</div>
-          <div style={{ fontSize: 10, color: "var(--text3)", marginTop: 1 }}>
+          <div style={{ fontSize: 10, color: "rgba(240,240,240,0.30)", marginTop: 1 }}>
             {firstSet.weight}kg × {firstSet.reps} · {sets.length} series
           </div>
         </div>
@@ -61,7 +62,7 @@ export default function ExerciseCardCompact({
                 style={{
                   width: 22, height: 22, borderRadius: "50%",
                   background: done ? accent : "var(--bg3)",
-                  border: `1.5px solid ${done ? accent : "var(--border)"}`,
+                  border: `1px solid ${done ? accent : "var(--border)"}`,
                   color: done ? "#000" : "var(--text3)",
                   fontSize: 10, cursor: "pointer",
                   display: "flex", alignItems: "center", justifyContent: "center",
@@ -72,7 +73,7 @@ export default function ExerciseCardCompact({
               >{done ? "✓" : si + 1}</button>
             );
           })}
-          <div style={{ fontSize: 14, color: "var(--text3)", display: "flex", alignItems: "center" }}>
+          <div style={{ fontSize: 14, color: "rgba(240,240,240,0.30)", display: "flex", alignItems: "center" }}>
             {expanded ? "▲" : "▼"}
           </div>
         </div>
@@ -80,11 +81,11 @@ export default function ExerciseCardCompact({
 
       {/* Expandido: inputs completos */}
       {expanded && (
-        <div style={{ padding: "6px 12px 10px", borderTop: "1px solid var(--border)", animation: "slideDown 0.15s ease" }}>
+        <div style={{ padding: "6px 12px 10px", borderTop: "1px solid var(--glass-border)", animation: "slideDown 0.15s ease" }}>
           {/* Headers */}
           <div style={{ display: "grid", gridTemplateColumns: "18px 1fr 60px 60px 32px 28px", gap: 4, marginBottom: 5 }}>
             {["", "NOTA", "KG", "REPS", "✓", ""].map((h, i) => (
-              <span key={i} style={{ fontSize: 8, color: "var(--text3)", letterSpacing: 1, textAlign: i > 1 ? "center" : "left" }}>{h}</span>
+              <span key={i} style={{ fontSize: 8, color: "rgba(240,240,240,0.30)", letterSpacing: 1, textAlign: i > 1 ? "center" : "left" }}>{h}</span>
             ))}
           </div>
 
@@ -96,11 +97,11 @@ export default function ExerciseCardCompact({
                 gap: 4, alignItems: "center", marginBottom: 5,
                 opacity: done ? 0.45 : 1, transition: "opacity 0.2s",
               }}>
-                <span style={{ fontSize: 10, color: "var(--text3)", textAlign: "center" }}>{si + 1}</span>
+                <span style={{ fontSize: 10, color: "rgba(240,240,240,0.30)", textAlign: "center" }}>{si + 1}</span>
                 <input value={set.note || ""} onChange={e => onUpdateSet(exIndex, si, "note", e.target.value)}
                   placeholder="nota..."
                   style={{
-                    background: "var(--bg3)", border: "1px solid var(--border)", color: "var(--text3)",
+                    background: "rgba(255,255,255,0.05)", border: "1px solid var(--glass-border)", color: "rgba(240,240,240,0.30)",
                     padding: "5px 6px", borderRadius: 7, fontSize: 11,
                     fontFamily: "inherit", width: "100%", outline: "none",
                   }}
@@ -108,7 +109,7 @@ export default function ExerciseCardCompact({
                 <input type="number" value={set.weight}
                   onChange={e => onUpdateSet(exIndex, si, "weight", parseFloat(e.target.value) || 0)}
                   style={{
-                    background: "var(--bg3)", border: "1px solid var(--border)", color: accent,
+                    background: "rgba(255,255,255,0.05)", border: "1px solid var(--glass-border)", color: accent,
                     padding: "5px 4px", borderRadius: 7, fontSize: 13, fontWeight: 300,
                     textAlign: "center", fontFamily: "inherit", width: "100%", outline: "none",
                   }}
@@ -116,7 +117,7 @@ export default function ExerciseCardCompact({
                 <input type="number" value={set.reps}
                   onChange={e => onUpdateSet(exIndex, si, "reps", parseInt(e.target.value) || 0)}
                   style={{
-                    background: "var(--bg3)", border: "1px solid var(--border)", color: "var(--text)",
+                    background: "rgba(255,255,255,0.05)", border: "1px solid var(--glass-border)", color: "var(--text)",
                     padding: "5px 4px", borderRadius: 7, fontSize: 13, fontWeight: 300,
                     textAlign: "center", fontFamily: "inherit", width: "100%", outline: "none",
                   }}
@@ -124,7 +125,7 @@ export default function ExerciseCardCompact({
                 <button onClick={() => handleToggle(si)} style={{
                   width: 32, height: 32, borderRadius: 8,
                   background: done ? "#14532d" : "var(--bg3)",
-                  border: `1.5px solid ${done ? "#22c55e" : "var(--border)"}`,
+                  border: `1px solid ${done ? "#22c55e" : "var(--border)"}`,
                   color: done ? "#22c55e" : "var(--text3)",
                   cursor: "pointer", fontSize: 13, padding: 0,
                   display: "flex", alignItems: "center", justifyContent: "center",
@@ -144,7 +145,7 @@ export default function ExerciseCardCompact({
           })}
           <button onClick={() => onAddSet(exIndex)} style={{
             width: "100%", background: "transparent",
-            border: "1px dashed var(--border)", color: "var(--text3)",
+            border: "1px dashed var(--border)", color: "rgba(240,240,240,0.30)",
             padding: "5px", borderRadius: 7, fontSize: 9,
             letterSpacing: 1, cursor: "pointer", fontFamily: "inherit",
           }}>+ SERIE</button>

@@ -37,15 +37,15 @@ export default function ProgressionView({ logs, routine, onBack }) {
       {/* Header */}
       <div style={{ padding: "20px 18px 0" }}>
         <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 20 }}>
-          <button onClick={onBack} className="nbtn" style={{ color: "var(--text3)", fontSize: 20, padding: "0 4px" }}>←</button>
+          <button onClick={onBack} className="nbtn" style={{ color: "rgba(240,240,240,0.30)", fontSize: 20, padding: "0 4px" }}>←</button>
           <div>
-            <div style={{ fontSize: 9, color: "var(--text3)", letterSpacing: 3 }}>ANÁLISIS</div>
+            <div style={{ fontSize: 9, color: "rgba(240,240,240,0.30)", letterSpacing: 3 }}>ANÁLISIS</div>
             <h2 style={{ margin: 0, fontSize: 18, fontWeight: 400, color: "var(--text)" }}>Progresión</h2>
           </div>
         </div>
 
         {/* Tabs principales */}
-        <div style={{ display: "flex", borderBottom: "1px solid var(--border)" }}>
+        <div style={{ display: "flex", borderBottom: "1px solid var(--glass-border)" }}>
           {[
             { key: "calc",    label: "🧮 CALCULADORA" },
             { key: "analyze", label: "🔍 ANALIZAR" },
@@ -82,16 +82,16 @@ export default function ProgressionView({ logs, routine, onBack }) {
                   boxShadow: mode === m.key ? "0 2px 12px #fb923c11" : "none",
                 }}>
                   <div style={{ fontSize: 10, color: mode === m.key ? "#fb923c" : "var(--text3)", letterSpacing: 1, marginBottom: 3 }}>{m.label}</div>
-                  <div style={{ fontSize: 9, color: "var(--text3)" }}>{m.desc}</div>
+                  <div style={{ fontSize: 9, color: "rgba(240,240,240,0.30)" }}>{m.desc}</div>
                 </button>
               ))}
             </div>
 
             {/* Info */}
             <div style={{
-              background: "var(--bg2)", border: "1px solid var(--border)",
+              background: "rgba(255,255,255,0.07)", backdropFilter: "blur(40px)", WebkitBackdropFilter: "blur(40px)", border: "1px solid var(--glass-border)",
               borderRadius: 10, padding: "10px 14px", marginBottom: 16,
-              fontSize: 11, color: "var(--text3)", lineHeight: 1.6,
+              fontSize: 11, color: "rgba(240,240,240,0.30)", lineHeight: 1.6,
             }}>
               {mode === "double"
                 ? "📖 Trabaja en un rango (ej: 8-12). Al llegar al techo → sube peso. Ideal para hipertrofia."
@@ -153,18 +153,18 @@ export default function ProgressionView({ logs, routine, onBack }) {
             </div>
 
             <select value={selEx} onChange={e => setSelEx(e.target.value)} style={{
-              width: "100%", background: "var(--bg2)", border: "1px solid var(--border)",
-              color: "var(--text2)", padding: "11px 14px", borderRadius: 12,
+              width: "100%", background: "rgba(255,255,255,0.07)", backdropFilter: "blur(40px)", WebkitBackdropFilter: "blur(40px)", border: "1px solid var(--glass-border)",
+              color: "rgba(240,240,240,0.55)", padding: "11px 14px", borderRadius: 12,
               fontSize: 13, fontFamily: "inherit", outline: "none", marginBottom: 16,
             }}>
               {exercises.map(ex => <option key={ex.name} value={ex.name}>{ex.name}</option>)}
             </select>
 
             {!analysis ? (
-              <div style={{ background: "var(--bg2)", border: "1px solid var(--border)", borderRadius: 14, padding: "32px 24px", textAlign: "center" }}>
+              <div style={{ background: "rgba(255,255,255,0.07)", backdropFilter: "blur(40px)", WebkitBackdropFilter: "blur(40px)", border: "1px solid var(--glass-border)", borderRadius: 14, padding: "32px 24px", textAlign: "center" }}>
                 <div style={{ fontSize: 40, marginBottom: 12 }}>📊</div>
-                <div style={{ fontSize: 14, color: "var(--text2)", marginBottom: 6 }}>Sin suficientes datos</div>
-                <div style={{ fontSize: 12, color: "var(--text3)" }}>Necesitas al menos 2 sesiones con {selEx}</div>
+                <div style={{ fontSize: 14, color: "rgba(240,240,240,0.55)", marginBottom: 6 }}>Sin suficientes datos</div>
+                <div style={{ fontSize: 12, color: "rgba(240,240,240,0.30)" }}>Necesitas al menos 2 sesiones con {selEx}</div>
               </div>
             ) : (
               <div>
@@ -176,14 +176,14 @@ export default function ProgressionView({ logs, routine, onBack }) {
                   borderRadius: 14, padding: "14px 16px", marginBottom: 12,
                   animation: "scaleIn 0.2s ease",
                 }}>
-                  <div style={{ fontSize: 9, color: "var(--text3)", letterSpacing: 3, marginBottom: 8 }}>TENDENCIA — {selEx}</div>
+                  <div style={{ fontSize: 9, color: "rgba(240,240,240,0.30)", letterSpacing: 3, marginBottom: 8 }}>TENDENCIA — {selEx}</div>
                   <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
                     <div>
                       <div style={{ fontSize: 22, fontWeight: 400, color: analysis.trend === "up" ? "#22c55e" : analysis.trend === "down" ? "#ef4444" : "var(--yellow)" }}>
                         {analysis.trend === "up" ? "↑" : analysis.trend === "down" ? "↓" : "→"}
                         {" "}{analysis.rmGain > 0 ? "+" : ""}{analysis.rmGain} kg 1RM
                       </div>
-                      <div style={{ fontSize: 11, color: "var(--text3)", marginTop: 3 }}>
+                      <div style={{ fontSize: 11, color: "rgba(240,240,240,0.30)", marginTop: 3 }}>
                         {analysis.history.length} sesiones · {analysis.rmPerSession > 0 ? "+" : ""}{analysis.rmPerSession} kg/sesión
                       </div>
                     </div>
@@ -201,7 +201,7 @@ export default function ProgressionView({ logs, routine, onBack }) {
                     padding: "12px 16px", marginBottom: 12, animation: "slideDown 0.2s ease",
                   }}>
                     <div style={{ fontSize: 12, color: "var(--yellow)", marginBottom: 6 }}>⚠️ ESTANCAMIENTO DETECTADO</div>
-                    <div style={{ fontSize: 11, color: "var(--text3)", lineHeight: 1.7 }}>
+                    <div style={{ fontSize: 11, color: "rgba(240,240,240,0.30)", lineHeight: 1.7 }}>
                       • Intenta subir reps antes de subir peso<br />
                       • Agrega una serie extra de volumen<br />
                       • Verifica que entrenas cerca del fallo (RIR 0-2)<br />
@@ -211,17 +211,17 @@ export default function ProgressionView({ logs, routine, onBack }) {
                 )}
 
                 {/* Historial */}
-                <div style={{ background: "var(--bg2)", border: "1px solid var(--border)", borderRadius: 14, padding: "14px 16px", marginBottom: 12 }}>
-                  <div style={{ fontSize: 9, color: "var(--text3)", letterSpacing: 3, marginBottom: 12 }}>ÚLTIMAS SESIONES</div>
+                <div style={{ background: "rgba(255,255,255,0.07)", backdropFilter: "blur(40px)", WebkitBackdropFilter: "blur(40px)", border: "1px solid var(--glass-border)", borderRadius: 14, padding: "14px 16px", marginBottom: 12 }}>
+                  <div style={{ fontSize: 9, color: "rgba(240,240,240,0.30)", letterSpacing: 3, marginBottom: 12 }}>ÚLTIMAS SESIONES</div>
                   {analysis.history.map((h, i) => (
                     <div key={i} style={{
                       display: "flex", justifyContent: "space-between", alignItems: "center",
                       marginBottom: 8, paddingBottom: 8,
                       borderBottom: i < analysis.history.length - 1 ? "1px solid var(--border)" : "none",
                     }}>
-                      <span style={{ fontSize: 12, color: "var(--text3)" }}>{h.date}</span>
+                      <span style={{ fontSize: 12, color: "rgba(240,240,240,0.30)" }}>{h.date}</span>
                       <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                        <span style={{ fontSize: 12, color: "var(--text3)" }}>{h.weight}kg × {h.reps}</span>
+                        <span style={{ fontSize: 12, color: "rgba(240,240,240,0.30)" }}>{h.weight}kg × {h.reps}</span>
                         <span style={{
                           fontSize: 13, fontWeight: i === analysis.history.length - 1 ? 500 : 300,
                           color: i === analysis.history.length - 1 ? accent : "var(--text3)",
@@ -235,7 +235,7 @@ export default function ProgressionView({ logs, routine, onBack }) {
                 {/* Sugerencia */}
                 {analysis.last && (
                   <div>
-                    <div style={{ fontSize: 9, color: "var(--text3)", letterSpacing: 3, marginBottom: 10 }}>SUGERENCIA PRÓXIMA SESIÓN</div>
+                    <div style={{ fontSize: 9, color: "rgba(240,240,240,0.30)", letterSpacing: 3, marginBottom: 10 }}>SUGERENCIA PRÓXIMA SESIÓN</div>
                     <ResultCard result={calcDoubleProgression(analysis.last.weight, analysis.last.reps, 6, 12, 2.5)} />
                   </div>
                 )}
@@ -251,9 +251,9 @@ export default function ProgressionView({ logs, routine, onBack }) {
 function InputField({ label, value, onChange, placeholder, accent }) {
   return (
     <div>
-      <div style={{ fontSize: 9, color: "var(--text3)", letterSpacing: 1, marginBottom: 5 }}>{label}</div>
+      <div style={{ fontSize: 9, color: "rgba(240,240,240,0.30)", letterSpacing: 1, marginBottom: 5 }}>{label}</div>
       <input type="number" value={value} onChange={e => onChange(e.target.value)} placeholder={placeholder} style={{
-        width: "100%", background: "var(--bg3)", border: "1px solid var(--border)",
+        width: "100%", background: "rgba(255,255,255,0.05)", border: "1px solid var(--glass-border)",
         color: accent || "var(--text)", padding: "10px", borderRadius: 10,
         fontSize: 16, fontFamily: "inherit", outline: "none",
         textAlign: "center", fontWeight: 400, transition: "border-color 0.15s",
@@ -273,29 +273,29 @@ function ResultCard({ result }) {
       boxShadow: `0 2px 12px ${rawColor}11`,
     }}>
       <div style={{ fontSize: 9, color: rawColor, letterSpacing: 3, marginBottom: 8 }}>{result.type}</div>
-      <div style={{ fontSize: 13, color: "var(--text2)", marginBottom: 14, lineHeight: 1.6 }}>{result.message}</div>
+      <div style={{ fontSize: 13, color: "rgba(240,240,240,0.55)", marginBottom: 14, lineHeight: 1.6 }}>{result.message}</div>
       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}>
         {[
           { label: "PRÓXIMO PESO", value: `${result.nextWeight}`, unit: "kg" },
           { label: "PRÓXIMAS REPS", value: `${result.nextReps}`, unit: "reps" },
         ].map(s => (
-          <div key={s.label} style={{ background: "var(--bg3)", borderRadius: 10, padding: "12px", textAlign: "center" }}>
-            <div style={{ fontSize: 9, color: "var(--text3)", marginBottom: 6, letterSpacing: 1 }}>{s.label}</div>
+          <div key={s.label} style={{ background: "rgba(255,255,255,0.05)", borderRadius: 10, padding: "12px", textAlign: "center" }}>
+            <div style={{ fontSize: 9, color: "rgba(240,240,240,0.30)", marginBottom: 6, letterSpacing: 1 }}>{s.label}</div>
             <div style={{ fontSize: 22, color: rawColor, fontWeight: 300 }}>{s.value}</div>
-            <div style={{ fontSize: 9, color: "var(--text3)" }}>{s.unit}</div>
+            <div style={{ fontSize: 9, color: "rgba(240,240,240,0.30)" }}>{s.unit}</div>
           </div>
         ))}
       </div>
       {result.progress !== undefined && (
         <div style={{ marginTop: 12 }}>
-          <div style={{ background: "var(--bg3)", borderRadius: 99, height: 5, overflow: "hidden" }}>
+          <div style={{ background: "rgba(255,255,255,0.05)", borderRadius: 99, height: 5, overflow: "hidden" }}>
             <div style={{
               height: "100%", borderRadius: 99, background: rawColor,
               width: `${result.progress}%`, transition: "width 0.5s ease",
               boxShadow: `0 0 8px ${rawColor}66`,
             }} />
           </div>
-          <div style={{ fontSize: 9, color: "var(--text3)", textAlign: "right", marginTop: 4 }}>
+          <div style={{ fontSize: 9, color: "rgba(240,240,240,0.30)", textAlign: "right", marginTop: 4 }}>
             {result.progress}% hacia el techo
           </div>
         </div>

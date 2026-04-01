@@ -39,11 +39,11 @@ export default function LeaderboardView({ user, myXP, onBack }) {
     <div style={{ maxWidth: 460, margin: "0 auto", fontFamily: "inherit", animation: "fadeIn 0.25s ease" }}>
 
       {/* Header */}
-      <div style={{ padding: "24px 20px 0", borderBottom: "1.5px solid var(--text)" }}>
+      <div style={{ padding: "24px 20px 0", borderBottom: "1px solid var(--glass-border)" }}>
         <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 20 }}>
           <button onClick={onBack} className="nbtn" style={{ color: "var(--text)", fontSize: 20, padding: "0 4px" }}>←</button>
           <div>
-            <div style={{ fontSize: 9, color: "var(--text3)", letterSpacing: 3, fontWeight: 700 }}>COMPETENCIA</div>
+            <div style={{ fontSize: 9, color: "rgba(240,240,240,0.30)", letterSpacing: 3, fontWeight: 700 }}>COMPETENCIA</div>
             <div style={{ fontSize: 22, fontWeight: 900, color: "var(--text)", letterSpacing: -0.8 }}>Ranking</div>
           </div>
         </div>
@@ -54,18 +54,18 @@ export default function LeaderboardView({ user, myXP, onBack }) {
         {/* Mi posición */}
         {myPosition > 0 && myRank && (
           <div style={{
-            background: "var(--text)", borderRadius: 16,
+            background: "rgba(255,255,255,0.90)", borderRadius: 16,
             padding: "16px 18px", marginTop: 20, marginBottom: 20,
             display: "flex", justifyContent: "space-between", alignItems: "center",
           }}>
             <div>
-              <div style={{ fontSize: 9, color: "rgba(245,245,240,0.5)", letterSpacing: 3, fontWeight: 700, marginBottom: 4 }}>TU POSICIÓN</div>
-              <div className="mono" style={{ fontSize: 36, color: "var(--bg)", fontWeight: 900, letterSpacing: -1.5 }}>#{myPosition}</div>
-              <div className="mono" style={{ fontSize: 11, color: "rgba(245,245,240,0.5)", marginTop: 2 }}>{(myXP || 0).toLocaleString()} XP</div>
+              <div style={{ fontSize: 9, color: "rgba(255,255,255,0.45)", letterSpacing: 3, fontWeight: 700, marginBottom: 4 }}>TU POSICIÓN</div>
+              <div className="mono" style={{ fontSize: 36, color: "#080810", fontWeight: 900, letterSpacing: -1.5 }}>#{myPosition}</div>
+              <div className="mono" style={{ fontSize: 11, color: "rgba(255,255,255,0.45)", marginTop: 2 }}>{(myXP || 0).toLocaleString()} XP</div>
             </div>
             <div style={{ textAlign: "center" }}>
               <div style={{ fontSize: 40 }}>{myRank.emoji}</div>
-              <div style={{ fontSize: 9, color: "rgba(245,245,240,0.6)", marginTop: 4, letterSpacing: 2, fontWeight: 700 }}>{myRank.name.toUpperCase()}</div>
+              <div style={{ fontSize: 9, color: "rgba(255,255,255,0.55)", marginTop: 4, letterSpacing: 2, fontWeight: 700 }}>{myRank.name.toUpperCase()}</div>
             </div>
           </div>
         )}
@@ -103,8 +103,8 @@ export default function LeaderboardView({ user, myXP, onBack }) {
 
                   <div style={{
                     width: 38, height: 38, borderRadius: "50%", flexShrink: 0,
-                    background: isMe ? "rgba(245,245,240,0.15)" : "var(--bg3)",
-                    border: `1px solid ${isMe ? "rgba(245,245,240,0.2)" : "var(--border)"}`,
+                    background: isMe ? "rgba(255,255,255,0.14)" : "var(--bg3)",
+                    border: `1px solid ${isMe ? "rgba(255,255,255,0.15)" : "var(--border)"}`,
                     overflow: "hidden", display: "flex", alignItems: "center", justifyContent: "center",
                   }}>
                     {entry.photoURL
@@ -145,7 +145,7 @@ export default function LeaderboardView({ user, myXP, onBack }) {
                     )}
                     {!isMe && isFriend && (
                       <div style={{ width: 32, height: 32, display: "flex", alignItems: "center", justifyContent: "center" }}>
-                        <span style={{ fontSize: 11, color: "var(--text3)" }}>✓</span>
+                        <span style={{ fontSize: 11, color: "rgba(240,240,240,0.30)" }}>✓</span>
                       </div>
                     )}
                   </div>
@@ -155,7 +155,7 @@ export default function LeaderboardView({ user, myXP, onBack }) {
             {!board.length && (
               <div style={{ textAlign: "center", padding: "60px 20px" }}>
                 <div style={{ fontSize: 36, marginBottom: 12 }}>🏅</div>
-                <div style={{ fontSize: 14, color: "var(--text2)", fontWeight: 600 }}>Nadie registrado aún</div>
+                <div style={{ fontSize: 14, color: "rgba(240,240,240,0.55)", fontWeight: 600 }}>Nadie registrado aún</div>
               </div>
             )}
           </div>

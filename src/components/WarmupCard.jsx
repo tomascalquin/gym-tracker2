@@ -30,13 +30,13 @@ export default function WarmupCard({ sets, accent }) {
 
       {open && (
         <div style={{
-          background: "var(--bg3)", border: "1px solid var(--border)",
+          background: "rgba(255,255,255,0.05)", border: "1px solid var(--glass-border)",
           borderTop: "none", borderRadius: "0 0 7px 7px", padding: "10px 12px",
           animation: "slideDown 0.15s ease",
         }}>
           <div style={{ display: "grid", gridTemplateColumns: "1fr 60px 50px 60px", gap: 6, marginBottom: 6 }}>
             {["TIPO", "KG", "REPS", "%1RM"].map(h => (
-              <span key={h} style={{ fontSize: 9, color: "var(--text3)", letterSpacing: 1, textAlign: h !== "TIPO" ? "center" : "left" }}>{h}</span>
+              <span key={h} style={{ fontSize: 9, color: "rgba(240,240,240,0.30)", letterSpacing: 1, textAlign: h !== "TIPO" ? "center" : "left" }}>{h}</span>
             ))}
           </div>
           {warmup.map((w, i) => (
@@ -49,7 +49,7 @@ export default function WarmupCard({ sets, accent }) {
               </span>
             </div>
           ))}
-          <div style={{ fontSize: 10, color: "var(--text3)", marginTop: 6, borderTop: "1px solid var(--border)", paddingTop: 6 }}>
+          <div style={{ fontSize: 10, color: "rgba(240,240,240,0.30)", marginTop: 6, borderTop: "1px solid var(--glass-border)", paddingTop: 6 }}>
             💡 1-2 min descanso entre series de aproximamiento
           </div>
         </div>

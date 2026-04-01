@@ -20,9 +20,10 @@ export default function ExerciseCardCompact({
 
   return (
     <div style={{
-      background: allDone ? "var(--text)" : "var(--bg2)",
-      border: `1px solid ${allDone ? "var(--text)" : "var(--border)"}`,
-      borderRadius: 16, marginBottom: 8, overflow: "hidden",
+      background: allDone ? "rgba(255,255,255,0.88)" : "var(--glass-bg)",
+      backdropFilter: "var(--glass-blur)", WebkitBackdropFilter: "var(--glass-blur)",
+      border: `1px solid ${allDone ? "rgba(255,255,255,0.95)" : "var(--glass-border)"}`,
+      borderRadius: 18, marginBottom: 8, overflow: "hidden",
       transition: "all 0.2s ease",
     }}>
       {/* Header */}
@@ -52,7 +53,7 @@ export default function ExerciseCardCompact({
                 "RESISTENCIA": { bg: "#fdf6e3", color: "#b8860b", border: "#b8860b33" },
                 "CARDIO":      { bg: "#fce8e6", color: "#c0392b", border: "#c0392b33" },
               };
-              const zc = zoneColors[zone.label] || { bg: "var(--bg3)", color: "var(--text3)", border: "var(--border)" };
+              const zc = zoneColors[zone.label] || { bg: "var(--bg3)", color: "rgba(240,240,240,0.30)", border: "var(--border)" };
               return (
                 <span style={{
                   fontSize: 7, letterSpacing: 1.5, fontWeight: 700,
@@ -98,7 +99,7 @@ export default function ExerciseCardCompact({
       {expanded && (
         <div style={{
           padding: "6px 14px 12px",
-          borderTop: `1px solid ${allDone ? "rgba(245,245,240,0.15)" : "var(--border)"}`,
+          borderTop: `1px solid ${allDone ? "rgba(8,8,16,0.12)" : "var(--border)"}`,
           animation: "slideDown 0.15s ease",
           background: allDone ? "var(--text)" : "var(--bg2)",
         }}>
@@ -129,8 +130,8 @@ export default function ExerciseCardCompact({
                   onChange={e => onUpdateSet(exIndex, si, "note", e.target.value)}
                   placeholder="nota..."
                   style={{
-                    background: allDone ? "rgba(245,245,240,0.08)" : "var(--bg3)",
-                    border: `1px solid ${allDone ? "rgba(245,245,240,0.15)" : "var(--border)"}`,
+                    background: allDone ? "rgba(8,8,16,0.25)" : "var(--bg3)",
+                    border: `1px solid ${allDone ? "rgba(8,8,16,0.12)" : "var(--border)"}`,
                     color: allDone ? "rgba(245,245,240,0.6)" : "var(--text3)",
                     padding: "6px 8px", borderRadius: 8, fontSize: 11,
                     fontFamily: "inherit", width: "100%", outline: "none",
@@ -142,8 +143,8 @@ export default function ExerciseCardCompact({
                   onChange={e => onUpdateSet(exIndex, si, "weight", parseFloat(e.target.value) || 0)}
                   className="mono"
                   style={{
-                    background: allDone ? "rgba(245,245,240,0.08)" : "var(--bg3)",
-                    border: `1px solid ${allDone ? "rgba(245,245,240,0.15)" : "var(--border)"}`,
+                    background: allDone ? "rgba(8,8,16,0.25)" : "var(--bg3)",
+                    border: `1px solid ${allDone ? "rgba(8,8,16,0.12)" : "var(--border)"}`,
                     color: allDone ? "rgba(245,245,240,0.9)" : "var(--text)",
                     padding: "6px 4px", borderRadius: 8, fontSize: 14, fontWeight: 700,
                     textAlign: "center", fontFamily: "DM Mono, monospace", width: "100%", outline: "none",
@@ -155,8 +156,8 @@ export default function ExerciseCardCompact({
                   onChange={e => onUpdateSet(exIndex, si, "reps", parseInt(e.target.value) || 0)}
                   className="mono"
                   style={{
-                    background: allDone ? "rgba(245,245,240,0.08)" : "var(--bg3)",
-                    border: `1px solid ${allDone ? "rgba(245,245,240,0.15)" : "var(--border)"}`,
+                    background: allDone ? "rgba(8,8,16,0.25)" : "var(--bg3)",
+                    border: `1px solid ${allDone ? "rgba(8,8,16,0.12)" : "var(--border)"}`,
                     color: allDone ? "rgba(245,245,240,0.9)" : "var(--text)",
                     padding: "6px 4px", borderRadius: 8, fontSize: 14,
                     textAlign: "center", fontFamily: "DM Mono, monospace", width: "100%", outline: "none",
@@ -164,7 +165,7 @@ export default function ExerciseCardCompact({
                 />
                 <button onClick={() => handleToggle(si)} style={{
                   width: 32, height: 32, borderRadius: 8,
-                  background: done ? (allDone ? "rgba(245,245,240,0.2)" : "var(--text)") : "var(--bg3)",
+                  background: done ? (allDone ? "rgba(8,8,16,0.15)" : "var(--text)") : "var(--bg3)",
                   border: `1.5px solid ${done ? (allDone ? "rgba(245,245,240,0.4)" : "var(--text)") : "var(--border)"}`,
                   color: done ? (allDone ? "var(--bg)" : "var(--bg)") : "var(--text3)",
                   cursor: "pointer", fontSize: 13, padding: 0,
@@ -173,7 +174,7 @@ export default function ExerciseCardCompact({
                 }}>{done ? "✓" : "○"}</button>
                 <button onClick={() => onRemoveSet(exIndex, si)} disabled={sets.length <= 1} style={{
                   width: 28, height: 28, borderRadius: 7, background: "transparent",
-                  border: sets.length <= 1 ? "1px solid transparent" : `1px solid ${allDone ? "rgba(245,245,240,0.2)" : "var(--border)"}`,
+                  border: sets.length <= 1 ? "1px solid transparent" : `1px solid ${allDone ? "rgba(8,8,16,0.15)" : "var(--border)"}`,
                   color: sets.length <= 1 ? "transparent" : "var(--red)",
                   cursor: sets.length <= 1 ? "default" : "pointer",
                   fontSize: 11, display: "flex", alignItems: "center",
@@ -184,7 +185,7 @@ export default function ExerciseCardCompact({
           })}
           <button onClick={() => onAddSet(exIndex)} style={{
             width: "100%", background: "transparent",
-            border: `1px dashed ${allDone ? "rgba(245,245,240,0.2)" : "var(--border)"}`,
+            border: `1px dashed ${allDone ? "rgba(8,8,16,0.15)" : "var(--border)"}`,
             color: allDone ? "rgba(245,245,240,0.4)" : "var(--text3)",
             padding: "6px", borderRadius: 8, fontSize: 9,
             letterSpacing: 1.5, fontWeight: 700,
@@ -216,7 +217,7 @@ function WarmupInline({ sets, allDone }) {
         style={{
           width: "100%",
           background: "transparent",
-          border: `1px solid ${allDone ? "rgba(245,245,240,0.2)" : "var(--border)"}`,
+          border: `1px solid ${allDone ? "rgba(8,8,16,0.15)" : "var(--border)"}`,
           color: allDone ? "rgba(245,245,240,0.5)" : "var(--text3)",
           padding: "6px 10px", borderRadius: 8,
           fontSize: 9, letterSpacing: 1.5, fontWeight: 700,
@@ -230,7 +231,7 @@ function WarmupInline({ sets, allDone }) {
 
       {open && (
         <div style={{
-          background: allDone ? "rgba(245,245,240,0.05)" : "var(--bg3)",
+          background: allDone ? "rgba(8,8,16,0.20)" : "var(--bg3)",
           border: `1px solid ${allDone ? "rgba(245,245,240,0.1)" : "var(--border)"}`,
           borderTop: "none", borderRadius: "0 0 8px 8px",
           padding: "8px 10px", animation: "slideDown 0.15s ease",
@@ -252,9 +253,9 @@ function WarmupInline({ sets, allDone }) {
               <span style={{ textAlign: "center" }}>
                 <span style={{
                   fontSize: 8, fontWeight: 700, letterSpacing: 1,
-                  background: allDone ? "rgba(245,245,240,0.15)" : "var(--bg2)",
+                  background: allDone ? "rgba(8,8,16,0.12)" : "var(--bg2)",
                   color: allDone ? "rgba(245,245,240,0.6)" : "var(--text3)",
-                  border: `1px solid ${allDone ? "rgba(245,245,240,0.2)" : "var(--border)"}`,
+                  border: `1px solid ${allDone ? "rgba(8,8,16,0.15)" : "var(--border)"}`,
                   padding: "2px 6px", borderRadius: 99
                 }}>{w.pct}%</span>
               </span>

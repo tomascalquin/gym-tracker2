@@ -77,19 +77,19 @@ export default function ToolsView({ onBack }) {
       {/* ── Header ── */}
       <div style={{ padding: "24px 20px 0" }}>
         <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 20 }}>
-          <button onClick={onBack} className="nbtn" style={{ fontSize: 22, color: "var(--text3)", padding: "0 4px 0 0" }}>‹</button>
+          <button onClick={onBack} className="nbtn" style={{ fontSize: 22, color: "rgba(240,240,240,0.30)", padding: "0 4px 0 0" }}>‹</button>
           <div>
-            <div style={{ fontSize: 9, letterSpacing: 3, color: "var(--text3)", fontWeight: 700 }}>GYM TRACKER</div>
+            <div style={{ fontSize: 9, letterSpacing: 3, color: "rgba(240,240,240,0.30)", fontWeight: 700 }}>GYM TRACKER</div>
             <div style={{ fontSize: 24, fontWeight: 900, color: "var(--text)", letterSpacing: -1, lineHeight: 1.1 }}>HERRAMIENTAS</div>
           </div>
         </div>
-        <div style={{ borderTop: "1.5px solid var(--text)", borderBottom: "1.5px solid var(--text)", padding: "10px 0", marginBottom: 16, display: "flex", gap: 4, overflowX: "auto" }}>
+        <div style={{ borderTop: "1px solid var(--glass-border)", borderBottom: "1px solid var(--glass-border)", padding: "10px 0", marginBottom: 16, display: "flex", gap: 4, overflowX: "auto" }}>
           {TABS.map(t => (
             <button key={t.key} onClick={() => setTab(t.key)} style={{
               padding: "7px 14px", borderRadius: 99, flexShrink: 0,
-              background: tab === t.key ? "var(--text)" : "transparent",
+              background: tab === t.key ? "rgba(255,255,255,0.90)" : "transparent",
               border: `1px solid ${tab === t.key ? "var(--text)" : "var(--border)"}`,
-              color: tab === t.key ? "var(--bg)" : "var(--text2)",
+              color: tab === t.key ? "#080810" : "var(--text2)",
               fontSize: 11, fontWeight: 700, letterSpacing: 0.5,
               cursor: "pointer", fontFamily: "inherit",
               WebkitTapHighlightColor: "transparent",
@@ -128,16 +128,16 @@ function WeightConverter() {
       <Card>
         <div style={{ display: "flex", gap: 12, alignItems: "flex-end", marginBottom: 16 }}>
           <ToolInput label="Kilogramos" value={kg} onChange={handleKg} />
-          <div style={{ color: "var(--text3)", fontSize: 20, paddingBottom: 10, flexShrink: 0 }}>⇌</div>
+          <div style={{ color: "rgba(240,240,240,0.30)", fontSize: 20, paddingBottom: 10, flexShrink: 0 }}>⇌</div>
           <ToolInput label="Libras" value={lb} onChange={handleLb} />
         </div>
-        <div style={{ fontSize: 9, color: "var(--text3)", letterSpacing: 2, marginBottom: 8 }}>PESOS RÁPIDOS</div>
+        <div style={{ fontSize: 9, color: "rgba(240,240,240,0.30)", letterSpacing: 2, marginBottom: 8 }}>PESOS RÁPIDOS</div>
         <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
           {[20, 40, 45, 60, 80, 100, 120, 140].map(p => (
             <button key={p} onClick={() => handleKg(String(p))} style={{
               padding: "5px 10px", borderRadius: 8,
-              background: "var(--bg3)", border: "1px solid var(--border)",
-              fontSize: 12, color: "var(--text2)", cursor: "pointer",
+              background: "rgba(255,255,255,0.07)", border: "1px solid var(--glass-border)",
+              fontSize: 12, color: "rgba(240,240,240,0.55)", cursor: "pointer",
               fontFamily: "inherit", WebkitTapHighlightColor: "transparent",
             }}>{p} kg</button>
           ))}
@@ -148,7 +148,7 @@ function WeightConverter() {
       <Card>
         <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 12 }}>
           <thead>
-            <tr style={{ borderBottom: "1px solid var(--border)" }}>
+            <tr style={{ borderBottom: "1px solid var(--glass-border)" }}>
               <Th>Plato</Th><Th>kg</Th><Th>lb</Th>
             </tr>
           </thead>
@@ -162,10 +162,10 @@ function WeightConverter() {
               ["2.5 kg — Negro",    2.5,  5.5],
               ["Barra olímpica",   20,   44.1],
             ].map(([name, k, l]) => (
-              <tr key={name} style={{ borderBottom: "1px solid var(--border)" }}>
-                <Td style={{ color: "var(--text2)" }}>{name}</Td>
+              <tr key={name} style={{ borderBottom: "1px solid var(--glass-border)" }}>
+                <Td style={{ color: "rgba(240,240,240,0.55)" }}>{name}</Td>
                 <Td className="mono" style={{ fontWeight: 700 }}>{k}</Td>
-                <Td className="mono" style={{ color: "var(--text3)" }}>{l}</Td>
+                <Td className="mono" style={{ color: "rgba(240,240,240,0.30)" }}>{l}</Td>
               </tr>
             ))}
           </tbody>
@@ -206,8 +206,8 @@ function OneRMCalc() {
           {["kg", "lb"].map(u => (
             <button key={u} onClick={() => setUnit(u)} style={{
               flex: 1, padding: "8px", borderRadius: 10,
-              background: unit === u ? "var(--text)" : "var(--bg3)",
-              border: "none", color: unit === u ? "var(--bg)" : "var(--text2)",
+              background: unit === u ? "rgba(255,255,255,0.90)" : "var(--bg3)",
+              border: "none", color: unit === u ? "#080810" : "var(--text2)",
               fontSize: 12, fontWeight: 700, cursor: "pointer",
               fontFamily: "inherit", WebkitTapHighlightColor: "transparent",
             }}>{u.toUpperCase()}</button>
@@ -222,14 +222,14 @@ function OneRMCalc() {
 
         {/* Fórmula */}
         <div style={{ marginBottom: orm ? 14 : 0 }}>
-          <div style={{ fontSize: 9, color: "var(--text3)", letterSpacing: 2, marginBottom: 8 }}>FÓRMULA</div>
+          <div style={{ fontSize: 9, color: "rgba(240,240,240,0.30)", letterSpacing: 2, marginBottom: 8 }}>FÓRMULA</div>
           <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
             {Object.keys(ONE_RM_FORMULAS).map(f => (
               <button key={f} onClick={() => setFormula(f)} style={{
                 padding: "5px 10px", borderRadius: 8,
-                background: formula === f ? "var(--text)" : "var(--bg3)",
+                background: formula === f ? "rgba(255,255,255,0.90)" : "var(--bg3)",
                 border: "none", fontSize: 11,
-                color: formula === f ? "var(--bg)" : "var(--text2)",
+                color: formula === f ? "#080810" : "rgba(240,240,240,0.55)",
                 cursor: "pointer", fontFamily: "inherit",
                 WebkitTapHighlightColor: "transparent",
               }}>{f}</button>
@@ -240,13 +240,13 @@ function OneRMCalc() {
         {/* Resultado */}
         {ormDisplay && (
           <div style={{
-            background: "var(--text)", borderRadius: 12, padding: "16px",
+            background: "rgba(255,255,255,0.90)", borderRadius: 12, padding: "16px",
             textAlign: "center", marginTop: 14,
           }}>
-            <div style={{ fontSize: 9, letterSpacing: 3, color: "var(--bg)", opacity: 0.5, marginBottom: 4 }}>
+            <div style={{ fontSize: 9, letterSpacing: 3, color: "#080810", opacity: 0.5, marginBottom: 4 }}>
               1RM ESTIMADO
             </div>
-            <div className="mono" style={{ fontSize: 40, fontWeight: 900, color: "var(--bg)", letterSpacing: -2 }}>
+            <div className="mono" style={{ fontSize: 40, fontWeight: 900, color: "#080810", letterSpacing: -2 }}>
               {ormDisplay.toFixed(1)}
               <span style={{ fontSize: 16, fontWeight: 400, opacity: 0.6, marginLeft: 6 }}>{unit}</span>
             </div>
@@ -260,7 +260,7 @@ function OneRMCalc() {
           <Card>
             <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 12 }}>
               <thead>
-                <tr style={{ borderBottom: "1px solid var(--border)" }}>
+                <tr style={{ borderBottom: "1px solid var(--glass-border)" }}>
                   <Th>% 1RM</Th>
                   <Th>Peso ({unit})</Th>
                   <Th>Reps est.</Th>
@@ -269,12 +269,12 @@ function OneRMCalc() {
               <tbody>
                 {percentages.map(({ pct, weight: pw, repsEst }) => (
                   <tr key={pct} style={{
-                    borderBottom: "1px solid var(--border)",
+                    borderBottom: "1px solid var(--glass-border)",
                     background: pct === 100 ? "var(--bg3)" : "transparent",
                   }}>
                     <Td className="mono" style={{ fontWeight: pct >= 90 ? 700 : 400 }}>{pct}%</Td>
                     <Td className="mono" style={{ fontWeight: 700 }}>{pw.toFixed(1)}</Td>
-                    <Td className="mono" style={{ color: "var(--text3)" }}>~{repsEst}</Td>
+                    <Td className="mono" style={{ color: "rgba(240,240,240,0.30)" }}>~{repsEst}</Td>
                   </tr>
                 ))}
               </tbody>
@@ -329,8 +329,8 @@ function StrengthPoints() {
           {[["M", "♂ Masculino"], ["F", "♀ Femenino"]].map(([s, l]) => (
             <button key={s} onClick={() => setSex(s)} style={{
               flex: 1, padding: "8px", borderRadius: 10,
-              background: sex === s ? "var(--text)" : "var(--bg3)",
-              border: "none", color: sex === s ? "var(--bg)" : "var(--text2)",
+              background: sex === s ? "rgba(255,255,255,0.90)" : "var(--bg3)",
+              border: "none", color: sex === s ? "#080810" : "var(--text2)",
               fontSize: 12, fontWeight: 700, cursor: "pointer",
               fontFamily: "inherit", WebkitTapHighlightColor: "transparent",
             }}>{l}</button>
@@ -342,8 +342,8 @@ function StrengthPoints() {
           {["kg", "lb"].map(u => (
             <button key={u} onClick={() => setUnit(u)} style={{
               padding: "5px 12px", borderRadius: 8,
-              background: unit === u ? "var(--text)" : "var(--bg3)",
-              border: "none", color: unit === u ? "var(--bg)" : "var(--text2)",
+              background: unit === u ? "rgba(255,255,255,0.90)" : "var(--bg3)",
+              border: "none", color: unit === u ? "#080810" : "var(--text2)",
               fontSize: 11, fontWeight: 700, cursor: "pointer",
               fontFamily: "inherit", WebkitTapHighlightColor: "transparent",
             }}>{u}</button>
@@ -358,7 +358,7 @@ function StrengthPoints() {
           <ToolInput label="Banca" value={bench} onChange={setBench} />
           <ToolInput label="Peso Muerto" value={dead} onChange={setDead} />
         </div>
-        <div style={{ fontSize: 10, color: "var(--text3)", marginBottom: wilks ? 14 : 0 }}>
+        <div style={{ fontSize: 10, color: "rgba(240,240,240,0.30)", marginBottom: wilks ? 14 : 0 }}>
           También podés ingresar un solo ejercicio en cualquier campo
         </div>
 
@@ -372,8 +372,8 @@ function StrengthPoints() {
             {reachedLevel && (
               <div style={{
                 marginTop: 10, padding: "10px 14px", borderRadius: 10,
-                background: "var(--bg3)", border: "1px solid var(--border)",
-                fontSize: 12, color: "var(--text2)",
+                background: "rgba(255,255,255,0.07)", border: "1px solid var(--glass-border)",
+                fontSize: 12, color: "rgba(240,240,240,0.55)",
               }}>
                 Nivel alcanzado: <span style={{ fontWeight: 700, color: "var(--text)" }}>{reachedLevel.label}</span>
               </div>
@@ -386,7 +386,7 @@ function StrengthPoints() {
       <Card>
         <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 12 }}>
           <thead>
-            <tr style={{ borderBottom: "1px solid var(--border)" }}>
+            <tr style={{ borderBottom: "1px solid var(--glass-border)" }}>
               <Th>Nivel</Th><Th>Wilks2</Th><Th>IPF GL</Th>
             </tr>
           </thead>
@@ -395,14 +395,14 @@ function StrengthPoints() {
               const reached = wilks && wilks >= w;
               return (
                 <tr key={label} style={{
-                  borderBottom: "1px solid var(--border)",
+                  borderBottom: "1px solid var(--glass-border)",
                   background: reached ? "var(--bg3)" : "transparent",
                 }}>
                   <Td style={{ fontWeight: reached ? 700 : 400, color: reached ? "var(--text)" : "var(--text2)" }}>
                     {reached ? "✓ " : ""}{label}
                   </Td>
                   <Td className="mono">{w}+</Td>
-                  <Td className="mono" style={{ color: "var(--text3)" }}>{g}+</Td>
+                  <Td className="mono" style={{ color: "rgba(240,240,240,0.30)" }}>{g}+</Td>
                 </tr>
               );
             })}
@@ -435,8 +435,8 @@ function RPERIRTool() {
         {[["table", "📋 Tabla RPE"], ["calc", "🧮 Calculadora"]].map(([k, l]) => (
           <button key={k} onClick={() => setMode(k)} style={{
             flex: 1, padding: "9px", borderRadius: 10,
-            background: mode === k ? "var(--text)" : "var(--bg3)",
-            border: "none", color: mode === k ? "var(--bg)" : "var(--text2)",
+            background: mode === k ? "rgba(255,255,255,0.90)" : "var(--bg3)",
+            border: "none", color: mode === k ? "#080810" : "var(--text2)",
             fontSize: 12, fontWeight: 700, cursor: "pointer",
             fontFamily: "inherit", WebkitTapHighlightColor: "transparent",
           }}>{l}</button>
@@ -448,16 +448,16 @@ function RPERIRTool() {
           <Card>
             <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 12 }}>
               <thead>
-                <tr style={{ borderBottom: "1px solid var(--border)" }}>
+                <tr style={{ borderBottom: "1px solid var(--glass-border)" }}>
                   <Th>RPE</Th><Th>RIR</Th><Th>Descripción</Th>
                 </tr>
               </thead>
               <tbody>
                 {RPE_RIR_TABLE.map(({ rpe, rir, desc }) => (
-                  <tr key={rpe} style={{ borderBottom: "1px solid var(--border)" }}>
+                  <tr key={rpe} style={{ borderBottom: "1px solid var(--glass-border)" }}>
                     <Td className="mono" style={{ fontWeight: 700, width: 44 }}>{rpe}</Td>
-                    <Td className="mono" style={{ color: "var(--text3)", width: 36 }}>{rir}</Td>
-                    <Td style={{ color: "var(--text2)", lineHeight: 1.5, fontSize: 11 }}>{desc}</Td>
+                    <Td className="mono" style={{ color: "rgba(240,240,240,0.30)", width: 36 }}>{rir}</Td>
+                    <Td style={{ color: "rgba(240,240,240,0.55)", lineHeight: 1.5, fontSize: 11 }}>{desc}</Td>
                   </tr>
                 ))}
               </tbody>
@@ -469,14 +469,14 @@ function RPERIRTool() {
             <div style={{ overflowX: "auto", margin: "0 -2px" }}>
               <table style={{ borderCollapse: "collapse", fontSize: 10, minWidth: 360 }}>
                 <thead>
-                  <tr style={{ borderBottom: "1px solid var(--border)" }}>
+                  <tr style={{ borderBottom: "1px solid var(--glass-border)" }}>
                     <Th style={{ paddingRight: 12 }}>RPE</Th>
                     {[1,2,3,4,5,6,7,8,9,10].map(r => <Th key={r}>{r}R</Th>)}
                   </tr>
                 </thead>
                 <tbody>
                   {Object.entries(RPE_PERCENT_TABLE).map(([r, row]) => (
-                    <tr key={r} style={{ borderBottom: "1px solid var(--border)" }}>
+                    <tr key={r} style={{ borderBottom: "1px solid var(--glass-border)" }}>
                       <Td className="mono" style={{ fontWeight: 700, paddingRight: 12 }}>{r}</Td>
                       {row.map((p, i) => (
                         <Td key={i} className="mono" style={{
@@ -495,7 +495,7 @@ function RPERIRTool() {
 
       {mode === "calc" && (
         <Card>
-          <div style={{ fontSize: 11, color: "var(--text2)", marginBottom: 16, lineHeight: 1.6 }}>
+          <div style={{ fontSize: 11, color: "rgba(240,240,240,0.55)", marginBottom: 16, lineHeight: 1.6 }}>
             Ingresá el peso y reps que hiciste + el RPE percibido → obtenés tu 1RM estimado.
           </div>
 
@@ -504,8 +504,8 @@ function RPERIRTool() {
             {["kg", "lb"].map(u => (
               <button key={u} onClick={() => setUnit(u)} style={{
                 padding: "5px 12px", borderRadius: 8,
-                background: unit === u ? "var(--text)" : "var(--bg3)",
-                border: "none", color: unit === u ? "var(--bg)" : "var(--text2)",
+                background: unit === u ? "rgba(255,255,255,0.90)" : "var(--bg3)",
+                border: "none", color: unit === u ? "#080810" : "var(--text2)",
                 fontSize: 11, fontWeight: 700, cursor: "pointer",
                 fontFamily: "inherit", WebkitTapHighlightColor: "transparent",
               }}>{u}</button>
@@ -516,9 +516,9 @@ function RPERIRTool() {
           <div style={{ display: "flex", gap: 10, marginBottom: 16 }}>
             <ToolInput label={`Peso (${unit})`} value={weight} onChange={setWeight} />
             <div style={{ flex: 1 }}>
-              <div style={{ fontSize: 9, color: "var(--text3)", letterSpacing: 2, marginBottom: 6 }}>REPS</div>
+              <div style={{ fontSize: 9, color: "rgba(240,240,240,0.30)", letterSpacing: 2, marginBottom: 6 }}>REPS</div>
               <select value={reps} onChange={e => setReps(Number(e.target.value))} style={{
-                width: "100%", background: "var(--bg3)", border: "1px solid var(--border)",
+                width: "100%", background: "rgba(255,255,255,0.07)", border: "1px solid var(--glass-border)",
                 color: "var(--text)", padding: "10px 12px", borderRadius: 10,
                 fontSize: 15, fontFamily: "\"DM Mono\", monospace", fontWeight: 700,
                 outline: "none", cursor: "pointer",
@@ -531,14 +531,14 @@ function RPERIRTool() {
           {/* RPE slider */}
           <div style={{ marginBottom: 16 }}>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginBottom: 8 }}>
-              <div style={{ fontSize: 9, color: "var(--text3)", letterSpacing: 2 }}>RPE PERCIBIDO</div>
+              <div style={{ fontSize: 9, color: "rgba(240,240,240,0.30)", letterSpacing: 2 }}>RPE PERCIBIDO</div>
               <div className="mono" style={{ fontSize: 22, fontWeight: 900, color: "var(--text)" }}>{rpe}</div>
             </div>
             <input type="range" min={7} max={10} step={0.5} value={rpe}
               onChange={e => setRpe(Number(e.target.value))}
               style={{ width: "100%", accentColor: "var(--text)", cursor: "pointer", height: 4 }}
             />
-            <div style={{ display: "flex", justifyContent: "space-between", fontSize: 9, color: "var(--text3)", marginTop: 4 }}>
+            <div style={{ display: "flex", justifyContent: "space-between", fontSize: 9, color: "rgba(240,240,240,0.30)", marginTop: 4 }}>
               <span>RPE 7 — fácil</span><span>RPE 10 — fallo</span>
             </div>
           </div>
@@ -546,8 +546,8 @@ function RPERIRTool() {
           {/* Descripción RPE */}
           {rirVal && (
             <div style={{
-              background: "var(--bg3)", borderRadius: 10, padding: "10px 14px", marginBottom: 14,
-              fontSize: 12, color: "var(--text2)", lineHeight: 1.5,
+              background: "rgba(255,255,255,0.07)", backdropFilter: "blur(20px)", WebkitBackdropFilter: "blur(20px)", borderRadius: 14, padding: "10px 14px", marginBottom: 14,
+              fontSize: 12, color: "rgba(240,240,240,0.55)", lineHeight: 1.5,
             }}>
               <span className="mono" style={{ fontWeight: 700, color: "var(--text)" }}>RIR {rirVal.rir}</span>
               {" — "}{rirVal.desc}
@@ -560,13 +560,13 @@ function RPERIRTool() {
           {/* Resultado 1RM */}
           {orm && (
             <div style={{
-              background: "var(--text)", borderRadius: 12, padding: "16px",
+              background: "rgba(255,255,255,0.90)", borderRadius: 12, padding: "16px",
               textAlign: "center",
             }}>
-              <div style={{ fontSize: 9, letterSpacing: 3, color: "var(--bg)", opacity: 0.5, marginBottom: 4 }}>
+              <div style={{ fontSize: 9, letterSpacing: 3, color: "#080810", opacity: 0.5, marginBottom: 4 }}>
                 1RM ESTIMADO
               </div>
-              <div className="mono" style={{ fontSize: 40, fontWeight: 900, color: "var(--bg)", letterSpacing: -2 }}>
+              <div className="mono" style={{ fontSize: 40, fontWeight: 900, color: "#080810", letterSpacing: -2 }}>
                 {orm.toFixed(1)}
                 <span style={{ fontSize: 16, fontWeight: 400, opacity: 0.6, marginLeft: 6 }}>{unit}</span>
               </div>
@@ -581,7 +581,7 @@ function RPERIRTool() {
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 function SectionLabel({ children, style }) {
   return (
-    <div style={{ fontSize: 9, letterSpacing: 3, color: "var(--text3)", fontWeight: 700, marginBottom: 10, ...style }}>
+    <div style={{ fontSize: 9, letterSpacing: 3, color: "rgba(240,240,240,0.30)", fontWeight: 700, marginBottom: 10, ...style }}>
       {children}
     </div>
   );
@@ -590,8 +590,11 @@ function SectionLabel({ children, style }) {
 function Card({ children }) {
   return (
     <div style={{
-      background: "var(--bg2)", border: "1px solid var(--border)",
-      borderRadius: 16, padding: "16px",
+      background: "rgba(255,255,255,0.07)",
+      backdropFilter: "blur(40px) saturate(180%)",
+      WebkitBackdropFilter: "blur(40px) saturate(180%)",
+      border: "1px solid rgba(255,255,255,0.13)",
+      borderRadius: 18, padding: "16px",
     }}>{children}</div>
   );
 }
@@ -599,7 +602,7 @@ function Card({ children }) {
 function ToolInput({ label, value, onChange }) {
   return (
     <div style={{ flex: 1 }}>
-      <div style={{ fontSize: 9, color: "var(--text3)", letterSpacing: 2, marginBottom: 6 }}>
+      <div style={{ fontSize: 9, color: "rgba(240,240,240,0.30)", letterSpacing: 2, marginBottom: 6 }}>
         {label.toUpperCase()}
       </div>
       <input
@@ -608,8 +611,8 @@ function ToolInput({ label, value, onChange }) {
         onChange={e => onChange(e.target.value)}
         placeholder="0"
         style={{
-          width: "100%", background: "var(--bg3)",
-          border: "1px solid var(--border)",
+          width: "100%", background: "rgba(255,255,255,0.07)",
+          border: "1px solid var(--glass-border)",
           color: "var(--text)", padding: "10px 12px",
           borderRadius: 10, fontSize: 16,
           fontFamily: "\"DM Mono\", monospace",
@@ -625,7 +628,7 @@ function Th({ children, style }) {
     <th style={{
       textAlign: "left", padding: "6px 6px",
       fontSize: 9, letterSpacing: 1.5, fontWeight: 700,
-      color: "var(--text3)", textTransform: "uppercase", ...style,
+      color: "rgba(240,240,240,0.30)", textTransform: "uppercase", ...style,
     }}>{children}</th>
   );
 }
@@ -641,13 +644,13 @@ function Td({ children, className, style }) {
 function ScoreBox({ label, value }) {
   return (
     <div style={{
-      flex: 1, background: "var(--text)", borderRadius: 12,
+      flex: 1, background: "rgba(255,255,255,0.90)", borderRadius: 12,
       padding: "14px", textAlign: "center",
     }}>
-      <div style={{ fontSize: 9, letterSpacing: 2, color: "var(--bg)", opacity: 0.5, marginBottom: 4 }}>
+      <div style={{ fontSize: 9, letterSpacing: 2, color: "#080810", opacity: 0.5, marginBottom: 4 }}>
         {label}
       </div>
-      <div className="mono" style={{ fontSize: 30, fontWeight: 900, color: "var(--bg)", letterSpacing: -1 }}>
+      <div className="mono" style={{ fontSize: 30, fontWeight: 900, color: "#080810", letterSpacing: -1 }}>
         {value}
       </div>
     </div>

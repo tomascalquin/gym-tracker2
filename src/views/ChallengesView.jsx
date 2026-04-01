@@ -81,9 +81,9 @@ export default function ChallengesView({ user, myLogs, myRoutine, onBack }) {
       {/* Header */}
       <div style={{ padding: "20px 18px 0" }}>
         <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 20 }}>
-          <button onClick={onBack} className="nbtn" style={{ color: "var(--text3)", fontSize: 20, padding: "0 4px" }}>←</button>
+          <button onClick={onBack} className="nbtn" style={{ color: "rgba(240,240,240,0.30)", fontSize: 20, padding: "0 4px" }}>←</button>
           <div style={{ flex: 1 }}>
-            <div style={{ fontSize: 9, color: "var(--text3)", letterSpacing: 3 }}>COMPETENCIA</div>
+            <div style={{ fontSize: 9, color: "rgba(240,240,240,0.30)", letterSpacing: 3 }}>COMPETENCIA</div>
             <h2 style={{ margin: 0, fontSize: 22, fontWeight: 900, color: "var(--text)", letterSpacing: -0.8 }}>Retos 1v1</h2>
           </div>
           <button onClick={() => setShowCreate(v => !v)} style={{
@@ -98,7 +98,7 @@ export default function ChallengesView({ user, myLogs, myRoutine, onBack }) {
         </div>
 
         {/* Tabs */}
-        <div style={{ display: "flex", borderBottom: "1px solid var(--border)" }}>
+        <div style={{ display: "flex", borderBottom: "1px solid var(--glass-border)" }}>
           {[
             { key: "active",   label: `ACTIVOS (${active.length})` },
             { key: "finished", label: `TERMINADOS (${finished.length})` },
@@ -119,7 +119,7 @@ export default function ChallengesView({ user, myLogs, myRoutine, onBack }) {
         {/* Crear reto */}
         {showCreate && (
           <div style={{
-            background: "var(--bg2)", border: `1px solid ${ACCENT}33`,
+            background: "rgba(255,255,255,0.07)", backdropFilter: "blur(40px)", WebkitBackdropFilter: "blur(40px)", border: `1px solid ${ACCENT}33`,
             borderRadius: 16, padding: "18px", marginBottom: 20,
             animation: "slideDown 0.25s ease",
             boxShadow: `0 4px 20px ${ACCENT}11`,
@@ -127,9 +127,9 @@ export default function ChallengesView({ user, myLogs, myRoutine, onBack }) {
             <div style={{ fontSize: 9, color: ACCENT, letterSpacing: 3, marginBottom: 16 }}>NUEVO RETO ⚔️</div>
 
             <div style={{ marginBottom: 12 }}>
-              <div style={{ fontSize: 9, color: "var(--text3)", letterSpacing: 2, marginBottom: 6 }}>RIVAL</div>
+              <div style={{ fontSize: 9, color: "rgba(240,240,240,0.30)", letterSpacing: 2, marginBottom: 6 }}>RIVAL</div>
               <select value={selectedRival} onChange={e => { setSelectedRival(e.target.value); setCreateError(""); }} style={{
-                width: "100%", background: "var(--bg3)", border: "1px solid var(--border)",
+                width: "100%", background: "rgba(255,255,255,0.05)", border: "1px solid var(--glass-border)",
                 color: selectedRival ? "var(--text)" : "var(--text3)", padding: "11px 14px", borderRadius: 12,
                 fontSize: 13, fontFamily: "inherit", outline: "none",
               }}>
@@ -139,11 +139,11 @@ export default function ChallengesView({ user, myLogs, myRoutine, onBack }) {
             </div>
 
             <div style={{ marginBottom: 12 }}>
-              <div style={{ fontSize: 9, color: "var(--text3)", letterSpacing: 2, marginBottom: 6 }}>EJERCICIO</div>
+              <div style={{ fontSize: 9, color: "rgba(240,240,240,0.30)", letterSpacing: 2, marginBottom: 6 }}>EJERCICIO</div>
               <input value={exercise} onChange={e => { setExercise(e.target.value); setCreateError(""); }}
                 placeholder="Ej: Peso Rumano, Press Banca..."
                 style={{
-                  width: "100%", background: "var(--bg3)", border: "1px solid var(--border)",
+                  width: "100%", background: "rgba(255,255,255,0.05)", border: "1px solid var(--glass-border)",
                   color: "var(--text)", padding: "11px 14px", borderRadius: 12,
                   fontSize: 13, fontFamily: "inherit", outline: "none",
                 }}
@@ -152,18 +152,18 @@ export default function ChallengesView({ user, myLogs, myRoutine, onBack }) {
 
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10, marginBottom: 12 }}>
               <div>
-                <div style={{ fontSize: 9, color: "var(--text3)", letterSpacing: 2, marginBottom: 6 }}>OBJETIVO (kg 1RM)</div>
+                <div style={{ fontSize: 9, color: "rgba(240,240,240,0.30)", letterSpacing: 2, marginBottom: 6 }}>OBJETIVO (kg 1RM)</div>
                 <input type="number" value={targetWeight} onChange={e => { setTargetWeight(e.target.value); setCreateError(""); }}
                   placeholder="100"
                   style={{
-                    width: "100%", background: "var(--bg3)", border: "1px solid var(--border)",
+                    width: "100%", background: "rgba(255,255,255,0.05)", border: "1px solid var(--glass-border)",
                     color: ACCENT, padding: "11px 14px", borderRadius: 12,
                     fontSize: 18, fontFamily: "inherit", outline: "none", textAlign: "center", fontWeight: 300,
                   }}
                 />
               </div>
               <div>
-                <div style={{ fontSize: 9, color: "var(--text3)", letterSpacing: 2, marginBottom: 6 }}>PLAZO: {deadlineDays}d</div>
+                <div style={{ fontSize: 9, color: "rgba(240,240,240,0.30)", letterSpacing: 2, marginBottom: 6 }}>PLAZO: {deadlineDays}d</div>
                 <input type="range" min={7} max={90} value={deadlineDays}
                   onChange={e => setDeadlineDays(parseInt(e.target.value))}
                   style={{ width: "100%", marginTop: 12, accentColor: ACCENT }}
@@ -194,7 +194,7 @@ export default function ChallengesView({ user, myLogs, myRoutine, onBack }) {
             {(tab === "active" ? active : finished).length === 0 && (
               <div style={{ textAlign: "center", padding: "50px 20px" }}>
                 <div style={{ fontSize: 36, marginBottom: 12 }}>⚔️</div>
-                <div style={{ fontSize: 14, color: "var(--text2)" }}>
+                <div style={{ fontSize: 14, color: "rgba(240,240,240,0.55)" }}>
                   {tab === "active" ? "Sin retos activos" : "Sin retos terminados"}
                 </div>
               </div>
@@ -214,7 +214,7 @@ export default function ChallengesView({ user, myLogs, myRoutine, onBack }) {
 
               return (
                 <div key={ch.id} style={{
-                  background: "var(--bg2)",
+                  background: "rgba(255,255,255,0.07)", backdropFilter: "blur(40px)", WebkitBackdropFilter: "blur(40px)",
                   border: `1px solid ${statusColor}33`,
                   borderLeft: `3px solid ${statusColor}`,
                   borderRadius: 14, padding: "16px", marginBottom: 10,
@@ -223,9 +223,9 @@ export default function ChallengesView({ user, myLogs, myRoutine, onBack }) {
                 }}>
                   <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 14 }}>
                     <div>
-                      <div style={{ fontSize: 9, color: "var(--text3)", letterSpacing: 2, marginBottom: 4 }}>RETO ⚔️</div>
+                      <div style={{ fontSize: 9, color: "rgba(240,240,240,0.30)", letterSpacing: 2, marginBottom: 4 }}>RETO ⚔️</div>
                       <div style={{ fontSize: 15, color: "var(--text)", fontWeight: 400 }}>{ch.exercise}</div>
-                      <div style={{ fontSize: 11, color: "var(--text3)", marginTop: 2 }}>
+                      <div style={{ fontSize: 11, color: "rgba(240,240,240,0.30)", marginTop: 2 }}>
                         Objetivo: <span style={{ color: ACCENT }}>{ch.targetWeight} kg 1RM</span>
                       </div>
                     </div>
@@ -233,7 +233,7 @@ export default function ChallengesView({ user, myLogs, myRoutine, onBack }) {
                       {ch.status === "completed" && (
                         <div style={{ fontSize: 14, color: statusColor }}>{iWon ? "🏆 Ganaste" : "💀 Perdiste"}</div>
                       )}
-                      {ch.status === "expired" && <div style={{ fontSize: 11, color: "var(--text3)" }}>Expirado</div>}
+                      {ch.status === "expired" && <div style={{ fontSize: 11, color: "rgba(240,240,240,0.30)" }}>Expirado</div>}
                       {ch.status === "active" && (
                         <div style={{ fontSize: 11, color: daysLeft <= 7 ? "var(--red)" : "var(--text3)" }}>
                           {daysLeft} días restantes
@@ -258,14 +258,14 @@ function ProgressBar({ label, current, pct, target, color, isWinner }) {
   return (
     <div style={{ marginBottom: 12 }}>
       <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 5 }}>
-        <span style={{ fontSize: 11, color: "var(--text2)" }}>
+        <span style={{ fontSize: 11, color: "rgba(240,240,240,0.55)" }}>
           {isWinner && "🏆 "}{label}
         </span>
         <span style={{ fontSize: 12, color: current > 0 ? color : "var(--text3)" }}>
-          {current > 0 ? `${current} kg` : "—"} <span style={{ color: "var(--text3)", fontSize: 10 }}>/ {target}</span>
+          {current > 0 ? `${current} kg` : "—"} <span style={{ color: "rgba(240,240,240,0.30)", fontSize: 10 }}>/ {target}</span>
         </span>
       </div>
-      <div style={{ background: "var(--bg3)", borderRadius: 99, height: 6, overflow: "hidden" }}>
+      <div style={{ background: "rgba(255,255,255,0.05)", borderRadius: 99, height: 6, overflow: "hidden" }}>
         <div style={{
           height: "100%", borderRadius: 99,
           background: `linear-gradient(90deg, ${color} 0%, ${color}88 100%)`,
@@ -273,7 +273,7 @@ function ProgressBar({ label, current, pct, target, color, isWinner }) {
           boxShadow: pct > 0 ? `0 0 8px ${color}66` : "none",
         }} />
       </div>
-      <div style={{ fontSize: 9, color: "var(--text3)", textAlign: "right", marginTop: 3 }}>{pct}%</div>
+      <div style={{ fontSize: 9, color: "rgba(240,240,240,0.30)", textAlign: "right", marginTop: 3 }}>{pct}%</div>
     </div>
   );
 }

@@ -112,15 +112,15 @@ export default function EditRoutineView({ user, routine, onBack, onRoutineUpdate
       {/* Header sticky */}
       <div style={{
         position: "sticky", top: 0, zIndex: 20,
-        background: "rgba(245,245,240,0.97)", backdropFilter: "blur(20px)",
+        background: "rgba(8,8,16,0.80)", backdropFilter: "blur(40px)", WebkitBackdropFilter: "blur(40px)",
         WebkitBackdropFilter: "blur(20px)",
-        borderBottom: "1px solid var(--border)",
+        borderBottom: "1px solid var(--glass-border)",
         padding: "12px 18px",
         display: "flex", alignItems: "center", justifyContent: "space-between",
       }}>
-        <button onClick={onBack} className="nbtn" style={{ color: "var(--text3)", fontSize: 20, padding: "0 4px" }}>←</button>
+        <button onClick={onBack} className="nbtn" style={{ color: "rgba(240,240,240,0.30)", fontSize: 20, padding: "0 4px" }}>←</button>
         <div style={{ textAlign: "center" }}>
-          <div style={{ fontSize: 9, color: "var(--text3)", letterSpacing: 3 }}>CONFIGURACIÓN</div>
+          <div style={{ fontSize: 9, color: "rgba(240,240,240,0.30)", letterSpacing: 3 }}>CONFIGURACIÓN</div>
           <div style={{ fontSize: 14, color: "var(--text)" }}>Editar Rutina</div>
         </div>
         <button onClick={handleSave} disabled={saving} style={{
@@ -136,7 +136,7 @@ export default function EditRoutineView({ user, routine, onBack, onRoutineUpdate
       <div style={{ padding: "16px 18px" }}>
         {/* Selector de días — pills */}
         <div style={{ marginBottom: 16 }}>
-          <div style={{ fontSize: 9, color: "var(--text3)", letterSpacing: 3, marginBottom: 10 }}>DÍAS</div>
+          <div style={{ fontSize: 9, color: "rgba(240,240,240,0.30)", letterSpacing: 3, marginBottom: 10 }}>DÍAS</div>
           <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
             {days.map(day => {
               const dc = DAY_META[day] || { accent: "#60a5fa" };
@@ -155,7 +155,7 @@ export default function EditRoutineView({ user, routine, onBack, onRoutineUpdate
             {!addingDay ? (
               <button onClick={() => setAddingDay(true)} style={{
                 background: "transparent", border: "1px dashed var(--border)",
-                color: "var(--text3)", padding: "7px 14px", borderRadius: 99,
+                color: "rgba(240,240,240,0.30)", padding: "7px 14px", borderRadius: 99,
                 cursor: "pointer", fontSize: 10, letterSpacing: 1, fontFamily: "inherit",
               }}>+ DÍA</button>
             ) : (
@@ -163,7 +163,7 @@ export default function EditRoutineView({ user, routine, onBack, onRoutineUpdate
                 <input value={newDayName} onChange={e => setNewDayName(e.target.value)}
                   onKeyDown={e => e.key === "Enter" && addDay()} placeholder="Nombre" autoFocus
                   style={{
-                    background: "var(--bg2)", border: "1px solid #60a5fa44", color: "var(--text)",
+                    background: "rgba(255,255,255,0.07)", backdropFilter: "blur(40px)", WebkitBackdropFilter: "blur(40px)", border: "1px solid #60a5fa44", color: "var(--text)",
                     padding: "7px 12px", borderRadius: 99, fontSize: 11, fontFamily: "inherit",
                     outline: "none", width: 110,
                   }}
@@ -174,7 +174,7 @@ export default function EditRoutineView({ user, routine, onBack, onRoutineUpdate
                   fontSize: 10, fontWeight: 700, fontFamily: "inherit",
                 }}>OK</button>
                 <button onClick={() => { setAddingDay(false); setNewDayName(""); }} className="nbtn"
-                  style={{ color: "var(--text3)", fontSize: 14 }}>✕</button>
+                  style={{ color: "rgba(240,240,240,0.30)", fontSize: 14 }}>✕</button>
               </div>
             )}
           </div>
@@ -183,7 +183,7 @@ export default function EditRoutineView({ user, routine, onBack, onRoutineUpdate
         {/* Header del día activo */}
         {activeDay && (
           <div style={{
-            background: "var(--bg2)", border: `1px solid ${c.accent}22`,
+            background: "rgba(255,255,255,0.07)", backdropFilter: "blur(40px)", WebkitBackdropFilter: "blur(40px)", border: `1px solid ${c.accent}22`,
             borderLeft: `3px solid ${c.accent}`, borderRadius: 12,
             padding: "12px 14px", marginBottom: 12,
             display: "flex", justifyContent: "space-between", alignItems: "center",
@@ -201,15 +201,15 @@ export default function EditRoutineView({ user, routine, onBack, onRoutineUpdate
         {/* Ejercicios */}
         {exercises.map((ex, ei) => (
           <div key={ei} style={{
-            background: "var(--bg2)", border: "1px solid var(--border)",
+            background: "rgba(255,255,255,0.07)", backdropFilter: "blur(40px)", WebkitBackdropFilter: "blur(40px)", border: "1px solid var(--glass-border)",
             borderRadius: 14, marginBottom: 10, overflow: "hidden",
             animation: `slideDown 0.2s ease ${ei * 0.04}s both`,
           }}>
             {/* Header ejercicio */}
             <div style={{
-              padding: "11px 14px", borderBottom: "1px solid var(--border)",
+              padding: "11px 14px", borderBottom: "1px solid var(--glass-border)",
               display: "flex", gap: 8, alignItems: "center",
-              background: "var(--bg3)",
+              background: "rgba(255,255,255,0.05)",
             }}>
               <input value={ex.name} onChange={e => updateExName(ei, e.target.value)}
                 placeholder="Nombre del ejercicio"
@@ -238,30 +238,30 @@ export default function EditRoutineView({ user, routine, onBack, onRoutineUpdate
               {/* Headers */}
               <div style={{ display: "grid", gridTemplateColumns: "18px 1fr 60px 60px 28px", gap: 5, marginBottom: 6 }}>
                 {["", "NOTA", "KG", "REPS", ""].map((h, i) => (
-                  <span key={i} style={{ fontSize: 8, color: "var(--text3)", letterSpacing: 1, textAlign: i > 1 ? "center" : "left" }}>{h}</span>
+                  <span key={i} style={{ fontSize: 8, color: "rgba(240,240,240,0.30)", letterSpacing: 1, textAlign: i > 1 ? "center" : "left" }}>{h}</span>
                 ))}
               </div>
 
               {ex.sets.map((set, si) => (
                 <div key={si} style={{ display: "grid", gridTemplateColumns: "18px 1fr 60px 60px 28px", gap: 5, alignItems: "center", marginBottom: 6 }}>
-                  <span style={{ fontSize: 10, color: "var(--text3)", textAlign: "center" }}>{si + 1}</span>
+                  <span style={{ fontSize: 10, color: "rgba(240,240,240,0.30)", textAlign: "center" }}>{si + 1}</span>
                   <input value={set.note || ""} onChange={e => updateSet(ei, si, "note", e.target.value)} placeholder="—"
                     style={{
-                      background: "var(--bg3)", border: "1px solid var(--border)", color: "var(--text3)",
+                      background: "rgba(255,255,255,0.05)", border: "1px solid var(--glass-border)", color: "rgba(240,240,240,0.30)",
                       padding: "6px 8px", borderRadius: 7, fontSize: 12, fontFamily: "inherit",
                       outline: "none", width: "100%",
                     }}
                   />
                   <input type="number" value={set.weight} onChange={e => updateSet(ei, si, "weight", parseFloat(e.target.value) || 0)}
                     style={{
-                      background: "var(--bg3)", border: "1px solid var(--border)", color: c.accent,
+                      background: "rgba(255,255,255,0.05)", border: "1px solid var(--glass-border)", color: c.accent,
                       padding: "6px 4px", borderRadius: 7, fontSize: 14, fontWeight: 300,
                       textAlign: "center", fontFamily: "inherit", width: "100%", outline: "none",
                     }}
                   />
                   <input type="number" value={set.reps} onChange={e => updateSet(ei, si, "reps", parseInt(e.target.value) || 0)}
                     style={{
-                      background: "var(--bg3)", border: "1px solid var(--border)", color: "var(--text)",
+                      background: "rgba(255,255,255,0.05)", border: "1px solid var(--glass-border)", color: "var(--text)",
                       padding: "6px 4px", borderRadius: 7, fontSize: 14, fontWeight: 300,
                       textAlign: "center", fontFamily: "inherit", width: "100%", outline: "none",
                     }}
@@ -279,7 +279,7 @@ export default function EditRoutineView({ user, routine, onBack, onRoutineUpdate
 
               <button onClick={() => addSet(ei)} style={{
                 marginTop: 4, width: "100%", background: "transparent",
-                border: "1px dashed var(--border)", color: "var(--text3)",
+                border: "1px dashed var(--border)", color: "rgba(240,240,240,0.30)",
                 padding: "6px", borderRadius: 8, fontSize: 10, letterSpacing: 1,
                 cursor: "pointer", fontFamily: "inherit",
               }}>+ SERIE</button>
@@ -331,7 +331,7 @@ function DayNameEditor({ name, onRename, accent }) {
       <input value={val} onChange={e => setVal(e.target.value)}
         onKeyDown={e => e.key === "Enter" && confirm()} autoFocus
         style={{
-          background: "var(--bg3)", border: `1px solid ${accent}44`, color: "var(--text)",
+          background: "rgba(255,255,255,0.05)", border: `1px solid ${accent}44`, color: "var(--text)",
           padding: "6px 10px", borderRadius: 8, fontSize: 13, fontFamily: "inherit",
           outline: "none", width: 130,
         }}
@@ -342,7 +342,7 @@ function DayNameEditor({ name, onRename, accent }) {
         fontSize: 10, fontWeight: 700, fontFamily: "inherit",
       }}>OK</button>
       <button onClick={() => { setVal(name); setEditing(false); }} className="nbtn"
-        style={{ color: "var(--text3)", fontSize: 14 }}>✕</button>
+        style={{ color: "rgba(240,240,240,0.30)", fontSize: 14 }}>✕</button>
     </div>
   );
 }

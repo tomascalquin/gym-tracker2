@@ -96,7 +96,8 @@ export default function ChatView({ chatId, currentUser, title, onBack, accentCol
   return (
     <div style={{
       display: "flex", flexDirection: "column",
-      height: "100%", background: "var(--bg)",
+      height: "100%", background: "rgba(8,8,16,0.96)",
+      backdropFilter: "blur(40px)", WebkitBackdropFilter: "blur(40px)",
       fontFamily: "DM Mono, monospace",
       position: "fixed", inset: 0, zIndex: 200,
       paddingTop: "env(safe-area-inset-top)",
@@ -104,10 +105,10 @@ export default function ChatView({ chatId, currentUser, title, onBack, accentCol
       {/* Header */}
       <div style={{
         display: "flex", alignItems: "center", gap: 12, flexShrink: 0,
-        padding: "12px 16px", borderBottom: "1px solid var(--border)",
-        background: "var(--bg)",
+        padding: "12px 16px", borderBottom: "1px solid var(--glass-border)",
+        background: "rgba(8,8,16,0.6)", backdropFilter: "blur(20px)", WebkitBackdropFilter: "blur(20px)",
       }}>
-        <button onClick={onBack} className="nbtn" style={{ color: "var(--text3)", fontSize: 20, minHeight: 44, padding: "0 8px" }}>←</button>
+        <button onClick={onBack} className="nbtn" style={{ color: "rgba(240,240,240,0.30)", fontSize: 20, minHeight: 44, padding: "0 8px" }}>←</button>
         <div style={{
           width: 36, height: 36, borderRadius: "50%",
           background: accentColor + "22", border: `1px solid ${accentColor}44`,
@@ -116,7 +117,7 @@ export default function ChatView({ chatId, currentUser, title, onBack, accentCol
         }}>💬</div>
         <div>
           <div style={{ fontSize: 14, color: "var(--text)", fontWeight: 500 }}>{title}</div>
-          <div style={{ fontSize: 10, color: "var(--text3)" }}>
+          <div style={{ fontSize: 10, color: "rgba(240,240,240,0.30)" }}>
             {messages.length} mensajes
           </div>
         </div>
@@ -130,8 +131,8 @@ export default function ChatView({ chatId, currentUser, title, onBack, accentCol
         {messages.length === 0 && (
           <div style={{ textAlign: "center", padding: "60px 20px" }}>
             <div style={{ fontSize: 40, marginBottom: 12 }}>💬</div>
-            <div style={{ fontSize: 14, color: "var(--text2)" }}>Sin mensajes aún</div>
-            <div style={{ fontSize: 12, color: "var(--text3)", marginTop: 4 }}>Sé el primero en escribir</div>
+            <div style={{ fontSize: 14, color: "rgba(240,240,240,0.55)" }}>Sin mensajes aún</div>
+            <div style={{ fontSize: 12, color: "rgba(240,240,240,0.30)", marginTop: 4 }}>Sé el primero en escribir</div>
           </div>
         )}
 
@@ -139,8 +140,8 @@ export default function ChatView({ chatId, currentUser, title, onBack, accentCol
           if (item.type === "date") return (
             <div key={`date-${i}`} style={{ textAlign: "center", margin: "14px 0 8px" }}>
               <span style={{
-                fontSize: 10, color: "var(--text3)", letterSpacing: 1,
-                background: "var(--bg2)", padding: "3px 10px", borderRadius: 10,
+                fontSize: 10, color: "rgba(240,240,240,0.30)", letterSpacing: 1,
+                background: "rgba(255,255,255,0.07)", backdropFilter: "blur(40px)", WebkitBackdropFilter: "blur(40px)", padding: "3px 10px", borderRadius: 10,
               }}>{item.label}</span>
             </div>
           );
@@ -157,7 +158,7 @@ export default function ChatView({ chatId, currentUser, title, onBack, accentCol
                 {!isMe && showAvatar && (
                   <div style={{
                     width: 32, height: 32, borderRadius: "50%",
-                    background: "var(--bg2)", border: `1.5px solid ${accentColor}33`,
+                    background: "rgba(255,255,255,0.07)", backdropFilter: "blur(40px)", WebkitBackdropFilter: "blur(40px)", border: `1.5px solid ${accentColor}33`,
                     overflow: "hidden", display: "flex", alignItems: "center", justifyContent: "center",
                   }}>
                     {msg.photoURL
@@ -195,7 +196,7 @@ export default function ChatView({ chatId, currentUser, title, onBack, accentCol
                   )}
                 </div>
                 <div style={{
-                  fontSize: 9, color: "var(--text3)", marginTop: 3,
+                  fontSize: 9, color: "rgba(240,240,240,0.30)", marginTop: 3,
                   textAlign: isMe ? "right" : "left",
                   paddingLeft: isMe ? 0 : 4, paddingRight: isMe ? 4 : 0,
                 }}>{formatTime(msg.createdAt)}</div>
@@ -210,7 +211,7 @@ export default function ChatView({ chatId, currentUser, title, onBack, accentCol
       {showEmojis && (
         <div style={{
           display: "flex", gap: 4, padding: "8px 16px",
-          borderTop: "1px solid var(--border)", background: "var(--bg2)",
+          borderTop: "1px solid var(--glass-border)", background: "rgba(8,8,16,0.7)", backdropFilter: "blur(20px)", WebkitBackdropFilter: "blur(20px)",
           overflowX: "auto", flexShrink: 0,
         }}>
           {QUICK_EMOJIS.map(e => (
@@ -227,8 +228,8 @@ export default function ChatView({ chatId, currentUser, title, onBack, accentCol
         display: "flex", alignItems: "flex-end", gap: 8,
         padding: "10px 16px",
         paddingBottom: "calc(10px + env(safe-area-inset-bottom))",
-        borderTop: "1px solid var(--border)",
-        background: "var(--bg)", flexShrink: 0,
+        borderTop: "1px solid var(--glass-border)",
+        background: "transparent", flexShrink: 0,
       }}>
         <button onClick={() => setShowEmojis(v => !v)} className="nbtn" style={{
           fontSize: 22, padding: "0 4px",
@@ -237,7 +238,7 @@ export default function ChatView({ chatId, currentUser, title, onBack, accentCol
         }}>😊</button>
 
         <button onClick={() => fileRef.current.click()} disabled={sending} className="nbtn" style={{
-          fontSize: 22, padding: "0 4px", color: "var(--text3)",
+          fontSize: 22, padding: "0 4px", color: "rgba(240,240,240,0.30)",
           minHeight: 44, flexShrink: 0,
         }}>📎</button>
         <input ref={fileRef} type="file" accept="image/*" onChange={handleImage} style={{ display: "none" }} />
@@ -252,7 +253,7 @@ export default function ChatView({ chatId, currentUser, title, onBack, accentCol
             placeholder="Escribe un mensaje..."
             rows={1}
             style={{
-              width: "100%", background: "var(--bg2)",
+              width: "100%", background: "rgba(255,255,255,0.07)", backdropFilter: "blur(40px)", WebkitBackdropFilter: "blur(40px)",
               border: `1px solid ${text ? accentColor + "66" : "var(--border)"}`,
               color: "var(--text)", padding: "10px 14px",
               borderRadius: 22, fontSize: 14, fontFamily: "inherit",

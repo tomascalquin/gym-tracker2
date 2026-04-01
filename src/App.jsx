@@ -314,7 +314,7 @@ export default function App() {
       {isOffline && (
         <div style={{
           position: "fixed", top: 0, left: 0, right: 0, zIndex: 999,
-          background: "#111", borderBottom: "1px solid #333",
+          background: "rgba(8,8,20,0.92)", borderBottom: "1px solid rgba(255,255,255,0.12)",
           padding: "8px 18px", textAlign: "center",
           fontSize: 10, color: "#f5f5f0", letterSpacing: 2, fontWeight: 700,
           fontFamily: "inherit",
@@ -421,11 +421,16 @@ function Splash({ text }) {
       position: "fixed", inset: 0,
       display: "flex", flexDirection: "column",
       alignItems: "center", justifyContent: "center",
-      gap: 16, background: "var(--bg)",
+      gap: 14,
+      background: "#080810",
       fontFamily: "-apple-system, BlinkMacSystemFont, sans-serif",
     }}>
-      <div style={{ fontSize: 28, animation: "blink 1s infinite", color: "var(--text)" }}>◆</div>
-      <div style={{ fontSize: 10, letterSpacing: 4, fontWeight: 700, color: "var(--text3)" }}>{text}</div>
+      {/* orbs */}
+      <div style={{ position:"absolute", inset:0, background: "radial-gradient(ellipse 60% 50% at 20% 10%, rgba(88,56,230,0.45) 0%, transparent 70%), radial-gradient(ellipse 50% 60% at 80% 30%, rgba(14,100,200,0.35) 0%, transparent 70%), radial-gradient(ellipse 55% 45% at 50% 85%, rgba(120,40,180,0.30) 0%, transparent 70%)", pointerEvents:"none" }} />
+      <div style={{ position:"relative", textAlign:"center" }}>
+        <div style={{ fontSize: 32, animation: "blink 1.2s infinite", color: "rgba(255,255,255,0.9)" }}>◆</div>
+        <div style={{ fontSize: 9, letterSpacing: 4, fontWeight: 700, color: "rgba(255,255,255,0.3)", marginTop: 12 }}>{text}</div>
+      </div>
     </div>
   );
 }

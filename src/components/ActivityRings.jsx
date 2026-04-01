@@ -87,7 +87,7 @@ export default function ActivityRings({ logs, streak, size = 100 }) {
         <div style={{ fontSize: size * 0.16, color: rings[0].color, fontWeight: 500, lineHeight: 1 }}>
           {weekSessions}
         </div>
-        <div style={{ fontSize: size * 0.09, color: "var(--text3)", letterSpacing: 1, marginTop: 2 }}>
+        <div style={{ fontSize: size * 0.09, color: "rgba(240,240,240,0.30)", letterSpacing: 1, marginTop: 2 }}>
           SEM
         </div>
       </div>

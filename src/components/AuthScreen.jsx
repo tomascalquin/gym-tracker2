@@ -60,8 +60,8 @@ export default function AuthScreen() {
   }
 
   const inputStyle = {
-    width: "100%", background: "var(--bg3)",
-    border: "1px solid var(--border)", color: "var(--text)",
+    width: "100%", background: "rgba(255,255,255,0.05)",
+    border: "1px solid var(--glass-border)", color: "var(--text)",
     padding: "12px 14px", borderRadius: 10,
     fontSize: 14, fontFamily: "inherit", outline: "none",
     marginBottom: 10, transition: "border-color 0.15s",
@@ -71,17 +71,17 @@ export default function AuthScreen() {
     <div style={{
       minHeight: "100vh", display: "flex", flexDirection: "column",
       alignItems: "center", justifyContent: "center", gap: 16,
-      background: "var(--bg)", fontFamily: "inherit",
+      background: "transparent", fontFamily: "inherit",
     }}>
       <div style={{ fontSize: 24, animation: "blink 1.4s infinite", color: "var(--text)" }}>◆</div>
-      <div style={{ fontSize: 10, letterSpacing: 4, fontWeight: 700, color: "var(--text3)" }}>REDIRIGIENDO A GOOGLE</div>
+      <div style={{ fontSize: 10, letterSpacing: 4, fontWeight: 700, color: "rgba(240,240,240,0.30)" }}>REDIRIGIENDO A GOOGLE</div>
     </div>
   );
 
   return (
     <div style={{
       minHeight: "100vh", display: "flex", alignItems: "center",
-      justifyContent: "center", background: "var(--bg)",
+      justifyContent: "center", background: "transparent",
       fontFamily: "inherit", padding: "20px",
     }}>
       <div style={{ width: "100%", maxWidth: 360 }}>
@@ -91,14 +91,14 @@ export default function AuthScreen() {
           <div style={{ fontSize: 36, fontWeight: 900, color: "var(--text)", letterSpacing: -1.5, marginBottom: 6 }}>
             GYM<br />TRACKER
           </div>
-          <div style={{ height: "1.5px", background: "var(--text)", margin: "16px 0" }} />
-          <div style={{ fontSize: 10, color: "var(--text3)", letterSpacing: 3, fontWeight: 700 }}>
+          <div style={{ height: "1px", background: "var(--glass-border)", margin: "16px 0" }} />
+          <div style={{ fontSize: 10, color: "rgba(240,240,240,0.30)", letterSpacing: 3, fontWeight: 700 }}>
             {mode === "login" ? "INICIA SESIÓN" : "CREA TU CUENTA"}
           </div>
         </div>
 
         {/* Tabs */}
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", marginBottom: 28, borderBottom: "1.5px solid var(--text)" }}>
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", marginBottom: 28, borderBottom: "1px solid var(--glass-border)" }}>
           {["login", "register"].map(m => (
             <button key={m} onClick={() => { setMode(m); clearError(); }} style={{
               background: "transparent", border: "none",
@@ -133,7 +133,7 @@ export default function AuthScreen() {
 
           {mode === "login" && !resetSent && (
             <button onClick={handleReset} className="nbtn" style={{
-              fontSize: 11, color: "var(--text3)", marginTop: 8, cursor: "pointer",
+              fontSize: 11, color: "rgba(240,240,240,0.30)", marginTop: 8, cursor: "pointer",
               textDecoration: "underline",
             }}>¿Olvidaste tu contraseña?</button>
           )}
@@ -154,15 +154,15 @@ export default function AuthScreen() {
 
         {/* Separador */}
         <div style={{ display: "flex", alignItems: "center", gap: 12, margin: "20px 0" }}>
-          <div style={{ flex: 1, height: 1, background: "var(--border)" }} />
-          <span style={{ fontSize: 10, color: "var(--text3)", letterSpacing: 2, fontWeight: 700 }}>O</span>
-          <div style={{ flex: 1, height: 1, background: "var(--border)" }} />
+          <div style={{ flex: 1, height: 1, background: "rgba(255,255,255,0.12)" }} />
+          <span style={{ fontSize: 10, color: "rgba(240,240,240,0.30)", letterSpacing: 2, fontWeight: 700 }}>O</span>
+          <div style={{ flex: 1, height: 1, background: "rgba(255,255,255,0.12)" }} />
         </div>
 
         {/* Google */}
         <button onClick={handleGoogle} disabled={loading} style={{
           width: "100%", padding: "13px",
-          background: "var(--bg2)", border: "1px solid var(--border)",
+          background: "rgba(255,255,255,0.07)", backdropFilter: "blur(40px)", WebkitBackdropFilter: "blur(40px)", border: "1px solid var(--glass-border)",
           color: "var(--text)", borderRadius: 12,
           cursor: loading ? "default" : "pointer",
           fontSize: 13, fontFamily: "inherit",

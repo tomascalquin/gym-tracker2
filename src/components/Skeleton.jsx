@@ -12,7 +12,7 @@ function SkeletonBase({ style }) {
 export function DayCardSkeleton() {
   return (
     <div style={{
-      background: "var(--bg2)", border: "1px solid var(--border)",
+      background: "rgba(255,255,255,0.07)", backdropFilter: "blur(40px)", WebkitBackdropFilter: "blur(40px)", border: "1px solid var(--glass-border)",
       borderLeft: "3px solid var(--border)", borderRadius: 14,
       padding: "14px 16px", marginBottom: 7,
       display: "flex", alignItems: "center", justifyContent: "space-between",
@@ -35,7 +35,7 @@ export function StatSkeleton({ count = 4 }) {
     <div style={{ display: "grid", gridTemplateColumns: `repeat(${count}, 1fr)`, gap: 6, marginBottom: 14 }}>
       {[...Array(count)].map((_, i) => (
         <div key={i} style={{
-          background: "var(--bg2)", border: "1px solid var(--border)",
+          background: "rgba(255,255,255,0.07)", backdropFilter: "blur(40px)", WebkitBackdropFilter: "blur(40px)", border: "1px solid var(--glass-border)",
           borderRadius: 10, padding: "10px 6px", textAlign: "center",
         }}>
           <SkeletonBase style={{ width: 24, height: 20, margin: "0 auto 6px" }} />
@@ -50,7 +50,7 @@ export function StatSkeleton({ count = 4 }) {
 export function XPBarSkeleton() {
   return (
     <div style={{
-      background: "var(--bg2)", border: "1px solid var(--border)",
+      background: "rgba(255,255,255,0.07)", backdropFilter: "blur(40px)", WebkitBackdropFilter: "blur(40px)", border: "1px solid var(--glass-border)",
       borderRadius: 14, padding: "12px 16px", marginBottom: 14,
       display: "flex", alignItems: "center", gap: 10,
     }}>
@@ -70,7 +70,7 @@ export function RankCardSkeleton({ count = 5 }) {
     <>
       {[...Array(count)].map((_, i) => (
         <div key={i} style={{
-          background: "var(--bg2)", border: "1px solid var(--border)",
+          background: "rgba(255,255,255,0.07)", backdropFilter: "blur(40px)", WebkitBackdropFilter: "blur(40px)", border: "1px solid var(--glass-border)",
           borderRadius: 14, marginBottom: 6, padding: "12px 14px",
           display: "flex", alignItems: "center", gap: 10,
         }}>
@@ -96,7 +96,7 @@ export function HistoryCardSkeleton({ count = 4 }) {
     <>
       {[...Array(count)].map((_, i) => (
         <div key={i} style={{
-          background: "var(--bg2)", border: "1px solid var(--border)",
+          background: "rgba(255,255,255,0.07)", backdropFilter: "blur(40px)", WebkitBackdropFilter: "blur(40px)", border: "1px solid var(--glass-border)",
           borderLeft: "3px solid var(--border)", borderRadius: 14,
           padding: "13px 14px", marginBottom: 8,
           display: "flex", justifyContent: "space-between",
@@ -125,7 +125,7 @@ export function FriendCardSkeleton({ count = 3 }) {
     <>
       {[...Array(count)].map((_, i) => (
         <div key={i} style={{
-          background: "var(--bg2)", border: "1px solid var(--border)",
+          background: "rgba(255,255,255,0.07)", backdropFilter: "blur(40px)", WebkitBackdropFilter: "blur(40px)", border: "1px solid var(--glass-border)",
           borderRadius: 14, padding: "12px 14px", marginBottom: 8,
           display: "flex", alignItems: "center", gap: 12,
         }}>

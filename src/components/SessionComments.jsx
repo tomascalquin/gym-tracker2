@@ -68,7 +68,7 @@ export default function SessionComments({ ownerUid, sessionKey, currentUser, can
               display: "flex", alignItems: "flex-start", gap: 8, marginBottom: 6,
             }}>
               <div style={{
-                width: 24, height: 24, borderRadius: "50%", background: "#1a1a2e",
+                width: 24, height: 24, borderRadius: "50%", background: "rgba(255,255,255,0.07)",
                 display: "flex", alignItems: "center", justifyContent: "center",
                 fontSize: 11, color: "#60a5fa", flexShrink: 0,
               }}>
@@ -100,7 +100,7 @@ export default function SessionComments({ ownerUid, sessionKey, currentUser, can
           <div style={{ display: "flex", gap: 6, marginBottom: 8, flexWrap: "wrap" }}>
             {QUICK_EMOJIS.map(emoji => (
               <button key={emoji} onClick={() => handleSend(emoji)} disabled={sending} style={{
-                background: "#1a1a2e", border: "1px solid #1a1a2a",
+                background: "rgba(255,255,255,0.07)", border: "1px solid rgba(255,255,255,0.12)",
                 borderRadius: 8, padding: "4px 8px", cursor: "pointer",
                 fontSize: 16, lineHeight: 1,
               }}>{emoji}</button>
@@ -115,7 +115,7 @@ export default function SessionComments({ ownerUid, sessionKey, currentUser, can
               onKeyDown={e => e.key === "Enter" && handleSend("", text)}
               placeholder="Escribe un comentario..."
               style={{
-                flex: 1, background: "#0e0e1a", border: "1px solid #1a1a2a",
+                flex: 1, background: "#0e0e1a", border: "1px solid rgba(255,255,255,0.12)",
                 color: "#f1f5f9", padding: "7px 10px", borderRadius: 7,
                 fontSize: 12, fontFamily: "inherit", outline: "none",
               }}

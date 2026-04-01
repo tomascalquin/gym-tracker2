@@ -48,19 +48,19 @@ export default function ActiveSessionBanner({ activeDay, sessionDate, completedS
       `}</style>
 
       <div style={{
-        background: "var(--bg)",
+        background: "rgba(255,255,255,0.07)", backdropFilter: "blur(40px)", WebkitBackdropFilter: "blur(40px)",
         backdropFilter: "blur(20px)", WebkitBackdropFilter: "blur(20px)",
-        border: "1.5px solid var(--text)",
+        border: "1px solid var(--glass-border2)",
         borderRadius: 16, padding: "12px 14px",
         display: "flex", alignItems: "center", gap: 10,
         animation: "activePulse 2s ease-in-out infinite",
       }}>
         {/* Indicador pulsante */}
         <div style={{ position: "relative", flexShrink: 0 }}>
-          <div style={{ width: 10, height: 10, borderRadius: "50%", background: "var(--text)" }} />
+          <div style={{ width: 10, height: 10, borderRadius: "50%", background: "rgba(255,255,255,0.90)" }} />
           <div style={{
             position: "absolute", inset: -3, borderRadius: "50%",
-            border: "1.5px solid var(--text3)",
+            border: "1px solid rgba(255,255,255,0.20)",
             animation: "ping 1.2s ease-in-out infinite",
           }} />
         </div>
@@ -74,16 +74,16 @@ export default function ActiveSessionBanner({ activeDay, sessionDate, completedS
           <div style={{ fontSize: 12, color: "var(--text)", letterSpacing: 1 }}>
             {activeDay} · EN PROGRESO
           </div>
-          <div style={{ fontSize: 10, color: "var(--text3)", marginTop: 2 }}>
+          <div style={{ fontSize: 10, color: "rgba(240,240,240,0.30)", marginTop: 2 }}>
             {doneSets}/{totalSets} series · toca para continuar
           </div>
         </button>
 
         {/* Barra de progreso */}
         <div style={{ width: 48, flexShrink: 0 }}>
-          <div style={{ background: "var(--border)", borderRadius: 99, height: 4, overflow: "hidden" }}>
+          <div style={{ background: "rgba(255,255,255,0.12)", borderRadius: 99, height: 4, overflow: "hidden" }}>
             <div style={{
-              height: "100%", borderRadius: 99, background: "var(--text)",
+              height: "100%", borderRadius: 99, background: "rgba(255,255,255,0.90)",
               width: `${pct}%`, transition: "width 0.4s ease",
               boxShadow: `0 0 6px ${c.accent}88`,
             }} />
@@ -104,7 +104,7 @@ export default function ActiveSessionBanner({ activeDay, sessionDate, completedS
         {/* Descartar ✕ */}
         <button onClick={handleDiscard} style={{
           background: "transparent",
-          border: "1px solid var(--border)",
+          border: "1px solid var(--glass-border)",
           color: "var(--red)",
           width: 28, height: 28, borderRadius: 8,
           cursor: "pointer", fontSize: 12,

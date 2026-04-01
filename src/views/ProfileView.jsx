@@ -56,11 +56,11 @@ export default function ProfileView({ user, myProfile, userXP, logs, onBack, onP
     <div style={{ maxWidth: 460, margin: "0 auto", fontFamily: "inherit", animation: "fadeIn 0.25s ease" }}>
 
       {/* ── Header ── */}
-      <div style={{ padding: "24px 20px 0", borderBottom: "1.5px solid var(--text)" }}>
+      <div style={{ padding: "24px 20px 0", borderBottom: "1px solid var(--glass-border)" }}>
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 20 }}>
           <button onClick={onBack} className="nbtn" style={{ color: "var(--text)", fontSize: 20, padding: "0 4px" }}>←</button>
-          <div style={{ fontSize: 9, letterSpacing: 3, color: "var(--text3)", fontWeight: 700 }}>MI PERFIL</div>
-          <button onClick={handleToggleTheme} className="nbtn" style={{ fontSize: 16, color: "var(--text3)" }}>
+          <div style={{ fontSize: 9, letterSpacing: 3, color: "rgba(240,240,240,0.30)", fontWeight: 700 }}>MI PERFIL</div>
+          <button onClick={handleToggleTheme} className="nbtn" style={{ fontSize: 16, color: "rgba(240,240,240,0.30)" }}>
             {theme === "light" ? "🌙" : "☀️"}
           </button>
         </div>
@@ -72,15 +72,16 @@ export default function ProfileView({ user, myProfile, userXP, logs, onBack, onP
               onClick={() => fileRef.current.click()}
               style={{
                 width: 72, height: 72, borderRadius: "50%",
-                background: "var(--text)",
-                border: "2px solid var(--text)",
+                background: "rgba(255,255,255,0.12)",
+                backdropFilter: "blur(20px)", WebkitBackdropFilter: "blur(20px)",
+                border: "2px solid rgba(255,255,255,0.25)",
                 display: "flex", alignItems: "center", justifyContent: "center",
                 cursor: "pointer", overflow: "hidden",
               }}
             >
               {photo
                 ? <img src={photo} alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
-                : <span style={{ fontSize: 26, fontWeight: 900, color: "var(--bg)" }}>{initial}</span>
+                : <span style={{ fontSize: 26, fontWeight: 900, color: "#fff" }}>{initial}</span>
               }
               {uploading && (
                 <div style={{ position: "absolute", inset: 0, background: "rgba(0,0,0,0.5)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 16 }}>⏳</div>
@@ -95,7 +96,9 @@ export default function ProfileView({ user, myProfile, userXP, logs, onBack, onP
             <div style={{ display: "flex", alignItems: "center", gap: 6, marginTop: 6 }}>
               <span style={{
                 fontSize: 9, fontWeight: 700, letterSpacing: 2,
-                background: "var(--text)", color: "var(--bg)",
+                background: "rgba(255,255,255,0.15)", backdropFilter: "blur(10px)", WebkitBackdropFilter: "blur(10px)",
+                border: "1px solid rgba(255,255,255,0.25)",
+                color: "rgba(255,255,255,0.9)",
                 padding: "3px 10px", borderRadius: 99,
               }}>{rank.emoji} {rank.name.toUpperCase()}</span>
             </div>
@@ -106,25 +109,25 @@ export default function ProfileView({ user, myProfile, userXP, logs, onBack, onP
       <div style={{ padding: "0 20px 100px" }}>
 
         {/* ── XP ── */}
-        <div style={{ padding: "16px 0", borderBottom: "1px solid var(--border)" }}>
+        <div style={{ padding: "16px 0", borderBottom: "1px solid var(--glass-border)" }}>
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginBottom: 10 }}>
             <span className="mono" style={{ fontSize: 22, fontWeight: 900, color: "var(--text)", letterSpacing: -1 }}>{userXP.toLocaleString()} XP</span>
             {nextRank && progress && (
-              <span style={{ fontSize: 10, color: "var(--text3)" }}>{progress.needed.toLocaleString()} para {nextRank.emoji}</span>
+              <span style={{ fontSize: 10, color: "rgba(240,240,240,0.30)" }}>{progress.needed.toLocaleString()} para {nextRank.emoji}</span>
             )}
           </div>
-          <div style={{ height: 2, background: "var(--border)", borderRadius: 2, overflow: "hidden" }}>
+          <div style={{ height: 2, background: "rgba(255,255,255,0.12)", borderRadius: 2, overflow: "hidden" }}>
             <div style={{
-              height: "100%", background: "var(--text)",
+              height: "100%", background: "rgba(255,255,255,0.90)",
               width: `${progress?.pct || 0}%`, transition: "width 0.6s ease",
               borderRadius: 2,
             }} />
           </div>
-          {!nextRank && <div style={{ fontSize: 11, color: "var(--text2)", marginTop: 8 }}>Rango máximo 👑</div>}
+          {!nextRank && <div style={{ fontSize: 11, color: "rgba(240,240,240,0.55)", marginTop: 8 }}>Rango máximo 👑</div>}
         </div>
 
         {/* ── Stats tabla editorial ── */}
-        <div style={{ borderBottom: "1px solid var(--border)" }}>
+        <div style={{ borderBottom: "1px solid var(--glass-border)" }}>
           {[
             { label: "SESIONES TOTALES", value: totalSessions },
             { label: "ESTA SEMANA",      value: weekSessions },
@@ -133,9 +136,9 @@ export default function ProfileView({ user, myProfile, userXP, logs, onBack, onP
           ].map(s => (
             <div key={s.label} style={{
               display: "flex", alignItems: "center", justifyContent: "space-between",
-              padding: "14px 0", borderBottom: "1px solid var(--border)",
+              padding: "14px 0", borderBottom: "1px solid var(--glass-border)",
             }}>
-              <div style={{ fontSize: 10, color: "var(--text3)", letterSpacing: 2, fontWeight: 700 }}>{s.label}</div>
+              <div style={{ fontSize: 10, color: "rgba(240,240,240,0.30)", letterSpacing: 2, fontWeight: 700 }}>{s.label}</div>
               <div className="mono" style={{ fontSize: 20, fontWeight: 900, color: "var(--text)", letterSpacing: -0.5 }}>{s.value}</div>
             </div>
           ))}
@@ -144,34 +147,34 @@ export default function ProfileView({ user, myProfile, userXP, logs, onBack, onP
         {/* ── Accesos ── */}
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8, marginTop: 20, marginBottom: 20 }}>
           <button onClick={() => { haptics.light(); onNavigate("achievements"); }} style={{
-            background: "var(--text)", border: "none",
-            borderRadius: tokens.radius.lg, padding: "16px 14px",
+            background: "rgba(255,255,255,0.90)", border: "none",
+            borderRadius: 18, padding: "16px 14px",
             cursor: "pointer", fontFamily: "inherit", textAlign: "left",
             WebkitTapHighlightColor: "transparent",
           }}>
             <div style={{ fontSize: 20, marginBottom: 8 }}>🏆</div>
-            <div style={{ fontSize: 11, fontWeight: 700, color: "var(--bg)", letterSpacing: 1 }}>LOGROS</div>
-            <div style={{ fontSize: 9, color: "rgba(245,245,240,0.5)", marginTop: 2 }}>Achievements</div>
+            <div style={{ fontSize: 11, fontWeight: 700, color: "#080810", letterSpacing: 1 }}>LOGROS</div>
+            <div style={{ fontSize: 9, color: "rgba(255,255,255,0.45)", marginTop: 2 }}>Achievements</div>
           </button>
 
           <button onClick={() => { haptics.light(); onNavigate("weeklySummary"); }} style={{
-            background: "var(--bg2)", border: "1px solid var(--border)",
-            borderRadius: tokens.radius.lg, padding: "16px 14px",
+            background: "rgba(255,255,255,0.07)", backdropFilter: "blur(40px)", WebkitBackdropFilter: "blur(40px)", border: "1px solid var(--glass-border)",
+            borderRadius: 18, padding: "16px 14px",
             cursor: "pointer", fontFamily: "inherit", textAlign: "left",
             WebkitTapHighlightColor: "transparent",
           }}>
             <div style={{ fontSize: 20, marginBottom: 8 }}>🤖</div>
             <div style={{ fontSize: 11, fontWeight: 700, color: "var(--text)", letterSpacing: 1 }}>IA SEMANAL</div>
-            <div style={{ fontSize: 9, color: "var(--text3)", marginTop: 2 }}>Análisis</div>
+            <div style={{ fontSize: 9, color: "rgba(240,240,240,0.30)", marginTop: 2 }}>Análisis</div>
           </button>
         </div>
 
         {/* ── Código de amigo ── */}
         <div style={{
-          background: "var(--bg2)", border: "1px solid var(--border)",
-          borderRadius: tokens.radius.lg, padding: "16px",
+          background: "rgba(255,255,255,0.07)", backdropFilter: "blur(40px)", WebkitBackdropFilter: "blur(40px)", border: "1px solid var(--glass-border)",
+          borderRadius: 18, padding: "16px",
         }}>
-          <div style={{ fontSize: 9, color: "var(--text3)", letterSpacing: 2.5, fontWeight: 700, marginBottom: 10 }}>CÓDIGO DE AMIGO</div>
+          <div style={{ fontSize: 9, color: "rgba(240,240,240,0.30)", letterSpacing: 2.5, fontWeight: 700, marginBottom: 10 }}>CÓDIGO DE AMIGO</div>
           <div className="mono" style={{ fontSize: 28, fontWeight: 900, color: "var(--text)", letterSpacing: 6, marginBottom: 14 }}>
             {myProfile?.friendCode || "—"}
           </div>
@@ -180,7 +183,7 @@ export default function ProfileView({ user, myProfile, userXP, logs, onBack, onP
             background: copied ? "var(--text)" : "transparent",
             border: `1px solid ${copied ? "var(--text)" : "var(--border)"}`,
             color: copied ? "var(--bg)" : "var(--text2)",
-            borderRadius: tokens.radius.md, cursor: "pointer",
+            borderRadius: 12, cursor: "pointer",
             fontSize: 9, letterSpacing: 2.5, fontWeight: 700,
             fontFamily: "inherit",
             display: "flex", alignItems: "center", justifyContent: "center", gap: 8,
@@ -191,7 +194,7 @@ export default function ProfileView({ user, myProfile, userXP, logs, onBack, onP
           </button>
         </div>
 
-        <div style={{ fontSize: 10, color: "var(--text3)", textAlign: "center", marginTop: 14 }}>
+        <div style={{ fontSize: 10, color: "rgba(240,240,240,0.30)", textAlign: "center", marginTop: 14 }}>
           Toca la foto para cambiarla
         </div>
       </div>

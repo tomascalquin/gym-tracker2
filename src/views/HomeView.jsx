@@ -46,13 +46,13 @@ export default function HomeView({ logs, user, myProfile, routine, userXP, sessi
       <div style={{ padding: "28px 20px 0" }}>
         <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: 20 }}>
           <div>
-            <div style={{ fontSize: 9, letterSpacing: 3.5, color: "var(--text3)", fontWeight: 700, marginBottom: 6 }}>
+            <div style={{ fontSize: 9, letterSpacing: 3.5, color: "rgba(240,240,240,0.30)", fontWeight: 700, marginBottom: 6 }}>
               GYM TRACKER
             </div>
             <div style={{ fontSize: 32, fontWeight: 900, color: "#fff", letterSpacing: -1.5, lineHeight: 1 }}>
               {firstName}
             </div>
-            <div style={{ fontSize: 11, color: "var(--text3)", marginTop: 5 }}>
+            <div style={{ fontSize: 11, color: "rgba(240,240,240,0.30)", marginTop: 5 }}>
               {totalSessions} sesiones · semana {getWeekNumber()}
             </div>
           </div>
@@ -107,7 +107,7 @@ export default function HomeView({ logs, user, myProfile, routine, userXP, sessi
         </div>
 
         {/* ── Días ── */}
-        <div style={{ fontSize: 9, letterSpacing: 3, color: "var(--text3)", fontWeight: 700, marginBottom: 12 }}>
+        <div style={{ fontSize: 9, letterSpacing: 3, color: "rgba(240,240,240,0.30)", fontWeight: 700, marginBottom: 12 }}>
           ELIGE TU SESIÓN
         </div>
         <div style={{ display: "flex", flexDirection: "column", gap: 8, marginBottom: 28 }}>
@@ -138,7 +138,7 @@ export default function HomeView({ logs, user, myProfile, routine, userXP, sessi
         </div>
 
         {/* ── Accesos rápidos glass grid ── */}
-        <div style={{ fontSize: 9, letterSpacing: 3, color: "var(--text3)", fontWeight: 700, marginBottom: 12 }}>
+        <div style={{ fontSize: 9, letterSpacing: 3, color: "rgba(240,240,240,0.30)", fontWeight: 700, marginBottom: 12 }}>
           HERRAMIENTAS
         </div>
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8, marginBottom: 20 }}>
@@ -172,7 +172,7 @@ export default function HomeView({ logs, user, myProfile, routine, userXP, sessi
               backdropFilter: "var(--glass-blur-sm)",
               WebkitBackdropFilter: "var(--glass-blur-sm)",
               border: "1px solid var(--glass-border)",
-              color: "var(--text3)",
+              color: "rgba(240,240,240,0.30)",
               padding: "12px",
               borderRadius: 14,
               fontSize: 9, letterSpacing: 2, fontWeight: 700,
@@ -189,7 +189,7 @@ export default function HomeView({ logs, user, myProfile, routine, userXP, sessi
               backdropFilter: "var(--glass-blur-sm)",
               WebkitBackdropFilter: "var(--glass-blur-sm)",
               border: "1px solid var(--glass-border)",
-              color: "var(--text3)",
+              color: "rgba(240,240,240,0.30)",
               padding: "12px",
               borderRadius: 14,
               fontSize: 9, letterSpacing: 2, fontWeight: 700,
@@ -219,7 +219,7 @@ function StatCard({ label, value }) {
       <div className="mono" style={{ fontSize: 22, fontWeight: 900, color: "#fff", letterSpacing: -1 }}>
         {value}
       </div>
-      <div style={{ fontSize: 7, color: "var(--text3)", letterSpacing: 2, fontWeight: 700, marginTop: 3 }}>
+      <div style={{ fontSize: 7, color: "rgba(240,240,240,0.30)", letterSpacing: 2, fontWeight: 700, marginTop: 3 }}>
         {label}
       </div>
     </div>
@@ -307,7 +307,7 @@ function QuickCard({ icon, label, sub, onClick }) {
     >
       <div style={{ fontSize: 20, marginBottom: 8 }}>{icon}</div>
       <div style={{ fontSize: 13, fontWeight: 700, color: "#fff", letterSpacing: -0.2 }}>{label}</div>
-      <div style={{ fontSize: 10, color: "var(--text3)", marginTop: 2 }}>{sub}</div>
+      <div style={{ fontSize: 10, color: "rgba(240,240,240,0.30)", marginTop: 2 }}>{sub}</div>
     </button>
   );
 }

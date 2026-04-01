@@ -47,7 +47,7 @@ export default function SessionTransition({ onDone }) {
       ref={ref}
       style={{
         position: "fixed", inset: 0, zIndex: 9999,
-        background: "var(--text)",
+        background: "rgba(255,255,255,0.90)",
         pointerEvents: "all",
         touchAction: "none",
         display: "flex", alignItems: "center", justifyContent: "center",
@@ -61,12 +61,12 @@ export default function SessionTransition({ onDone }) {
         animation: "fadeIn 0.2s ease 0.15s both",
       }}>
         <div style={{
-          fontSize: 28, color: "var(--bg)",
+          fontSize: 28, color: "#080810",
           fontWeight: 900, letterSpacing: -1,
           fontFamily: "-apple-system, BlinkMacSystemFont, sans-serif",
         }}>◆</div>
         <div style={{
-          fontSize: 9, color: "var(--bg)", opacity: 0.4,
+          fontSize: 9, color: "#080810", opacity: 0.4,
           letterSpacing: 4, fontWeight: 700,
           fontFamily: "-apple-system, BlinkMacSystemFont, sans-serif",
         }}>GYM TRACKER</div>
