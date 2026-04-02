@@ -454,6 +454,8 @@ export default function App() {
               {currentView === "weeklySummary" && <WeeklySummaryView logs={logs} routine={routine} onBack={() => setView("home")} />}
               {currentView === "achievements"  && <AchievementsView logs={logs} routine={routine} userXP={userXP} onBack={() => setView("profile")} />}
               {currentView === "travelMode"    && <TravelModeView onBack={() => setView("home")} />}
+            {currentView === "sleep"         && <SleepView user={user} onBack={() => setView("home")} />}
+            {currentView === "photos"        && <ProgressPhotosView user={user} onBack={() => setView("home")} />}
               {currentView === "tools"          && <ToolsView onBack={() => setView("home")} />}
               {currentView === "routinePresets" && (
                 <OnboardingView

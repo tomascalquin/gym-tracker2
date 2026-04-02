@@ -146,6 +146,8 @@ export default function HomeView({ logs, user, myProfile, routine, userXP, sessi
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8, marginBottom: 20 }}>
           {[
             { icon: "📊", label: "Progresión",   sub: "Calculadora",   key: "progression" },
+            { icon: "😴", label: "Sueño",        sub: "Descanso",      key: "sleep" },
+            { icon: "📸", label: "Fotos",         sub: "Progreso",      key: "photos" },
             { icon: "🔧", label: "Herramientas", sub: "Calculadoras",  key: "tools" },
             { icon: "🤖", label: "Semana IA",    sub: "Análisis",      key: "weeklySummary" },
             { icon: "🏅", label: "Logros",       sub: "Achievements",  key: "achievements" },
