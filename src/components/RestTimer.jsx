@@ -58,7 +58,9 @@ export default function RestTimer({ onClose, initialTime = 90 }) {
       gain.gain.setValueAtTime(0.3, ctx.currentTime);
       gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.6);
       osc.start(ctx.currentTime); osc.stop(ctx.currentTime + 0.6);
-    } catch {}
+    } catch (err) {
+      console.warn("rest timer sound error:", err?.message || err);
+    }
   }
 
   function finishTimer() {

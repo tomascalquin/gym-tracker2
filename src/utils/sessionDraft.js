@@ -13,7 +13,9 @@ export function saveDraft(uid, { activeDay, sessionDate, sessionData, completedS
       uid, activeDay, sessionDate, sessionData, completedSets, sessionNote,
       savedAt: Date.now(),
     }));
-  } catch {}
+  } catch (err) {
+    console.warn("saveDraft error:", err?.message || err);
+  }
 }
 
 export function loadDraft(uid) {

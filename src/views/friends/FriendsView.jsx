@@ -51,9 +51,14 @@ export default function FriendsView({ user, myProfile, onBack, onOpenChat }) {
       try {
         const sentSnap = await getDocs(collection(db, "friendships", user.uid, "sent"));
         if (sentSnap.docs.some(d => d.id === result.uid)) { setSearchError("Ya le enviaste una solicitud."); return; }
-      } catch {}
+      } catch (err) {
+        console.warn("check sent requests error:", err?.message || err);
+      }
       setSearchResult(result);
-    } catch { setSearchError("Error al buscar."); }
+    } catch (err) {
+      console.warn("friend search error:", err?.message || err);
+      setSearchError("Error al buscar.");
+    }
     finally { setSearching(false); }
   }
 

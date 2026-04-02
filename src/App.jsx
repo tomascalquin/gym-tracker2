@@ -118,6 +118,20 @@ export default function App() {
       .finally(() => setDataLoading(false));
   }, [user?.uid]);
 
+  useEffect(() => {
+    if (!user?.uid) return undefined;
+    const unregister = registerOnlineListener(user.uid, (count) => {
+      toast(`Sincronizado: ${count} cambio${count > 1 ? "s" : ""} pendientes`);
+    });
+
+    const pending = getPendingCount();
+    if (pending > 0 && !navigator.onLine) {
+      toast(`${pending} cambio${pending > 1 ? "s" : ""} pendiente${pending > 1 ? "s" : ""} para sincronizar`);
+    }
+
+    return unregister;
+  }, [user?.uid]);
+
   function toast(msg) { setToastMsg(msg); setTimeout(() => setToastMsg(null), 2200); }
 
   function handleToggleTheme() {

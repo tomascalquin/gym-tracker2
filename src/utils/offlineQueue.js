@@ -88,8 +88,10 @@ export function isOnline() {
  * Llama esto una vez al arrancar la app.
  */
 export function registerOnlineListener(uid, onFlushed) {
-  window.addEventListener("online", async () => {
+  const handler = async () => {
     const count = await flushQueue(uid);
     if (count > 0 && onFlushed) onFlushed(count);
-  });
+  };
+  window.addEventListener("online", handler);
+  return () => window.removeEventListener("online", handler);
 }

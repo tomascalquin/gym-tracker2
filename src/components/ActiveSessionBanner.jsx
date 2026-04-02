@@ -48,8 +48,7 @@ export default function ActiveSessionBanner({ activeDay, sessionDate, completedS
       `}</style>
 
       <div style={{
-        background: "rgba(255,255,255,0.07)", backdropFilter: "blur(40px)", WebkitBackdropFilter: "blur(40px)",
-        backdropFilter: "blur(20px)", WebkitBackdropFilter: "blur(20px)",
+        background: "rgba(255,255,255,0.07)", backdropFilter: "blur(20px)", WebkitBackdropFilter: "blur(20px)",
         border: "1px solid var(--glass-border2)",
         borderRadius: 16, padding: "12px 14px",
         display: "flex", alignItems: "center", gap: 10,

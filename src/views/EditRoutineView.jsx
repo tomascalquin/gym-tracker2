@@ -102,7 +102,9 @@ export default function EditRoutineView({ user, routine, onBack, onRoutineUpdate
       onRoutineUpdated(local);
       showSaved();
       setTimeout(onBack, 1200);
-    } catch { }
+    } catch (err) {
+      console.warn("save routine error:", err?.message || err);
+    }
     finally { setSaving(false); }
   }
 
@@ -112,8 +114,7 @@ export default function EditRoutineView({ user, routine, onBack, onRoutineUpdate
       {/* Header sticky */}
       <div style={{
         position: "sticky", top: 0, zIndex: 20,
-        background: "rgba(8,8,16,0.80)", backdropFilter: "blur(40px)", WebkitBackdropFilter: "blur(40px)",
-        WebkitBackdropFilter: "blur(20px)",
+        background: "rgba(8,8,16,0.80)", backdropFilter: "blur(20px)", WebkitBackdropFilter: "blur(20px)",
         borderBottom: "1px solid var(--glass-border)",
         padding: "12px 18px",
         display: "flex", alignItems: "center", justifyContent: "space-between",

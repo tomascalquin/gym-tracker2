@@ -96,7 +96,7 @@ export async function checkChallengeProgress(challenge, fromLogs, toLogs, fromRo
   }
 
   const fromBest = getBest(fromLogs, fromRoutine);
-  const toBest   = getBest(toLog, toRoutine);
+  const toBest   = getBest(toLogs, toRoutine);
 
   const fromWon = fromBest >= challenge.targetWeight;
   const toWon   = toBest   >= challenge.targetWeight;

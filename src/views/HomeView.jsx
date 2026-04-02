@@ -33,7 +33,9 @@ export default function HomeView({ logs, user, myProfile, routine, userXP, sessi
         if (!friends.length) { saveLastVisit(); return; }
         const recent = await loadFriendActivity(friends.map(f => f.uid));
         if (recent.length > 0) { setActivity(recent); setShowFeed(true); }
-      } catch {}
+      } catch (err) {
+        console.warn("load home activity error:", err?.message || err);
+      }
       finally { saveLastVisit(); }
     }
     load();
