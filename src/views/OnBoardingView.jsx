@@ -261,7 +261,7 @@ const PRESET_ROUTINES = {
 
 const ACCENT = "#60a5fa";
 
-export default function OnboardingView({ user, onRoutineReady }) {
+export default function OnboardingView({ user, onRoutineReady, onBack = null, allowOverwrite = false }) {
   const [step, setStep]       = useState("choose"); // choose | preview | custom
   const [selected, setSelected] = useState(null);
   const [saving, setSaving]   = useState(false);
@@ -270,6 +270,10 @@ export default function OnboardingView({ user, onRoutineReady }) {
 
   async function handleUsePreset() {
     if (!selected) return;
+    if (allowOverwrite) {
+      const ok = window.confirm("Esto reemplazará tu rutina actual. ¿Quieres continuar?");
+      if (!ok) return;
+    }
     setSaving(true);
     await onRoutineReady(PRESET_ROUTINES[selected].days);
   }
@@ -281,15 +285,21 @@ export default function OnboardingView({ user, onRoutineReady }) {
       fontFamily: "inherit", minHeight: "100vh",
       background: "transparent", animation: "fadeIn 0.3s ease",
     }}>
-      {/* Skip arriba — primera opción visible */}
+      {/* Acción superior */}
       <div style={{ display: "flex", justifyContent: "flex-end", marginBottom: 20 }}>
-        <button onClick={() => onRoutineReady({ "Mi Rutina": { exercises: [] } })} style={{
+        <button onClick={() => {
+          if (onBack) {
+            onBack();
+          } else {
+            onRoutineReady({ "Mi Rutina": { exercises: [] } });
+          }
+        }} style={{
           background: "transparent", border: "none",
           color: "rgba(240,240,240,0.30)", cursor: "pointer",
           fontSize: 12, letterSpacing: 1, fontFamily: "inherit",
           display: "flex", alignItems: "center", gap: 6, padding: "4px 0",
         }}>
-          Explorar app <span style={{ fontSize: 16 }}>→</span>
+          {onBack ? "Volver" : "Explorar app"} <span style={{ fontSize: 16 }}>→</span>
         </button>
       </div>
 
@@ -369,22 +379,24 @@ export default function OnboardingView({ user, onRoutineReady }) {
         </div>
       )}
 
-      <div style={{ textAlign: "center", marginTop: 20 }}>
-        <div style={{ fontSize: 10, color: "rgba(240,240,240,0.30)", marginBottom: 12 }}>
-          Puedes editar los ejercicios y pesos después desde la app.
+      {!onBack && (
+        <div style={{ textAlign: "center", marginTop: 20 }}>
+          <div style={{ fontSize: 10, color: "rgba(240,240,240,0.30)", marginBottom: 12 }}>
+            Puedes editar los ejercicios y pesos después desde la app.
+          </div>
+          <button onClick={() => onRoutineReady({ "Mi Rutina": { exercises: [] } })} style={{
+            background: "transparent",
+            border: "1px solid var(--glass-border)",
+            color: "rgba(240,240,240,0.30)", padding: "12px 24px",
+            borderRadius: 12, cursor: "pointer",
+            fontSize: 11, letterSpacing: 2, fontFamily: "inherit",
+            width: "100%", minHeight: 46,
+            transition: "all 0.15s",
+          }}>
+            OMITIR — Configurar después →
+          </button>
         </div>
-        <button onClick={() => onRoutineReady({ "Mi Rutina": { exercises: [] } })} style={{
-          background: "transparent",
-          border: "1px solid var(--glass-border)",
-          color: "rgba(240,240,240,0.30)", padding: "12px 24px",
-          borderRadius: 12, cursor: "pointer",
-          fontSize: 11, letterSpacing: 2, fontFamily: "inherit",
-          width: "100%", minHeight: 46,
-          transition: "all 0.15s",
-        }}>
-          OMITIR — Configurar después →
-        </button>
-      </div>
+      )}
     </div>
   );
 

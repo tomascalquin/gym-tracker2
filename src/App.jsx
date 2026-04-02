@@ -415,6 +415,17 @@ export default function App() {
             {currentView === "achievements"  && <AchievementsView logs={logs} routine={routine} userXP={userXP} onBack={() => setView("profile")} />}
             {currentView === "travelMode"    && <TravelModeView onBack={() => setView("home")} />}
             {currentView === "tools"          && <ToolsView onBack={() => setView("home")} />}
+            {currentView === "routinePresets" && (
+              <OnboardingView
+                user={user}
+                onBack={() => setView("home")}
+                allowOverwrite={true}
+                onRoutineReady={async (newRoutine) => {
+                  await handleRoutineReady(newRoutine);
+                  setView("home");
+                }}
+              />
+            )}
             {currentView === "editRoutine"   && (
               <EditRoutineView user={user} routine={routine} onBack={() => setView("home")}
                 onRoutineUpdated={(updated) => { setRoutine(updated); setView("home"); }}

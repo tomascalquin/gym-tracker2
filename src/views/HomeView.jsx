@@ -152,6 +152,7 @@ export default function HomeView({ logs, user, myProfile, routine, userXP, sessi
             { icon: "✈️", label: "Modo viaje",   sub: "Sin gym",       key: "travelMode" },
             { icon: "🏆", label: "Grupos",       sub: "Comparar",      key: "groups" },
             { icon: "⚔️", label: "Retos",        sub: "1 vs 1",        key: "challenges" },
+            { icon: "🧩", label: "Plantillas",   sub: "Preestablecidas", key: "routinePresets" },
             { icon: "✏️", label: "Rutina",       sub: "Editar",        key: "editRoutine" },
           ].map((item) => (
             <QuickCard
