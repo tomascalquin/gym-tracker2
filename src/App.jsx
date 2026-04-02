@@ -85,13 +85,36 @@ export default function App() {
   }, []);
 
   useEffect(() => {
-    const unsub = onAuthChange(fb => { setUser(fb); setAuthReady(true); });
-    checkRedirectResult().catch(console.error);
+    let cancelled = false;
+    let unsub = () => {};
+
+    (async () => {
+      const { error } = await checkRedirectResult();
+      if (cancelled) return;
+      if (error?.code) {
+        const redirectErrors = {
+          "auth/unauthorized-domain": "Dominio no autorizado: agrega tu URL en Firebase → Authentication → Settings → Authorized domains.",
+          "auth/operation-not-allowed": "Inicio con Google no habilitado en la consola de Firebase.",
+          "auth/account-exists-with-different-credential": "Ya existe una cuenta con ese email (otro método de acceso).",
+        };
+        const msg = redirectErrors[error.code] || `Google: ${error.message || "Error al volver del login"}`;
+        setToastMsg(msg);
+        setTimeout(() => setToastMsg(null), 5000);
+      }
+      unsub = onAuthChange((fb) => {
+        setUser(fb);
+        setAuthReady(true);
+      });
+    })();
+
     registerServiceWorker();
     const saved = getTheme();
     applyTheme(saved);
     checkInviteParam();
-    return unsub;
+    return () => {
+      cancelled = true;
+      unsub();
+    };
   }, []);
 
   useEffect(() => {
@@ -325,7 +348,14 @@ export default function App() {
   }
 
   if (!authReady || user === undefined) return <Splash text="CARGANDO" />;
-  if (!user) return <AuthScreen />;
+  if (!user) {
+    return (
+      <>
+        <Toast message={toastMsg} />
+        <AuthScreen />
+      </>
+    );
+  }
   if (dataLoading || routine === undefined) return <Splash text={`HOLA, ${(user.displayName || user.email).split(" ")[0].toUpperCase()}`} />;
   if (routine === null) return <OnboardingView user={user} onRoutineReady={handleRoutineReady} />;
 

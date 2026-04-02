@@ -23,6 +23,9 @@ export default function AuthScreen() {
       "auth/invalid-credential":      "Email o contraseña incorrectos.",
       "auth/popup-closed-by-user":    "Cerraste el popup de Google.",
       "auth/cancelled-popup-request": "",
+      "auth/unauthorized-domain":     "Dominio no permitido. Revisa Authorized domains en Firebase.",
+      "auth/operation-not-allowed": "Google deshabilitado en Firebase Console.",
+      "auth/web-storage-unsupported": "Safari bloqueó almacenamiento. Desactiva “Bloquear todas las cookies” o prueba en modo normal.",
     };
     return map[code] || "Ocurrió un error. Intenta de nuevo.";
   }

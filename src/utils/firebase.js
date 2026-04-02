@@ -1,6 +1,12 @@
 import { initializeApp } from "firebase/app";
 import { getFirestore } from "firebase/firestore";
-import { getAuth, GoogleAuthProvider, browserLocalPersistence, setPersistence } from "firebase/auth";
+import {
+  getAuth,
+  initializeAuth,
+  GoogleAuthProvider,
+  indexedDBLocalPersistence,
+  browserLocalPersistence,
+} from "firebase/auth";
 
 const firebaseConfig = {
   apiKey: "AIzaSyBd9TyjQzpspnXvjAcGdTFJtVwuGYGDhks",
@@ -15,9 +21,22 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 export const db = getFirestore(app);
 
-const authInstance = getAuth(app);
-setPersistence(authInstance, browserLocalPersistence).catch(console.error);
+/**
+ * iOS Safari / PWA: localStorage-only persistence rompe a menudo tras signInWithRedirect.
+ * IndexedDB + fallback a localStorage es lo que recomienda Firebase para móviles.
+ */
+function createAuth() {
+  try {
+    return initializeAuth(app, {
+      persistence: [indexedDBLocalPersistence, browserLocalPersistence],
+    });
+  } catch {
+    return getAuth(app);
+  }
+}
 
-export const auth = authInstance;
+export const auth = createAuth();
 export const googleProvider = new GoogleAuthProvider();
 googleProvider.setCustomParameters({ prompt: "select_account" });
+googleProvider.addScope("email");
+googleProvider.addScope("profile");

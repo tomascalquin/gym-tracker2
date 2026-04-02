@@ -32,6 +32,18 @@ self.addEventListener("fetch", (event) => {
   const url = new URL(event.request.url);
   if (url.origin !== location.origin) return;
 
+  // OAuth / Firebase Auth: la vuelta trae query o hash; no usar caché del SW (iOS Safari rompe sesión)
+  if (event.request.mode === "navigate") {
+    const hasAuthParams =
+      url.search.length > 1 ||
+      (url.hash && url.hash.length > 1) ||
+      /^(state|code|session_state|scope)=/.test(url.search.slice(1));
+    if (hasAuthParams) {
+      event.respondWith(fetch(event.request));
+      return;
+    }
+  }
+
   event.respondWith(
     fetch(event.request)
       .then((response) => {
