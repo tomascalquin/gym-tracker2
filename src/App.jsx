@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, lazy, Suspense } from "react";
 import {
   loadLogs, saveLog, deleteLog,
   loadRoutine, saveFullRoutine,
@@ -19,16 +19,6 @@ import AuthScreen from "./components/AuthScreen";
 import Toast from "./components/Toast";
 import RankUpModal from "./components/RankUpModal";
 import RestTimer from "./components/RestTimer";
-import HomeView from "./views/HomeView";
-import SessionView from "./views/SessionView";
-import HistoryView from "./views/HistoryView";
-import ProgressView from "./views/ProgressView";
-import FriendsView from "./views/friends/FriendsView";
-import GroupsView from "./views/groups/GroupsView";
-import ChallengesView from "./views/ChallengesView";
-import LeaderboardView from "./views/LeaderboardView";
-import ProfileView from "./views/ProfileView";
-import ProgressionView from "./views/ProgressionView";
 import TabBar, { TAB_VIEWS } from "./components/TabBar";
 import PageTransition from "./components/PageTransition";
 import SplashScreen from "./components/SplashScreen";
@@ -37,14 +27,29 @@ import { haptics } from "./utils/haptics";
 import { initPWAInstall, canInstall, installPWA, isInstalled } from "./utils/pwa";
 import SessionTransition from "./components/SessionTransition";
 import { DAY_META } from "./data/routine";
-import EditRoutineView from "./views/EditRoutineView";
-import OnboardingView from "./views/OnBoardingView";
-import WeeklySummaryView from "./views/WeeklySummaryView";
-import AchievementsView from "./views/AchievementsView";
-import TravelModeView from "./views/TravelModeView";
-import ToolsView from "./views/ToolsView";
 import { evaluateAchievements, getNewlyUnlocked, saveUnlockedAchievements, loadUnlockedAchievements } from "./utils/achievements";
 import { registerOnlineListener, getPendingCount } from "./utils/offlineQueue";
+
+// Vistas críticas (Cargan de inmediato)
+import HomeView from "./views/HomeView";
+import SessionView from "./views/SessionView";
+import OnboardingView from "./views/OnboardingView";
+
+// --- INICIO DE LA MAGIA (Code Splitting - Vistas secundarias cargan diferido) ---
+const HistoryView = lazy(() => import("./views/HistoryView"));
+const ProgressView = lazy(() => import("./views/ProgressView"));
+const FriendsView = lazy(() => import("./views/friends/FriendsView"));
+const GroupsView = lazy(() => import("./views/groups/GroupsView"));
+const ChallengesView = lazy(() => import("./views/ChallengesView"));
+const LeaderboardView = lazy(() => import("./views/LeaderboardView"));
+const ProfileView = lazy(() => import("./views/ProfileView"));
+const ProgressionView = lazy(() => import("./views/ProgressionView"));
+const EditRoutineView = lazy(() => import("./views/EditRoutineView"));
+const WeeklySummaryView = lazy(() => import("./views/WeeklySummaryView"));
+const AchievementsView = lazy(() => import("./views/AchievementsView"));
+const TravelModeView = lazy(() => import("./views/TravelModeView"));
+const ToolsView = lazy(() => import("./views/ToolsView"));
+// --- FIN DE LA MAGIA ---
 
 export default function App() {
   const [user, setUser]                     = useState(undefined);
@@ -401,67 +406,73 @@ export default function App() {
 
       <div className="scroll-view">
         <PageTransition view={view}>
-          {(currentView) => (<>
-            {currentView === "home" && (
-              <HomeView logs={logs} user={user} myProfile={myProfile} routine={routine} userXP={userXP}
-                sessionDate={sessionDate} setSessionDate={setSessionDate}
-                onStartSession={startSession} onNavigate={setView} onLogout={handleLogout}
-                activeDay={activeDay} completedSets={completedSets}
-                onDiscardSession={handleDiscardSession}
-              />
-            )}
-            {currentView === "session" && activeDay && (
-              <SessionView activeDay={activeDay} sessionDate={sessionDate}
-                sessionData={sessionData} completedSets={completedSets}
-                sessionNote={sessionNote} logs={logs} routine={routine}
-                onBack={() => setView("home")} onUpdateSet={updateSet}
-                onToggleSet={toggleSet} onAddSet={addSet} onRemoveSet={removeSet}
-                onChangeNote={setSessionNote} onSave={saveSession}
-                onAddExercise={handleAddExercise} onRemoveExercise={handleRemoveExercise}
-              />
-            )}
-            {currentView === "history" && (
-              <HistoryView logs={logs} user={user} onBack={() => setView("home")}
-                onViewSession={startSession} onDeleteSession={handleDeleteSession}
-              />
-            )}
-            {currentView === "progress"    && <ProgressView logs={logs} routine={routine} onBack={() => setView("home")} />}
-            {currentView === "progression" && <ProgressionView logs={logs} routine={routine} onBack={() => setView("home")} />}
-            {currentView === "friends"     && <FriendsView user={user} myProfile={myProfile} onBack={() => setView("home")}
-              onOpenChat={(uid, name) => { setChatTarget({ id: getDMChatId(user.uid, uid), title: name, accent: "#60a5fa", from: "friends" }); setView("chat"); }}
-            />}
-            {currentView === "groups"      && <GroupsView user={user} onBack={() => setView("home")}
-              onOpenChat={(gid, name) => { setChatTarget({ id: getGroupChatId(gid), title: name, accent: "#a78bfa", from: "groups" }); setView("chat"); }}
-            />}
-            {currentView === "challenges"  && <ChallengesView user={user} myLogs={logs} myRoutine={routine} onBack={() => setView("home")} />}
-            {currentView === "leaderboard" && <LeaderboardView user={user} myXP={userXP} onBack={() => setView("home")} />}
-            {currentView === "profile"     && (
-              <ProfileView user={user} myProfile={myProfile} userXP={userXP} logs={logs}
-                onBack={() => setView("home")} onProfileUpdated={handleProfileUpdated}
-                onNavigate={setView}
-              />
-            )}
-            {currentView === "weeklySummary" && <WeeklySummaryView logs={logs} routine={routine} onBack={() => setView("home")} />}
-            {currentView === "achievements"  && <AchievementsView logs={logs} routine={routine} userXP={userXP} onBack={() => setView("profile")} />}
-            {currentView === "travelMode"    && <TravelModeView onBack={() => setView("home")} />}
-            {currentView === "tools"          && <ToolsView onBack={() => setView("home")} />}
-            {currentView === "routinePresets" && (
-              <OnboardingView
-                user={user}
-                onBack={() => setView("home")}
-                allowOverwrite={true}
-                onRoutineReady={async (newRoutine) => {
-                  await handleRoutineReady(newRoutine);
-                  setView("home");
-                }}
-              />
-            )}
-            {currentView === "editRoutine"   && (
-              <EditRoutineView user={user} routine={routine} onBack={() => setView("home")}
-                onRoutineUpdated={(updated) => { setRoutine(updated); setView("home"); }}
-              />
-            )}
-          </>)}
+          {(currentView) => (
+            <Suspense fallback={
+              <div style={{ display: "flex", justifyContent: "center", alignItems: "center", minHeight: "80vh", fontSize: 10, letterSpacing: 2, color: "rgba(255,255,255,0.3)", fontFamily: "inherit" }}>
+                CARGANDO...
+              </div>
+            }>
+              {currentView === "home" && (
+                <HomeView logs={logs} user={user} myProfile={myProfile} routine={routine} userXP={userXP}
+                  sessionDate={sessionDate} setSessionDate={setSessionDate}
+                  onStartSession={startSession} onNavigate={setView} onLogout={handleLogout}
+                  activeDay={activeDay} completedSets={completedSets}
+                  onDiscardSession={handleDiscardSession}
+                />
+              )}
+              {currentView === "session" && activeDay && (
+                <SessionView activeDay={activeDay} sessionDate={sessionDate}
+                  sessionData={sessionData} completedSets={completedSets}
+                  sessionNote={sessionNote} logs={logs} routine={routine}
+                  onBack={() => setView("home")} onUpdateSet={updateSet}
+                  onToggleSet={toggleSet} onAddSet={addSet} onRemoveSet={removeSet}
+                  onChangeNote={setSessionNote} onSave={saveSession}
+                  onAddExercise={handleAddExercise} onRemoveExercise={handleRemoveExercise}
+                />
+              )}
+              {currentView === "history" && (
+                <HistoryView logs={logs} user={user} onBack={() => setView("home")}
+                  onViewSession={startSession} onDeleteSession={handleDeleteSession}
+                />
+              )}
+              {currentView === "progress"    && <ProgressView logs={logs} routine={routine} onBack={() => setView("home")} />}
+              {currentView === "progression" && <ProgressionView logs={logs} routine={routine} onBack={() => setView("home")} />}
+              {currentView === "friends"     && <FriendsView user={user} myProfile={myProfile} onBack={() => setView("home")}
+                onOpenChat={(uid, name) => { setChatTarget({ id: getDMChatId(user.uid, uid), title: name, accent: "#60a5fa", from: "friends" }); setView("chat"); }}
+              />}
+              {currentView === "groups"      && <GroupsView user={user} onBack={() => setView("home")}
+                onOpenChat={(gid, name) => { setChatTarget({ id: getGroupChatId(gid), title: name, accent: "#a78bfa", from: "groups" }); setView("chat"); }}
+              />}
+              {currentView === "challenges"  && <ChallengesView user={user} myLogs={logs} myRoutine={routine} onBack={() => setView("home")} />}
+              {currentView === "leaderboard" && <LeaderboardView user={user} myXP={userXP} onBack={() => setView("home")} />}
+              {currentView === "profile"     && (
+                <ProfileView user={user} myProfile={myProfile} userXP={userXP} logs={logs}
+                  onBack={() => setView("home")} onProfileUpdated={handleProfileUpdated}
+                  onNavigate={setView}
+                />
+              )}
+              {currentView === "weeklySummary" && <WeeklySummaryView logs={logs} routine={routine} onBack={() => setView("home")} />}
+              {currentView === "achievements"  && <AchievementsView logs={logs} routine={routine} userXP={userXP} onBack={() => setView("profile")} />}
+              {currentView === "travelMode"    && <TravelModeView onBack={() => setView("home")} />}
+              {currentView === "tools"          && <ToolsView onBack={() => setView("home")} />}
+              {currentView === "routinePresets" && (
+                <OnboardingView
+                  user={user}
+                  onBack={() => setView("home")}
+                  allowOverwrite={true}
+                  onRoutineReady={async (newRoutine) => {
+                    await handleRoutineReady(newRoutine);
+                    setView("home");
+                  }}
+                />
+              )}
+              {currentView === "editRoutine"   && (
+                <EditRoutineView user={user} routine={routine} onBack={() => setView("home")}
+                  onRoutineUpdated={(updated) => { setRoutine(updated); setView("home"); }}
+                />
+              )}
+            </Suspense>
+          )}
         </PageTransition>
       </div>
 

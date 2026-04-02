@@ -8,6 +8,7 @@ import {
   onAuthStateChanged,
   updateProfile,
   sendPasswordResetEmail,
+  confirmPasswordReset,
 } from "firebase/auth";
 import { auth, googleProvider } from "./firebase";
 
@@ -26,13 +27,11 @@ function isAppleMobileOrTablet() {
   const ua = navigator.userAgent || "";
   if (/iP(hone|ad|od)/i.test(ua)) return true;
   const platform = navigator.platform || "";
-  if (platform === "MacIntel" && navigator.maxTouchPoints > 1) return true;
-  return false;
+  return platform === "MacIntel" && navigator.maxTouchPoints > 1;
 }
 
 function isIOSBrowser() {
   if (isAppleMobileOrTablet()) return true;
-  // Chrome/Firefox/Edge en iPhone usan WebKit; el UA suele incluir CriOS/FxiOS
   return /CriOS|FxiOS|EdgiOS/i.test(navigator.userAgent || "");
 }
 
@@ -43,17 +42,19 @@ function isStandaloneDisplay() {
   );
 }
 
-/**
- * Popup de Google suele fallar en iOS (ITP, ventanas, PWA). Redirect es el camino estable.
- * En Android escritorio/móvil el popup suele ir bien.
- */
 export async function loginWithGoogle() {
-  const useRedirect = isIOSBrowser() || isStandaloneDisplay();
+  const isPWA = isStandaloneDisplay();
+  const isIOS = isIOSBrowser();
+
+  // Solo usamos Redirect en Safari móvil sin instalar. 
+  // En Web, PC y PWA usamos Popup.
+  const useRedirect = isIOS && !isPWA;
 
   if (useRedirect) {
     await signInWithRedirect(auth, googleProvider);
     return null;
   }
+  
   const credential = await signInWithPopup(auth, googleProvider);
   return credential.user;
 }
@@ -82,4 +83,7 @@ export function onAuthChange(callback) {
 
 export function getCurrentUser() {
   return auth.currentUser;
+}
+export async function confirmNewPassword(code, newPassword) {
+  await confirmPasswordReset(auth, code, newPassword);
 }
