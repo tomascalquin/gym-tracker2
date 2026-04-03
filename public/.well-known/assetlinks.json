@@ -1,0 +1,8 @@
+[{
+  "relation": ["delegate_permission/common.handle_all_urls"],
+  "target": {
+    "namespace": "android_app",
+    "package_name": "app.dropsc.gymtracker",
+    "sha256_cert_fingerprints": ["A0:89:F9:90:E4:C9:C3:E2:AA:2B:C8:3A:1A:D5:76:05:AA:5B:92:59:31:82:CD:53:F4:62:3A:C8:E4:F5:7A:D0"]
+  }
+}]
