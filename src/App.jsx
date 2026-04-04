@@ -49,6 +49,8 @@ const WeeklySummaryView = lazy(() => import("./views/WeeklySummaryView"));
 const AchievementsView = lazy(() => import("./views/AchievementsView"));
 const TravelModeView = lazy(() => import("./views/TravelModeView"));
 const ToolsView = lazy(() => import("./views/ToolsView"));
+const SleepView = lazy(() => import("./views/SleepView"));
+const ProgressPhotosView = lazy(() => import("./views/ProgressPhotosView"));
 // --- FIN DE LA MAGIA ---
 
 export default function App() {
@@ -418,6 +420,12 @@ export default function App() {
                   onStartSession={startSession} onNavigate={setView} onLogout={handleLogout}
                   activeDay={activeDay} completedSets={completedSets}
                   onDiscardSession={handleDiscardSession}
+                  onClaimBonusXP={async (amount) => {
+                    const displayName = user.displayName || user.email.split("@")[0];
+                    const result = await addXP(user.uid, displayName, amount, "Misión de bienvenida completada 🎁");
+                    setUserXP(result.newXP);
+                    toast(`🎁 +${amount} XP — ¡Misión de bienvenida completada!`);
+                  }}
                 />
               )}
               {currentView === "session" && activeDay && (
