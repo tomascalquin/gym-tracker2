@@ -1,3 +1,4 @@
+import ContextTooltip from "../components/ContextTooltip";
 import { useState, useMemo } from "react";
 import { calc1RM, bestSet, sessionVolume } from "../utils/fitness";
 import { getProgressionHistory, predictRM, daysToTarget } from "../utils/predictor";
@@ -5,7 +6,7 @@ import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianG
 import { tokens } from "../design";
 import MuscleMap from "../components/MuscleMap";
 
-export default function ProgressView({ logs, routine, onBack }) {
+export default function ProgressView({ logs, routine, onBack, user }) {
   const routineDays = Object.keys(routine || {});
   const [section, setSection] = useState("ejercicios"); // ejercicios | cuerpo | musculos
 
@@ -51,6 +52,7 @@ export default function ProgressView({ logs, routine, onBack }) {
       </div>
 
       <div style={{ padding: "20px 20px 100px" }}>
+        {user && <ContextTooltip uid={user.uid} hintId="progress" icon="📊" text="Aquí ves cómo evoluciona tu fuerza en cada ejercicio. Seleccioná un ejercicio para ver el gráfico de progresión." />}
         {section === "ejercicios" && <EjerciciosSection logs={logs} routine={routine} routineDays={routineDays} />}
         {section === "cuerpo"     && <VolumenSection logs={logs} />}
         {section === "musculos"   && (

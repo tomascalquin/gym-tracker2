@@ -136,6 +136,7 @@ export default function HomeView({
     { icon: "🏆", label: "Grupos",       sub: "Comparar",       key: "groups" },
     { icon: "⚔️", label: "Retos",        sub: "1 vs 1",         key: "challenges" },
     { icon: "✏️", label: "Rutina",       sub: "Editar",         key: "editRoutine" },
+    { icon: "📅", label: "Mesociclo",    sub: "Planificación",  key: "mesocycle" },
   ];
 
   return (

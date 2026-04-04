@@ -5,11 +5,11 @@ import { calc1RM, bestSet } from "./fitness";
 // ─── Rangos ───────────────────────────────────────────────────────────────────
 export const RANKS = [
   { name: "Piedra",   emoji: "🪨", minXP: 0,     color: "#78716c", dim: "#1c1917" },
-  { name: "Bronce",   emoji: "🥉", minXP: 500,   color: "#cd7f32", dim: "#1c0f00" },
-  { name: "Plata",    emoji: "🥈", minXP: 1500,  color: "#94a3b8", dim: "#0f172a" },
-  { name: "Oro",      emoji: "🥇", minXP: 3500,  color: "#fbbf24", dim: "#1c1100" },
-  { name: "Diamante", emoji: "💎", minXP: 7500,  color: "#38bdf8", dim: "#0c1a2e" },
-  { name: "Leyenda",  emoji: "👑", minXP: 15000, color: "#a78bfa", dim: "#1e1b4b" },
+  { name: "Bronce",   emoji: "🥉", minXP: 800,   color: "#cd7f32", dim: "#1c0f00" },
+  { name: "Plata",    emoji: "🥈", minXP: 2500,  color: "#94a3b8", dim: "#0f172a" },
+  { name: "Oro",      emoji: "🥇", minXP: 6000,  color: "#fbbf24", dim: "#1c1100" },
+  { name: "Diamante", emoji: "💎", minXP: 13000, color: "#38bdf8", dim: "#0c1a2e" },
+  { name: "Leyenda",  emoji: "👑", minXP: 28000, color: "#a78bfa", dim: "#1e1b4b" },
 ];
 
 export function getRank(xp) {
@@ -39,12 +39,12 @@ export function xpToNextRank(xp) {
 
 // ─── XP por acción ────────────────────────────────────────────────────────────
 export const XP_VALUES = {
-  SESSION:  100,
-  PR:        50,
-  STREAK_3:  25,
-  STREAK_7:  75,
-  STREAK_14: 150,
-  STREAK_30: 300,
+  SESSION:  60,   // base más baja — el XP real viene de PRs y racha
+  PR:        80,  // PRs valen más — recompensa el progreso real
+  STREAK_3:  20,
+  STREAK_7:  60,
+  STREAK_14: 130,
+  STREAK_30: 280,
 };
 
 // ─── Firestore ────────────────────────────────────────────────────────────────

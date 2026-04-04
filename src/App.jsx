@@ -26,6 +26,7 @@ import Confetti from "./components/Confetti";
 import { haptics } from "./utils/haptics";
 import { initPWAInstall, canInstall, installPWA, isInstalled } from "./utils/pwa";
 import SessionTransition from "./components/SessionTransition";
+import ShareCard from "./components/ShareCard";
 import { DAY_META } from "./data/routine";
 import { evaluateAchievements, getNewlyUnlocked, saveUnlockedAchievements, loadUnlockedAchievements } from "./utils/achievements";
 import { registerOnlineListener, getPendingCount } from "./utils/offlineQueue";
@@ -50,6 +51,7 @@ const AchievementsView = lazy(() => import("./views/AchievementsView"));
 const TravelModeView = lazy(() => import("./views/TravelModeView"));
 const ToolsView = lazy(() => import("./views/ToolsView"));
 const SleepView = lazy(() => import("./views/SleepView"));
+const MesocycleView = lazy(() => import("./views/MesocycleView"));
 const ProgressPhotosView = lazy(() => import("./views/ProgressPhotosView"));
 // --- FIN DE LA MAGIA ---
 
@@ -75,6 +77,7 @@ export default function App() {
   const [showInstall, setShowInstall]         = useState(false); 
   const [theme, setTheme]                   = useState(getTheme);
   const [timerOpen, setTimerOpen]           = useState(false);
+  const [shareData, setShareData]           = useState(null);
   const [timerVisible, setTimerVisible]     = useState(false);
   const [timerState, setTimerState]         = useState({ selected: 90, timeLeft: null, running: false, endTime: null }); 
 
@@ -288,6 +291,10 @@ export default function App() {
 
     setShowConfetti(true);
     haptics.celebrate();
+    // Preparar ShareCard
+    setTimeout(() => {
+      setShareData({ session, prs, xpEarned, userXP: result.newXP });
+    }, 1800); // después del confetti
     if (result.rankUp) {
       setRankUpData({ oldRank: result.oldRank, newRank: result.newRank, xpGained: xpEarned, prs });
       showLocalNotification("¡Subiste de rango! 🎉", `Ahora eres ${result.newRank.emoji} ${result.newRank.name}`);
@@ -394,6 +401,18 @@ export default function App() {
       )}
 
       {timerOpen && <RestTimer onClose={() => setTimerOpen(false)} />}
+
+      {shareData && (
+        <ShareCard
+          session={shareData.session}
+          routine={routine}
+          userXP={shareData.userXP}
+          user={user}
+          prs={shareData.prs}
+          xpEarned={shareData.xpEarned}
+          onClose={() => setShareData(null)}
+        />
+      )}
       <Confetti active={showConfetti} onDone={() => { setShowConfetti(false); setView("home"); }} />
 
       {view === "chat" && chatTarget && (
@@ -443,7 +462,7 @@ export default function App() {
                   onViewSession={startSession} onDeleteSession={handleDeleteSession}
                 />
               )}
-              {currentView === "progress"    && <ProgressView logs={logs} routine={routine} onBack={() => setView("home")} />}
+              {currentView === "progress"    && <ProgressView logs={logs} routine={routine} onBack={() => setView("home")} user={user} />}
               {currentView === "progression" && <ProgressionView logs={logs} routine={routine} onBack={() => setView("home")} />}
               {currentView === "friends"     && <FriendsView user={user} myProfile={myProfile} onBack={() => setView("home")}
                 onOpenChat={(uid, name) => { setChatTarget({ id: getDMChatId(user.uid, uid), title: name, accent: "#60a5fa", from: "friends" }); setView("chat"); }}
@@ -463,6 +482,7 @@ export default function App() {
               {currentView === "achievements"  && <AchievementsView logs={logs} routine={routine} userXP={userXP} onBack={() => setView("profile")} />}
               {currentView === "travelMode"    && <TravelModeView onBack={() => setView("home")} />}
             {currentView === "sleep"         && <SleepView user={user} onBack={() => setView("home")} />}
+            {currentView === "mesocycle"     && <MesocycleView user={user} logs={logs} routine={routine} onBack={() => setView("home")} />}
             {currentView === "photos"        && <ProgressPhotosView user={user} onBack={() => setView("home")} />}
               {currentView === "tools"          && <ToolsView onBack={() => setView("home")} />}
               {currentView === "routinePresets" && (
