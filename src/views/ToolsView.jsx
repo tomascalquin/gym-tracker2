@@ -61,7 +61,7 @@ const RPE_PERCENT_TABLE = {
 };
 
 // ─── Main ───────────────────────────────────────────────────────────────────
-export default function ToolsView({ onBack }) {
+export default function ToolsView({ onBack, onOpenTemplates }) {
   const [tab, setTab] = useState("weight");
 
   const TABS = [
@@ -69,6 +69,7 @@ export default function ToolsView({ onBack }) {
     { key: "orm",    label: "💪 1RM" },
     { key: "points", label: "🏆 Wilks/IPF" },
     { key: "rpe",    label: "🎯 RPE/RIR" },
+    { key: "templates", label: "📋 Plantillas" },
   ];
 
   return (
@@ -103,6 +104,7 @@ export default function ToolsView({ onBack }) {
         {tab === "orm"    && <OneRMCalc />}
         {tab === "points" && <StrengthPoints />}
         {tab === "rpe"    && <RPERIRTool />}
+        {tab === "templates" && <TemplatesTool onAction={onOpenTemplates} />}
       </div>
     </div>
   );
@@ -574,6 +576,35 @@ function RPERIRTool() {
           )}
         </Card>
       )}
+    </div>
+  );
+}
+
+// ─── Plantillas ──────────────────────────────────────────────────────────────
+function TemplatesTool({ onAction }) {
+  return (
+    <div>
+      <SectionLabel>REEMPLAZAR RUTINA</SectionLabel>
+      <Card>
+        <div style={{ fontSize: 12, color: "rgba(240,240,240,0.55)", marginBottom: 16, lineHeight: 1.6 }}>
+          Si querés cambiar tu plan de entrenamiento actual o empezar un nuevo programa, podés elegir una nueva plantilla predefinida. Tené en cuenta que esto reemplazará tu rutina activa.
+        </div>
+        
+        <button
+          onClick={onAction}
+          style={{
+            width: "100%", padding: "14px", borderRadius: 10,
+            background: "rgba(255,255,255,0.90)", border: "none",
+            color: "#080810", fontSize: 13, fontWeight: 800,
+            cursor: "pointer", fontFamily: "inherit",
+            WebkitTapHighlightColor: "transparent",
+            display: "flex", justifyContent: "center", alignItems: "center", gap: 8
+          }}
+        >
+          <span style={{ fontSize: 16 }}>📋</span>
+          Ver Plantillas Disponibles
+        </button>
+      </Card>
     </div>
   );
 }
