@@ -130,6 +130,7 @@ export default function HomeView({
     { icon: "😴", label: "Sueño",        sub: "Descanso",       key: "sleep" },
     { icon: "📸", label: "Fotos",        sub: "Progreso",       key: "photos" },
     { icon: "🔧", label: "Herramientas", sub: "Calculadoras",   key: "tools" },
+    { icon: "📋", label: "Plantillas",   sub: "Reemplazar",     key: "routinePresets" },
     { icon: "🤖", label: "Semana IA",    sub: "Análisis",       key: "weeklySummary" },
     { icon: "🏅", label: "Logros",       sub: "Achievements",   key: "achievements" },
     { icon: "✈️", label: "Modo viaje",   sub: "Sin gym",        key: "travelMode" },
