@@ -21,16 +21,19 @@ import { calc1RM, bestSet, sessionVolume } from "./fitness";
 // Fuente: Mike Israetel / Beardsley compilations
 // Unidad: series de trabajo por semana (≥60% 1RM, RIR 0-3)
 export const MUSCLE_RANGES = {
-  chest:     { mev: 8,  mav: 16, mrv: 22, label: "Pecho" },
-  back:      { mev: 10, mav: 18, mrv: 25, label: "Espalda" },
-  shoulders: { mev: 8,  mav: 16, mrv: 22, label: "Hombros" },
-  biceps:    { mev: 6,  mav: 14, mrv: 20, label: "Bíceps" },
-  triceps:   { mev: 6,  mav: 14, mrv: 18, label: "Tríceps" },
-  quads:     { mev: 8,  mav: 16, mrv: 20, label: "Cuádriceps" },
-  hamstrings:{ mev: 6,  mav: 12, mrv: 16, label: "Isquiotibiales" },
-  glutes:    { mev: 4,  mav: 12, mrv: 16, label: "Glúteos" },
-  calves:    { mev: 8,  mav: 16, mrv: 20, label: "Pantorrillas" },
-  adductors: { mev: 4,  mav: 10, mrv: 14, label: "Aductores" },
+  // MEV = mínimo efectivo semanal | MAV = máximo adaptativo | MRV = máximo recuperable
+  // Fuente: Israetel/RP 2023, Schoenfeld 2020. Valores para intermedio (1-3 años).
+  // Para principiantes se multiplica x0.7 (mevMult), para avanzados x1.2.
+  chest:      { mev: 6,  mav: 12, mrv: 18, label: "Pecho" },
+  back:       { mev: 8,  mav: 14, mrv: 20, label: "Espalda" },
+  shoulders:  { mev: 6,  mav: 12, mrv: 16, label: "Hombros" },
+  biceps:     { mev: 5,  mav: 10, mrv: 16, label: "Bíceps" },
+  triceps:    { mev: 5,  mav: 10, mrv: 14, label: "Tríceps" },
+  quads:      { mev: 6,  mav: 12, mrv: 16, label: "Cuádriceps" },
+  hamstrings: { mev: 5,  mav: 10, mrv: 14, label: "Isquiotibiales" },
+  glutes:     { mev: 4,  mav: 10, mrv: 14, label: "Glúteos" },
+  calves:     { mev: 6,  mav: 12, mrv: 16, label: "Pantorrillas" },
+  adductors:  { mev: 3,  mav: 8,  mrv: 12, label: "Aductores" },
 };
 
 // Mapeo ejercicio → músculos. Puedes extender esto.

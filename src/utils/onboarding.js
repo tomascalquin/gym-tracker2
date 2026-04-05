@@ -9,8 +9,8 @@ export const CHECKLIST = [
   {
     id:    "first_session",
     icon:  "💪",
-    title: "Completá tu primera sesión",
-    desc:  "Elegí un día de tu rutina y registrá el entrenamiento",
+    title: "Completa tu primera sesión",
+    desc:  "Elige un día de tu rutina y registra el entrenamiento",
     xp:    200,
     check: ({ logs }) => Object.keys(logs).length >= 1,
   },
@@ -25,7 +25,7 @@ export const CHECKLIST = [
   {
     id:    "three_sessions",
     icon:  "🔥",
-    title: "Completá 3 sesiones",
+    title: "Completa 3 sesiones",
     desc:  "La constancia es la clave del progreso",
     xp:    300,
     check: ({ logs }) => Object.keys(logs).length >= 3,

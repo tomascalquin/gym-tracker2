@@ -19,7 +19,7 @@ export const HINTS = {
   },
   tools: {
     id:   "tools",
-    text: "Calculá tu 1RM, convertí libras a kilos y sacá tu puntaje Wilks para compararte globalmente.",
+    text: "Calcula tu 1RM, convierte libras a kilos y saca tu puntaje Wilks para compararte globalmente.",
     icon: "🔧",
   },
   weeklySummary: {

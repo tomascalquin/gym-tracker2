@@ -26,7 +26,7 @@ export const GOALS = {
     repRange:    [6, 15],
     rirStart:    3,
     rirEnd:      1,
-    weeklyInc:   2,   // series extra por músculo por semana
+    weeklyInc:   1,   // series extra por músculo por semana
     deloadPct:   0.50,
     icon:        "💪",
   },
@@ -124,8 +124,8 @@ export function planMesocycle({ goal, weeks, daysPerWeek, level, bodyweight, log
 
     // Rango de peso sugerido (basado en historial si hay)
     const intensityNote = isDeload
-      ? "Semana de deload: bajá los pesos ~40-50%, enfocate en la técnica"
-      : `RIR objetivo: ${rir} — dejá ${rir} repeticiones en el tanque en cada serie`;
+      ? "Semana de deload: baja los pesos ~40-50%, enfócate en la técnica"
+      : `RIR objetivo: ${rir} — deja ${rir} repeticion${rir === 1 ? "" : "es"} en el tanque en cada serie`;
 
     mesocycle.push({
       week:          w,
@@ -220,7 +220,7 @@ function buildInsights({ goal, weeks, daysPerWeek, level, currentFatigue, curren
   const insights = [];
 
   if (!hasData) {
-    insights.push({ type: "info", text: "Completá 3+ sesiones para que el plan se personalice con tu historial real." });
+    insights.push({ type: "info", text: "Completa 3+ sesiones para que el plan se personalice con tu historial real de fatiga y estancamiento." });
   }
 
   if (currentFatigue?.fatigueLevel === "high" || currentFatigue?.fatigueLevel === "spike") {
@@ -239,7 +239,7 @@ function buildInsights({ goal, weeks, daysPerWeek, level, currentFatigue, curren
     insights.push({ type: "info", text: "Para fuerza máxima: los últimos 2 ejercicios de cada sesión pueden ser de hipertrofia (6-12 reps) para construir base muscular." });
   }
 
-  insights.push({ type: "tip", text: `La última semana siempre es deload: reducí el volumen 40-50% pero mantené la intensidad. El deload es donde ocurre la supercompensación.` });
+  insights.push({ type: "tip", text: `La última semana siempre es deload: reduce el volumen 40-50% pero mantén la intensidad. El deload es donde ocurre la supercompensación.` });
 
   if (bodyweight) {
     const proteinTarget = Math.round(bodyweight * 1.8);

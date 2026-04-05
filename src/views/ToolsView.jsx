@@ -61,15 +61,14 @@ const RPE_PERCENT_TABLE = {
 };
 
 // ─── Main ───────────────────────────────────────────────────────────────────
-export default function ToolsView({ onBack, onOpenTemplates }) {
+export default function ToolsView({ onBack, lang = "es" }) {
   const [tab, setTab] = useState("weight");
 
   const TABS = [
-    { key: "weight", label: "⚖️ Peso" },
+    { key: "weight", label: lang === "en" ? "⚖️ Weight" : "⚖️ Peso" },
     { key: "orm",    label: "💪 1RM" },
     { key: "points", label: "🏆 Wilks/IPF" },
     { key: "rpe",    label: "🎯 RPE/RIR" },
-    { key: "templates", label: "📋 Plantillas" },
   ];
 
   return (
@@ -81,7 +80,7 @@ export default function ToolsView({ onBack, onOpenTemplates }) {
           <button onClick={onBack} className="nbtn" style={{ fontSize: 22, color: "rgba(240,240,240,0.30)", padding: "0 4px 0 0" }}>‹</button>
           <div>
             <div style={{ fontSize: 9, letterSpacing: 3, color: "rgba(240,240,240,0.30)", fontWeight: 700 }}>GYM TRACKER</div>
-            <div style={{ fontSize: 24, fontWeight: 900, color: "var(--text)", letterSpacing: -1, lineHeight: 1.1 }}>HERRAMIENTAS</div>
+            <div style={{ fontSize: 24, fontWeight: 900, color: "var(--text)", letterSpacing: -1, lineHeight: 1.1 }}>{lang === "en" ? "TOOLS" : "HERRAMIENTAS"}</div>
           </div>
         </div>
         <div style={{ borderTop: "1px solid var(--glass-border)", borderBottom: "1px solid var(--glass-border)", padding: "10px 0", marginBottom: 16, display: "flex", gap: 4, overflowX: "auto" }}>
@@ -100,18 +99,17 @@ export default function ToolsView({ onBack, onOpenTemplates }) {
       </div>
 
       <div style={{ padding: "0 20px 120px" }}>
-        {tab === "weight" && <WeightConverter />}
-        {tab === "orm"    && <OneRMCalc />}
-        {tab === "points" && <StrengthPoints />}
-        {tab === "rpe"    && <RPERIRTool />}
-        {tab === "templates" && <TemplatesTool onAction={onOpenTemplates} />}
+        {tab === "weight" && <WeightConverter lang={lang} />}
+        {tab === "orm"    && <OneRMCalc lang={lang} />}
+        {tab === "points" && <StrengthPoints lang={lang} />}
+        {tab === "rpe"    && <RPERIRTool lang={lang} />}
       </div>
     </div>
   );
 }
 
 // ─── Conversor de Peso ────────────────────────────────────────────────────────
-function WeightConverter() {
+function WeightConverter({ lang = "es" }) {
   const [kg, setKg] = useState("");
   const [lb, setLb] = useState("");
 
@@ -124,16 +122,46 @@ function WeightConverter() {
     setKg(v !== "" && !isNaN(v) ? (parseFloat(v) / 2.20462).toFixed(2) : "");
   }
 
+  const L = {
+    title:      lang === "en" ? "KG ↔ LB CONVERTER"  : "CONVERSOR KG ↔ LB",
+    kilograms:  lang === "en" ? "Kilograms"           : "Kilogramos",
+    pounds:     lang === "en" ? "Pounds"              : "Libras",
+    quick:      lang === "en" ? "QUICK WEIGHTS"       : "PESOS RÁPIDOS",
+    plateRef:   lang === "en" ? "PLATE REFERENCE"     : "REFERENCIA DE PLATOS",
+    plate:      lang === "en" ? "Plate"               : "Plato",
+    bar:        lang === "en" ? "Olympic barbell"     : "Barra olímpica",
+  };
+
+  const plates = lang === "en"
+    ? [
+        ["25 kg — Red",    25, 55.1],
+        ["20 kg — Blue",   20, 44.1],
+        ["15 kg — Yellow", 15, 33.1],
+        ["10 kg — Green",  10, 22.0],
+        ["5 kg — White",    5, 11.0],
+        ["2.5 kg — Black",  2.5, 5.5],
+        [L.bar,            20, 44.1],
+      ]
+    : [
+        ["25 kg — Rojo",     25, 55.1],
+        ["20 kg — Azul",     20, 44.1],
+        ["15 kg — Amarillo", 15, 33.1],
+        ["10 kg — Verde",    10, 22.0],
+        ["5 kg — Blanco",     5, 11.0],
+        ["2.5 kg — Negro",    2.5, 5.5],
+        [L.bar,              20, 44.1],
+      ];
+
   return (
     <div>
-      <SectionLabel>CONVERSOR KG ↔ LB</SectionLabel>
+      <SectionLabel>{L.title}</SectionLabel>
       <Card>
         <div style={{ display: "flex", gap: 12, alignItems: "flex-end", marginBottom: 16 }}>
-          <ToolInput label="Kilogramos" value={kg} onChange={handleKg} />
+          <ToolInput label={L.kilograms} value={kg} onChange={handleKg} />
           <div style={{ color: "rgba(240,240,240,0.30)", fontSize: 20, paddingBottom: 10, flexShrink: 0 }}>⇌</div>
-          <ToolInput label="Libras" value={lb} onChange={handleLb} />
+          <ToolInput label={L.pounds} value={lb} onChange={handleLb} />
         </div>
-        <div style={{ fontSize: 9, color: "rgba(240,240,240,0.30)", letterSpacing: 2, marginBottom: 8 }}>PESOS RÁPIDOS</div>
+        <div style={{ fontSize: 9, color: "rgba(240,240,240,0.30)", letterSpacing: 2, marginBottom: 8 }}>{L.quick}</div>
         <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
           {[20, 40, 45, 60, 80, 100, 120, 140].map(p => (
             <button key={p} onClick={() => handleKg(String(p))} style={{
@@ -146,24 +174,16 @@ function WeightConverter() {
         </div>
       </Card>
 
-      <SectionLabel style={{ marginTop: 20 }}>REFERENCIA DE PLATOS</SectionLabel>
+      <SectionLabel style={{ marginTop: 20 }}>{L.plateRef}</SectionLabel>
       <Card>
         <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 12 }}>
           <thead>
             <tr style={{ borderBottom: "1px solid var(--glass-border)" }}>
-              <Th>Plato</Th><Th>kg</Th><Th>lb</Th>
+              <Th>{L.plate}</Th><Th>kg</Th><Th>lb</Th>
             </tr>
           </thead>
           <tbody>
-            {[
-              ["25 kg — Rojo",     25,   55.1],
-              ["20 kg — Azul",     20,   44.1],
-              ["15 kg — Amarillo", 15,   33.1],
-              ["10 kg — Verde",    10,   22.0],
-              ["5 kg — Blanco",     5,   11.0],
-              ["2.5 kg — Negro",    2.5,  5.5],
-              ["Barra olímpica",   20,   44.1],
-            ].map(([name, k, l]) => (
+            {plates.map(([name, k, l]) => (
               <tr key={name} style={{ borderBottom: "1px solid var(--glass-border)" }}>
                 <Td style={{ color: "rgba(240,240,240,0.55)" }}>{name}</Td>
                 <Td className="mono" style={{ fontWeight: 700 }}>{k}</Td>
@@ -178,7 +198,7 @@ function WeightConverter() {
 }
 
 // ─── Calculadora 1RM ─────────────────────────────────────────────────────────
-function OneRMCalc() {
+function OneRMCalc({ lang = "es" }) {
   const [weight, setWeight]   = useState("");
   const [reps, setReps]       = useState("");
   const [unit, setUnit]       = useState("kg");
@@ -201,7 +221,7 @@ function OneRMCalc() {
 
   return (
     <div>
-      <SectionLabel>CALCULADORA 1RM</SectionLabel>
+      <SectionLabel>{lang === "en" ? "1RM CALCULATOR" : "CALCULADORA 1RM"}</SectionLabel>
       <Card>
         {/* Unidad */}
         <div style={{ display: "flex", gap: 8, marginBottom: 14 }}>
@@ -218,13 +238,13 @@ function OneRMCalc() {
 
         {/* Inputs */}
         <div style={{ display: "flex", gap: 10, marginBottom: 14 }}>
-          <ToolInput label={`Peso (${unit})`} value={weight} onChange={setWeight} />
-          <ToolInput label="Reps hechas" value={reps} onChange={setReps} />
+          <ToolInput label={lang === "en" ? `Weight (${unit})` : `Peso (${unit})`} value={weight} onChange={setWeight} />
+          <ToolInput label={lang === "en" ? "Reps done" : "Reps hechas"} value={reps} onChange={setReps} />
         </div>
 
         {/* Fórmula */}
         <div style={{ marginBottom: orm ? 14 : 0 }}>
-          <div style={{ fontSize: 9, color: "rgba(240,240,240,0.30)", letterSpacing: 2, marginBottom: 8 }}>FÓRMULA</div>
+          <div style={{ fontSize: 9, color: "rgba(240,240,240,0.30)", letterSpacing: 2, marginBottom: 8 }}>{lang === "en" ? "FORMULA" : "FÓRMULA"}</div>
           <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
             {Object.keys(ONE_RM_FORMULAS).map(f => (
               <button key={f} onClick={() => setFormula(f)} style={{
@@ -246,7 +266,7 @@ function OneRMCalc() {
             textAlign: "center", marginTop: 14,
           }}>
             <div style={{ fontSize: 9, letterSpacing: 3, color: "#080810", opacity: 0.5, marginBottom: 4 }}>
-              1RM ESTIMADO
+              {lang === "en" ? "ESTIMATED 1RM" : "1RM ESTIMADO"}
             </div>
             <div className="mono" style={{ fontSize: 40, fontWeight: 900, color: "#080810", letterSpacing: -2 }}>
               {ormDisplay.toFixed(1)}
@@ -258,14 +278,14 @@ function OneRMCalc() {
 
       {percentages.length > 0 && (
         <>
-          <SectionLabel style={{ marginTop: 20 }}>TABLA DE PORCENTAJES</SectionLabel>
+          <SectionLabel style={{ marginTop: 20 }}>{lang === "en" ? "PERCENTAGE TABLE" : "TABLA DE PORCENTAJES"}</SectionLabel>
           <Card>
             <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 12 }}>
               <thead>
                 <tr style={{ borderBottom: "1px solid var(--glass-border)" }}>
                   <Th>% 1RM</Th>
-                  <Th>Peso ({unit})</Th>
-                  <Th>Reps est.</Th>
+                  <Th>{lang === "en" ? `Weight (${unit})` : `Peso (${unit})`}</Th>
+                  <Th>{lang === "en" ? "Est. reps" : "Reps est."}</Th>
                 </tr>
               </thead>
               <tbody>
@@ -289,7 +309,7 @@ function OneRMCalc() {
 }
 
 // ─── Wilks2 / IPF GL ────────────────────────────────────────────────────────
-function StrengthPoints() {
+function StrengthPoints({ lang = "es" }) {
   const [bw, setBw]       = useState("");
   const [squat, setSquat] = useState("");
   const [bench, setBench] = useState("");
@@ -322,13 +342,21 @@ function StrengthPoints() {
     ? levels.find(l => wilks >= l.wilks)
     : null;
 
+  const sexLabels = lang === "en"
+    ? [["M", "♂ Male"], ["F", "♀ Female"]]
+    : [["M", "♂ Masculino"], ["F", "♀ Femenino"]];
+
+  const levelLabels = lang === "en"
+    ? { Elite: "Elite", Maestro: "Master", Avanzado: "Advanced", Intermedio: "Intermediate", Novel: "Novice" }
+    : {};
+
   return (
     <div>
       <SectionLabel>WILKS2 / IPF GL POINTS</SectionLabel>
       <Card>
         {/* Sexo */}
         <div style={{ display: "flex", gap: 8, marginBottom: 14 }}>
-          {[["M", "♂ Masculino"], ["F", "♀ Femenino"]].map(([s, l]) => (
+          {sexLabels.map(([s, l]) => (
             <button key={s} onClick={() => setSex(s)} style={{
               flex: 1, padding: "8px", borderRadius: 10,
               background: sex === s ? "rgba(255,255,255,0.90)" : "var(--bg3)",
@@ -353,15 +381,15 @@ function StrengthPoints() {
         </div>
 
         {/* Inputs */}
-        <ToolInput label={`Peso corporal (${unit})`} value={bw} onChange={setBw} />
+        <ToolInput label={lang === "en" ? `Body weight (${unit})` : `Peso corporal (${unit})`} value={bw} onChange={setBw} />
         <div style={{ height: 10 }} />
         <div style={{ display: "flex", gap: 8, marginBottom: 4 }}>
-          <ToolInput label="Sentadilla" value={squat} onChange={setSquat} />
-          <ToolInput label="Banca" value={bench} onChange={setBench} />
-          <ToolInput label="Peso Muerto" value={dead} onChange={setDead} />
+          <ToolInput label={lang === "en" ? "Squat" : "Sentadilla"} value={squat} onChange={setSquat} />
+          <ToolInput label={lang === "en" ? "Bench" : "Banca"} value={bench} onChange={setBench} />
+          <ToolInput label={lang === "en" ? "Deadlift" : "Peso Muerto"} value={dead} onChange={setDead} />
         </div>
         <div style={{ fontSize: 10, color: "rgba(240,240,240,0.30)", marginBottom: wilks ? 14 : 0 }}>
-          También podés ingresar un solo ejercicio en cualquier campo
+          {lang === "en" ? "You can also enter just one exercise in any field" : "También puedes ingresar un solo ejercicio en cualquier campo"}
         </div>
 
         {/* Resultado */}
@@ -377,31 +405,35 @@ function StrengthPoints() {
                 background: "rgba(255,255,255,0.07)", border: "1px solid var(--glass-border)",
                 fontSize: 12, color: "rgba(240,240,240,0.55)",
               }}>
-                Nivel alcanzado: <span style={{ fontWeight: 700, color: "var(--text)" }}>{reachedLevel.label}</span>
+                {lang === "en" ? "Level reached:" : "Nivel alcanzado:"}{" "}
+                <span style={{ fontWeight: 700, color: "var(--text)" }}>
+                  {lang === "en" ? (levelLabels[reachedLevel.label] || reachedLevel.label) : reachedLevel.label}
+                </span>
               </div>
             )}
           </>
         )}
       </Card>
 
-      <SectionLabel style={{ marginTop: 20 }}>NIVELES DE REFERENCIA (Wilks2)</SectionLabel>
+      <SectionLabel style={{ marginTop: 20 }}>{lang === "en" ? "REFERENCE LEVELS (Wilks2)" : "NIVELES DE REFERENCIA (Wilks2)"}</SectionLabel>
       <Card>
         <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 12 }}>
           <thead>
             <tr style={{ borderBottom: "1px solid var(--glass-border)" }}>
-              <Th>Nivel</Th><Th>Wilks2</Th><Th>IPF GL</Th>
+              <Th>{lang === "en" ? "Level" : "Nivel"}</Th><Th>Wilks2</Th><Th>IPF GL</Th>
             </tr>
           </thead>
           <tbody>
             {levels.map(({ label, wilks: w, ipfgl: g }) => {
               const reached = wilks && wilks >= w;
+              const displayLabel = lang === "en" ? (levelLabels[label] || label) : label;
               return (
                 <tr key={label} style={{
                   borderBottom: "1px solid var(--glass-border)",
                   background: reached ? "var(--bg3)" : "transparent",
                 }}>
                   <Td style={{ fontWeight: reached ? 700 : 400, color: reached ? "var(--text)" : "var(--text2)" }}>
-                    {reached ? "✓ " : ""}{label}
+                    {reached ? "✓ " : ""}{displayLabel}
                   </Td>
                   <Td className="mono">{w}+</Td>
                   <Td className="mono" style={{ color: "rgba(240,240,240,0.30)" }}>{g}+</Td>
@@ -416,7 +448,7 @@ function StrengthPoints() {
 }
 
 // ─── RPE / RIR ───────────────────────────────────────────────────────────────
-function RPERIRTool() {
+function RPERIRTool({ lang = "es" }) {
   const [mode, setMode]     = useState("table");
   const [rpe, setRpe]       = useState(8);
   const [reps, setReps]     = useState(5);
@@ -429,12 +461,29 @@ function RPERIRTool() {
   const orm    = pct && wVal > 0 ? (wVal / (pct / 100)) : null;
   const rirVal = RPE_RIR_TABLE.find(x => x.rpe === rpe);
 
+  // Localized RPE descriptions
+  const rpeDescriptions = {
+    10:  lang === "en" ? "Absolute maximum, complete failure"        : "Máximo absoluto, fallo total",
+    9.5: lang === "en" ? "Near failure, maybe 1 more with doubt"    : "Casi fallo, podría haber 1 con duda",
+    9:   lang === "en" ? "Leaves 1 rep in the tank"                  : "Deja 1 rep en el tanque",
+    8.5: lang === "en" ? "Between 1 and 2 reps in reserve"          : "Entre 1 y 2 reps en reserva",
+    8:   lang === "en" ? "Leaves 2 reps in the tank"                 : "Deja 2 reps en el tanque",
+    7.5: lang === "en" ? "Between 2 and 3 reps in reserve"          : "Entre 2 y 3 reps en reserva",
+    7:   lang === "en" ? "Leaves 3 reps in the tank"                 : "Deja 3 reps en el tanque",
+    6:   lang === "en" ? "Moderate effort, 4+ reps in reserve"       : "Esfuerzo moderado, 4+ reps de reserva",
+    5:   lang === "en" ? "Light effort, very easy"                   : "Esfuerzo leve, muy fácil",
+  };
+
+  const modeTabs = lang === "en"
+    ? [["table", "📋 RPE Table"], ["calc", "🧮 Calculator"]]
+    : [["table", "📋 Tabla RPE"], ["calc", "🧮 Calculadora"]];
+
   return (
     <div>
       <SectionLabel>RPE / RIR</SectionLabel>
 
       <div style={{ display: "flex", gap: 8, marginBottom: 16 }}>
-        {[["table", "📋 Tabla RPE"], ["calc", "🧮 Calculadora"]].map(([k, l]) => (
+        {modeTabs.map(([k, l]) => (
           <button key={k} onClick={() => setMode(k)} style={{
             flex: 1, padding: "9px", borderRadius: 10,
             background: mode === k ? "rgba(255,255,255,0.90)" : "var(--bg3)",
@@ -451,22 +500,22 @@ function RPERIRTool() {
             <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 12 }}>
               <thead>
                 <tr style={{ borderBottom: "1px solid var(--glass-border)" }}>
-                  <Th>RPE</Th><Th>RIR</Th><Th>Descripción</Th>
+                  <Th>RPE</Th><Th>RIR</Th><Th>{lang === "en" ? "Description" : "Descripción"}</Th>
                 </tr>
               </thead>
               <tbody>
-                {RPE_RIR_TABLE.map(({ rpe, rir, desc }) => (
+                {RPE_RIR_TABLE.map(({ rpe, rir }) => (
                   <tr key={rpe} style={{ borderBottom: "1px solid var(--glass-border)" }}>
                     <Td className="mono" style={{ fontWeight: 700, width: 44 }}>{rpe}</Td>
                     <Td className="mono" style={{ color: "rgba(240,240,240,0.30)", width: 36 }}>{rir}</Td>
-                    <Td style={{ color: "rgba(240,240,240,0.55)", lineHeight: 1.5, fontSize: 11 }}>{desc}</Td>
+                    <Td style={{ color: "rgba(240,240,240,0.55)", lineHeight: 1.5, fontSize: 11 }}>{rpeDescriptions[rpe]}</Td>
                   </tr>
                 ))}
               </tbody>
             </table>
           </Card>
 
-          <SectionLabel style={{ marginTop: 20 }}>% 1RM POR RPE Y REPS</SectionLabel>
+          <SectionLabel style={{ marginTop: 20 }}>{lang === "en" ? "% 1RM BY RPE AND REPS" : "% 1RM POR RPE Y REPS"}</SectionLabel>
           <Card>
             <div style={{ overflowX: "auto", margin: "0 -2px" }}>
               <table style={{ borderCollapse: "collapse", fontSize: 10, minWidth: 360 }}>
@@ -498,7 +547,10 @@ function RPERIRTool() {
       {mode === "calc" && (
         <Card>
           <div style={{ fontSize: 11, color: "rgba(240,240,240,0.55)", marginBottom: 16, lineHeight: 1.6 }}>
-            Ingresá el peso y reps que hiciste + el RPE percibido → obtenés tu 1RM estimado.
+            {lang === "en"
+              ? "Enter the weight and reps you did + perceived RPE → get your estimated 1RM."
+              : "Ingresa el peso y reps que hiciste + el RPE percibido → obtienes tu 1RM estimado."
+            }
           </div>
 
           {/* Unidad */}
@@ -516,7 +568,7 @@ function RPERIRTool() {
 
           {/* Peso + reps */}
           <div style={{ display: "flex", gap: 10, marginBottom: 16 }}>
-            <ToolInput label={`Peso (${unit})`} value={weight} onChange={setWeight} />
+            <ToolInput label={lang === "en" ? `Weight (${unit})` : `Peso (${unit})`} value={weight} onChange={setWeight} />
             <div style={{ flex: 1 }}>
               <div style={{ fontSize: 9, color: "rgba(240,240,240,0.30)", letterSpacing: 2, marginBottom: 6 }}>REPS</div>
               <select value={reps} onChange={e => setReps(Number(e.target.value))} style={{
@@ -533,7 +585,7 @@ function RPERIRTool() {
           {/* RPE slider */}
           <div style={{ marginBottom: 16 }}>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginBottom: 8 }}>
-              <div style={{ fontSize: 9, color: "rgba(240,240,240,0.30)", letterSpacing: 2 }}>RPE PERCIBIDO</div>
+              <div style={{ fontSize: 9, color: "rgba(240,240,240,0.30)", letterSpacing: 2 }}>{lang === "en" ? "PERCEIVED RPE" : "RPE PERCIBIDO"}</div>
               <div className="mono" style={{ fontSize: 22, fontWeight: 900, color: "var(--text)" }}>{rpe}</div>
             </div>
             <input type="range" min={7} max={10} step={0.5} value={rpe}
@@ -541,7 +593,8 @@ function RPERIRTool() {
               style={{ width: "100%", accentColor: "var(--text)", cursor: "pointer", height: 4 }}
             />
             <div style={{ display: "flex", justifyContent: "space-between", fontSize: 9, color: "rgba(240,240,240,0.30)", marginTop: 4 }}>
-              <span>RPE 7 — fácil</span><span>RPE 10 — fallo</span>
+              <span>{lang === "en" ? "RPE 7 — easy" : "RPE 7 — fácil"}</span>
+              <span>{lang === "en" ? "RPE 10 — failure" : "RPE 10 — fallo"}</span>
             </div>
           </div>
 
@@ -552,9 +605,12 @@ function RPERIRTool() {
               fontSize: 12, color: "rgba(240,240,240,0.55)", lineHeight: 1.5,
             }}>
               <span className="mono" style={{ fontWeight: 700, color: "var(--text)" }}>RIR {rirVal.rir}</span>
-              {" — "}{rirVal.desc}
+              {" — "}{rpeDescriptions[rirVal.rpe]}
               {pct && <><br /><span style={{ marginTop: 4, display: "inline-block" }}>
-                A <strong>{reps} rep{reps > 1 ? "s" : ""}</strong> con RPE {rpe} → <span className="mono" style={{ fontWeight: 700, color: "var(--text)" }}>{pct}%</span> de tu 1RM
+                {lang === "en"
+                  ? <><strong>{reps} rep{reps > 1 ? "s" : ""}</strong> at RPE {rpe} → <span className="mono" style={{ fontWeight: 700, color: "var(--text)" }}>{pct}%</span> of your 1RM</>
+                  : <>A <strong>{reps} rep{reps > 1 ? "s" : ""}</strong> con RPE {rpe} → <span className="mono" style={{ fontWeight: 700, color: "var(--text)" }}>{pct}%</span> de tu 1RM</>
+                }
               </span></>}
             </div>
           )}
@@ -566,7 +622,7 @@ function RPERIRTool() {
               textAlign: "center",
             }}>
               <div style={{ fontSize: 9, letterSpacing: 3, color: "#080810", opacity: 0.5, marginBottom: 4 }}>
-                1RM ESTIMADO
+                {lang === "en" ? "ESTIMATED 1RM" : "1RM ESTIMADO"}
               </div>
               <div className="mono" style={{ fontSize: 40, fontWeight: 900, color: "#080810", letterSpacing: -2 }}>
                 {orm.toFixed(1)}
@@ -576,35 +632,6 @@ function RPERIRTool() {
           )}
         </Card>
       )}
-    </div>
-  );
-}
-
-// ─── Plantillas ──────────────────────────────────────────────────────────────
-function TemplatesTool({ onAction }) {
-  return (
-    <div>
-      <SectionLabel>REEMPLAZAR RUTINA</SectionLabel>
-      <Card>
-        <div style={{ fontSize: 12, color: "rgba(240,240,240,0.55)", marginBottom: 16, lineHeight: 1.6 }}>
-          Si querés cambiar tu plan de entrenamiento actual o empezar un nuevo programa, podés elegir una nueva plantilla predefinida. Tené en cuenta que esto reemplazará tu rutina activa.
-        </div>
-        
-        <button
-          onClick={onAction}
-          style={{
-            width: "100%", padding: "14px", borderRadius: 10,
-            background: "rgba(255,255,255,0.90)", border: "none",
-            color: "#080810", fontSize: 13, fontWeight: 800,
-            cursor: "pointer", fontFamily: "inherit",
-            WebkitTapHighlightColor: "transparent",
-            display: "flex", justifyContent: "center", alignItems: "center", gap: 8
-          }}
-        >
-          <span style={{ fontSize: 16 }}>📋</span>
-          Ver Plantillas Disponibles
-        </button>
-      </Card>
     </div>
   );
 }

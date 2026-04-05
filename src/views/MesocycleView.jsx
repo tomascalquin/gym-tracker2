@@ -110,7 +110,7 @@ function MesocycleExplainerModal({ onClose }) {
             </div>
             <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
               {[
-                { weeks: "4 sem", label: "Corto", when: "Cuando querés cambiar de objetivo pronto, sos principiante, o tenés poca tolerancia al volumen.", color: "#4ade80" },
+                { weeks: "4 sem", label: "Corto", when: "Cuando quieres cambiar de objetivo pronto, eres principiante, o tienes poca tolerancia al volumen.", color: "#4ade80" },
                 { weeks: "5–6 sem", label: "Intermedio", when: "El más común. Suficiente para acumular volumen y notar adaptaciones claras sin sobreentrenar.", color: "#a78bfa" },
                 { weeks: "7–8 sem", label: "Largo", when: "Para avanzados con buena tolerancia al volumen. Más tiempo acumulando = más potencial de adaptación.", color: "#fbbf24" },
               ].map(({ weeks, label, when, color }) => (
@@ -130,7 +130,7 @@ function MesocycleExplainerModal({ onClose }) {
           </div>
 
           <InfoBlock icon="🔄" title="Semana de deload" color="#fbbf24">
-            La última semana siempre es un deload: bajás volumen e intensidad al ~50–60%. Esto no es perder el tiempo — es cuando el cuerpo consolida las adaptaciones. Salís más fuerte para el siguiente mesociclo.
+          La última semana siempre es un deload: baja el volumen e intensidad al ~50–60%. Esto no es perder el tiempo — es cuando el cuerpo consolida las adaptaciones. Sales más fuerte para el siguiente mesociclo.
           </InfoBlock>
         </div>
 
@@ -210,7 +210,7 @@ function RoutineRecommendationModal({ routine, onClose, onConfirm }) {
   if (hasLegs && hasUpper) {
     if (exercises.length >= 16) {
       recommendation = "PPL (Push/Pull/Legs)";
-      structureTip = "Tenés volumen alto y ejercicios variados. El split PPL te permite 6 días con máximo volumen por grupo muscular, ideal para el próximo mesociclo.";
+      structureTip = "Tienes volumen alto y ejercicios variados. El split PPL te permite 6 días con máximo volumen por grupo muscular, ideal para el próximo mesociclo.";
     } else {
       recommendation = "Upper/Lower";
       structureTip = "Tu rutina actual cubre tren superior e inferior. El split Upper/Lower (4 días) es perfecto para seguir progresando con buena frecuencia por grupo muscular.";
@@ -248,7 +248,7 @@ function RoutineRecommendationModal({ routine, onClose, onConfirm }) {
           Nuevo mesociclo 🔄
         </div>
         <div style={{ fontSize: 12, color: "rgba(240,240,240,0.50)", marginBottom: 20, lineHeight: 1.5 }}>
-          Basado en tu rutina actual, esto es lo que te conviene
+          Basado en tu rutina actual, esto es lo que te recomendamos
         </div>
 
         {/* Ejercicios detectados */}
@@ -362,6 +362,7 @@ export default function MesocycleView({ user, logs, routine, onBack }) {
     clearMesocycle(user.uid);
     setPlan(null);
     setStep("config");
+    window.scrollTo({ top: 0, behavior: "smooth" });
   }
 
   return (

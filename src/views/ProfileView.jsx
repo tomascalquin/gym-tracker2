@@ -7,13 +7,23 @@ import { sessionVolume } from "../utils/fitness";
 import { copyInviteLink } from "../utils/invite";
 import { haptics } from "../utils/haptics";
 import { tokens } from "../design";
+import { getLang, setLang } from "../utils/i18n";
 
 export default function ProfileView({ user, myProfile, userXP, logs, onBack, onProfileUpdated, onNavigate }) {
   const [photo, setPhoto]         = useState(myProfile?.photoURL || null);
   const [uploading, setUploading] = useState(false);
   const [theme, setThemeState]    = useState(getTheme());
   const [copied, setCopied]       = useState(false);
+  const [lang, setLangState]      = useState(getLang());
   const fileRef = useRef();
+
+  function handleToggleLang() {
+    const next = lang === "es" ? "en" : "es";
+    setLang(next);
+    setLangState(next);
+    // Reload so all components pick up the new language
+    window.location.reload();
+  }
 
   const rank          = getRank(userXP);
   const progress      = xpToNextRank(userXP);
@@ -60,9 +70,24 @@ export default function ProfileView({ user, myProfile, userXP, logs, onBack, onP
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 20 }}>
           <button onClick={onBack} className="nbtn" style={{ color: "var(--text)", fontSize: 20, padding: "0 4px" }}>←</button>
           <div style={{ fontSize: 9, letterSpacing: 3, color: "rgba(240,240,240,0.30)", fontWeight: 700 }}>MI PERFIL</div>
-          <button onClick={handleToggleTheme} className="nbtn" style={{ fontSize: 16, color: "rgba(240,240,240,0.30)" }}>
-            {theme === "light" ? "🌙" : "☀️"}
-          </button>
+          <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+            <button
+              onClick={handleToggleLang}
+              className="nbtn"
+              style={{
+                fontSize: 9, fontWeight: 700, letterSpacing: 1.5,
+                color: "rgba(240,240,240,0.50)",
+                background: "rgba(255,255,255,0.08)",
+                border: "1px solid rgba(255,255,255,0.15)",
+                borderRadius: 8, padding: "4px 8px",
+              }}
+            >
+              {lang === "es" ? "EN" : "ES"}
+            </button>
+            <button onClick={handleToggleTheme} className="nbtn" style={{ fontSize: 16, color: "rgba(240,240,240,0.30)" }}>
+              {theme === "light" ? "🌙" : "☀️"}
+            </button>
+          </div>
         </div>
 
         {/* Avatar + nombre */}
