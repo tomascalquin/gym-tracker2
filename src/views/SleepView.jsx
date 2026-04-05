@@ -1,15 +1,108 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { saveSleepLog, loadSleepLogs, deleteSleepLog, sleepStats, QUALITY_LABELS } from "../utils/sleep";
 import { todayStr } from "../utils/storage";
 import { haptics } from "../utils/haptics";
 
-export default function SleepView({ user, onBack }) {
-  const [logs, setLogs]       = useState({});
-  const [loading, setLoading] = useState(true);
-  const [tab, setTab]         = useState("log");
-  const [saving, setSaving]   = useState(false);
+// ─── Slider custom glassmorphism ──────────────────────────────────────────────
+function GlassSlider({ min, max, step, value, onChange, color = "#a78bfa" }) {
+  const trackRef = useRef(null);
+  const isDragging = useRef(false);
 
-  // Form
+  function calcValue(clientX) {
+    const rect = trackRef.current.getBoundingClientRect();
+    const pct = Math.max(0, Math.min(1, (clientX - rect.left) / rect.width));
+    const raw = min + pct * (max - min);
+    const stepped = Math.round(raw / step) * step;
+    return Math.max(min, Math.min(max, parseFloat(stepped.toFixed(4))));
+  }
+
+  function onPointerDown(e) {
+    e.preventDefault();
+    isDragging.current = true;
+    trackRef.current.setPointerCapture(e.pointerId);
+    onChange(calcValue(e.clientX));
+  }
+  function onPointerMove(e) {
+    if (!isDragging.current) return;
+    onChange(calcValue(e.clientX));
+  }
+  function onPointerUp() { isDragging.current = false; }
+
+  const pct = ((value - min) / (max - min)) * 100;
+
+  return (
+    <div
+      ref={trackRef}
+      onPointerDown={onPointerDown}
+      onPointerMove={onPointerMove}
+      onPointerUp={onPointerUp}
+      style={{
+        position: "relative", height: 36, display: "flex",
+        alignItems: "center", cursor: "pointer", userSelect: "none",
+        WebkitUserSelect: "none", touchAction: "none",
+      }}
+    >
+      <div style={{
+        position: "absolute", left: 0, right: 0, height: 6,
+        background: "rgba(255,255,255,0.08)", borderRadius: 99,
+        overflow: "visible",
+      }}>
+        <div style={{
+          height: "100%", width: `${pct}%`,
+          background: `linear-gradient(90deg, ${color}88, ${color})`,
+          borderRadius: 99,
+        }} />
+      </div>
+      <div style={{
+        position: "absolute",
+        left: `calc(${pct}% - 13px)`,
+        width: 26, height: 26,
+        background: `radial-gradient(circle at 35% 35%, ${color}ff, ${color}aa)`,
+        border: `2px solid ${color}`,
+        borderRadius: "50%",
+        boxShadow: `0 0 14px ${color}55, 0 2px 8px rgba(0,0,0,0.5)`,
+      }} />
+    </div>
+  );
+}
+
+// ─── Toast de guardado ────────────────────────────────────────────────────────
+function SaveToast({ visible, isUpdate }) {
+  return (
+    <div style={{
+      position: "fixed", bottom: 100, left: "50%",
+      transform: `translateX(-50%) translateY(${visible ? 0 : 20}px)`,
+      opacity: visible ? 1 : 0,
+      transition: "all 0.35s cubic-bezier(0.34, 1.56, 0.64, 1)",
+      zIndex: 9999, pointerEvents: "none",
+    }}>
+      <div style={{
+        background: "rgba(74,222,128,0.15)",
+        backdropFilter: "blur(40px)", WebkitBackdropFilter: "blur(40px)",
+        border: "1px solid rgba(74,222,128,0.35)",
+        borderRadius: 99, padding: "10px 22px",
+        display: "flex", alignItems: "center", gap: 8,
+        boxShadow: "0 8px 32px rgba(74,222,128,0.20)",
+        whiteSpace: "nowrap",
+      }}>
+        <span style={{ fontSize: 16 }}>😴</span>
+        <span style={{ fontSize: 12, fontWeight: 700, color: "#4ade80", letterSpacing: 0.5 }}>
+          {isUpdate ? "Sueño actualizado" : "Sueño guardado para hoy"}
+        </span>
+        <span style={{ fontSize: 14 }}>✓</span>
+      </div>
+    </div>
+  );
+}
+
+export default function SleepView({ user, onBack }) {
+  const [logs, setLogs]           = useState({});
+  const [loading, setLoading]     = useState(true);
+  const [tab, setTab]             = useState("log");
+  const [saving, setSaving]       = useState(false);
+  const [showToast, setShowToast] = useState(false);
+  const [wasUpdate, setWasUpdate] = useState(false);
+
   const [date, setDate]       = useState(() => todayStr());
   const [hours, setHours]     = useState(7.5);
   const [quality, setQuality] = useState(4);
@@ -21,7 +114,6 @@ export default function SleepView({ user, onBack }) {
       .catch(() => setLoading(false));
   }, [user.uid]);
 
-  // Precargar si ya hay registro en la fecha seleccionada
   useEffect(() => {
     const existing = logs[date];
     if (existing) {
@@ -37,16 +129,18 @@ export default function SleepView({ user, onBack }) {
 
   async function handleSave() {
     if (hours < 1 || hours > 24) return;
+    const isUpdate = !!logs[date];
     setSaving(true);
     haptics.light();
     try {
       const entry = await saveSleepLog(user.uid, { date, hours, quality, note });
       setLogs(prev => ({ ...prev, [date]: entry }));
-    } catch (e) {
-      console.error(e);
-    }
+      setWasUpdate(isUpdate);
+      setShowToast(true);
+      setTimeout(() => setShowToast(false), 2500);
+      haptics.success?.();
+    } catch (e) { console.error(e); }
     setSaving(false);
-    haptics.success?.();
   }
 
   async function handleDelete(d) {
@@ -57,9 +151,12 @@ export default function SleepView({ user, onBack }) {
   const stats       = sleepStats(logs);
   const sorted      = Object.values(logs).sort((a, b) => b.date.localeCompare(a.date));
   const todayLogged = !!logs[todayStr()];
+  const hoursColor  = hours >= 7.5 ? "#4ade80" : hours >= 6 ? "#fbbf24" : "#f87171";
+  const hoursMsg    = hours >= 8 ? "Sueño óptimo 💪" : hours >= 7 ? "Buen descanso" : hours >= 6 ? "Algo corto, no ideal" : "Muy poco — afecta la recuperación";
 
   return (
     <div style={{ maxWidth: 460, margin: "0 auto", fontFamily: "inherit", animation: "fadeIn 0.25s ease" }}>
+      <SaveToast visible={showToast} isUpdate={wasUpdate} />
 
       {/* Header */}
       <div style={{ padding: "24px 20px 0", borderBottom: "1px solid rgba(255,255,255,0.08)" }}>
@@ -73,8 +170,7 @@ export default function SleepView({ user, onBack }) {
             <div style={{
               marginLeft: "auto", fontSize: 9, letterSpacing: 1.5, fontWeight: 700,
               color: "#4ade80", background: "rgba(74,222,128,0.12)",
-              border: "1px solid rgba(74,222,128,0.25)",
-              padding: "4px 10px", borderRadius: 99,
+              border: "1px solid rgba(74,222,128,0.25)", padding: "4px 10px", borderRadius: 99,
             }}>✓ HOY</div>
           )}
         </div>
@@ -94,7 +190,6 @@ export default function SleepView({ user, onBack }) {
 
       <div style={{ padding: "20px 20px 120px" }}>
 
-        {/* ── REGISTRAR ── */}
         {tab === "log" && (
           <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
             <div>
@@ -102,35 +197,33 @@ export default function SleepView({ user, onBack }) {
               <input type="date" value={date} onChange={e => setDate(e.target.value)} style={S.input} />
             </div>
 
-            <div>
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginBottom: 10 }}>
+            {/* Horas */}
+            <div style={{
+              background: "rgba(255,255,255,0.06)", backdropFilter: "blur(40px)",
+              WebkitBackdropFilter: "blur(40px)", border: "1px solid rgba(255,255,255,0.10)",
+              borderRadius: 18, padding: "16px",
+            }}>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginBottom: 16 }}>
                 <div style={S.label}>HORAS DORMIDAS</div>
-                <div className="mono" style={{ fontSize: 28, fontWeight: 900, color: "#fff", letterSpacing: -1 }}>{hours}h</div>
+                <div className="mono" style={{ fontSize: 32, fontWeight: 900, color: hoursColor, letterSpacing: -1, transition: "color 0.2s" }}>{hours}h</div>
               </div>
-              <input type="range" min={1} max={12} step={0.5} value={hours}
-                onChange={e => setHours(parseFloat(e.target.value))}
-                style={{ width: "100%", accentColor: "#a78bfa", cursor: "pointer" }}
-              />
-              <div style={{ display: "flex", justifyContent: "space-between", marginTop: 4 }}>
+              <GlassSlider min={1} max={12} step={0.5} value={hours} onChange={setHours} color={hoursColor} />
+              <div style={{ display: "flex", justifyContent: "space-between", marginTop: 6 }}>
                 <span style={{ fontSize: 9, color: "rgba(240,240,240,0.25)" }}>1h</span>
                 <span style={{ fontSize: 9, color: "rgba(240,240,240,0.25)" }}>12h</span>
               </div>
               <div style={{
-                marginTop: 10, padding: "8px 14px", borderRadius: 12,
-                background: hours >= 7.5 ? "rgba(74,222,128,0.10)" : hours >= 6 ? "rgba(251,191,36,0.10)" : "rgba(248,113,113,0.10)",
-                border: `1px solid ${hours >= 7.5 ? "rgba(74,222,128,0.20)" : hours >= 6 ? "rgba(251,191,36,0.20)" : "rgba(248,113,113,0.20)"}`,
-                fontSize: 11,
-                color: hours >= 7.5 ? "#4ade80" : hours >= 6 ? "#fbbf24" : "#f87171",
-              }}>
-                {hours >= 8 ? "Sueño óptimo 💪" : hours >= 7 ? "Buen descanso" : hours >= 6 ? "Algo corto, no ideal" : "Muy poco — afecta la recuperación"}
-              </div>
+                marginTop: 12, padding: "8px 14px", borderRadius: 12,
+                background: `${hoursColor}14`, border: `1px solid ${hoursColor}33`,
+                fontSize: 11, color: hoursColor, textAlign: "center", transition: "all 0.2s",
+              }}>{hoursMsg}</div>
             </div>
 
             <div>
               <div style={S.label}>CALIDAD DEL SUEÑO</div>
               <div style={{ display: "flex", gap: 8 }}>
                 {[1,2,3,4,5].map(q => {
-                  const ql  = QUALITY_LABELS[q];
+                  const ql = QUALITY_LABELS[q];
                   const sel = quality === q;
                   return (
                     <button key={q} onClick={() => setQuality(q)} style={{
@@ -139,8 +232,7 @@ export default function SleepView({ user, onBack }) {
                       border: `1px solid ${sel ? ql.color + "66" : "rgba(255,255,255,0.08)"}`,
                       cursor: "pointer", fontFamily: "inherit",
                       display: "flex", flexDirection: "column", alignItems: "center", gap: 4,
-                      transition: "all 0.15s",
-                      WebkitTapHighlightColor: "transparent",
+                      transition: "all 0.15s", WebkitTapHighlightColor: "transparent",
                     }}>
                       <span style={{ fontSize: 20 }}>{ql.emoji}</span>
                       <span style={{ fontSize: 7, letterSpacing: 0.5, color: sel ? ql.color : "rgba(240,240,240,0.30)", fontWeight: 700 }}>{q}</span>
@@ -177,7 +269,6 @@ export default function SleepView({ user, onBack }) {
           </div>
         )}
 
-        {/* ── HISTORIAL ── */}
         {tab === "history" && (
           loading ? (
             <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
@@ -191,9 +282,8 @@ export default function SleepView({ user, onBack }) {
                 const ql = QUALITY_LABELS[entry.quality] || QUALITY_LABELS[3];
                 return (
                   <div key={entry.date} style={{
-                    background: "rgba(255,255,255,0.06)",
-                    backdropFilter: "blur(40px)", WebkitBackdropFilter: "blur(40px)",
-                    border: "1px solid rgba(255,255,255,0.10)",
+                    background: "rgba(255,255,255,0.06)", backdropFilter: "blur(40px)",
+                    WebkitBackdropFilter: "blur(40px)", border: "1px solid rgba(255,255,255,0.10)",
                     borderRadius: 16, padding: "12px 14px",
                     display: "flex", alignItems: "center", gap: 12,
                     animation: `slideDown 0.2s ease ${i * 0.03}s both`,
@@ -206,11 +296,11 @@ export default function SleepView({ user, onBack }) {
                         </span>
                         <span style={{ fontSize: 9, color: "rgba(240,240,240,0.30)", letterSpacing: 1 }}>{entry.date}</span>
                       </div>
-                      {entry.note ? (
+                      {entry.note && (
                         <div style={{ fontSize: 11, color: "rgba(240,240,240,0.40)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
                           {entry.note}
                         </div>
-                      ) : null}
+                      )}
                     </div>
                     <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 6 }}>
                       <div style={{ display: "flex", gap: 2 }}>
@@ -234,7 +324,6 @@ export default function SleepView({ user, onBack }) {
           )
         )}
 
-        {/* ── STATS ── */}
         {tab === "stats" && (
           !stats ? (
             <Empty icon="📊" msg="Registra al menos un sueño para ver estadísticas" />
@@ -245,11 +334,9 @@ export default function SleepView({ user, onBack }) {
                 <StatCard label="CALIDAD"  value={`${stats.avgQuality}/5`} color={QUALITY_LABELS[Math.round(stats.avgQuality)]?.color || "#fff"} />
                 <StatCard label="RACHA"    value={`${stats.streak}d`} color="#4ade80" />
               </div>
-
               <div style={{
-                background: "rgba(255,255,255,0.06)",
-                backdropFilter: "blur(40px)", WebkitBackdropFilter: "blur(40px)",
-                border: "1px solid rgba(255,255,255,0.10)",
+                background: "rgba(255,255,255,0.06)", backdropFilter: "blur(40px)",
+                WebkitBackdropFilter: "blur(40px)", border: "1px solid rgba(255,255,255,0.10)",
                 borderRadius: 18, padding: 16,
               }}>
                 <div style={{ fontSize: 9, color: "rgba(240,240,240,0.30)", letterSpacing: 2.5, fontWeight: 700, marginBottom: 14 }}>
@@ -257,7 +344,6 @@ export default function SleepView({ user, onBack }) {
                 </div>
                 <SleepBarChart logs={logs} />
               </div>
-
               <div style={{
                 background: stats.avgHours >= 7.5 ? "rgba(74,222,128,0.08)" : "rgba(251,191,36,0.08)",
                 border: `1px solid ${stats.avgHours >= 7.5 ? "rgba(74,222,128,0.20)" : "rgba(251,191,36,0.20)"}`,
@@ -289,38 +375,31 @@ function SleepBarChart({ logs }) {
     const offset = d.getTimezoneOffset();
     const local  = new Date(d.getTime() - offset * 60000);
     const key    = local.toISOString().split("T")[0];
-    days.push({
-      key,
-      label:   d.toLocaleDateString("es", { weekday: "narrow" }),
-      entry:   logs[key],
-      isToday: i === 0,
-    });
+    days.push({ key, label: d.toLocaleDateString("es", { weekday: "narrow" }), entry: logs[key], isToday: i === 0 });
   }
-
+  const maxH = 12;
   return (
-    <div style={{ display: "flex", alignItems: "flex-end", gap: 4, height: 80 }}>
+    <div style={{ display: "flex", alignItems: "flex-end", gap: 3, height: 90 }}>
       {days.map(({ key, label, entry, isToday }) => {
         const h   = entry?.hours || 0;
-        const pct = Math.min(h / 10, 1);
+        const pct = Math.min(h / maxH, 1);
         const ql  = entry ? (QUALITY_LABELS[entry.quality] || QUALITY_LABELS[3]) : null;
+        const barColor = ql ? ql.color : "rgba(255,255,255,0.08)";
         return (
           <div key={key} style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", gap: 4 }}>
-            <div style={{ width: "100%", height: 64, display: "flex", alignItems: "flex-end" }}>
+            <div style={{ width: "100%", height: 72, display: "flex", alignItems: "flex-end" }}>
               <div style={{
                 width: "100%",
-                height: h > 0 ? `${Math.max(pct * 100, 4)}%` : "4%",
-                background: ql ? ql.color : "rgba(255,255,255,0.08)",
+                height: h > 0 ? `${Math.max(pct * 100, 6)}%` : "4%",
+                background: h > 0 ? `linear-gradient(180deg, ${barColor}cc 0%, ${barColor}66 100%)` : "rgba(255,255,255,0.05)",
                 borderRadius: "4px 4px 2px 2px",
-                opacity: h === 0 ? 0.2 : 1,
-                transition: "height 0.3s ease",
-                boxShadow: ql && h > 0 ? `0 0 6px ${ql.color}44` : "none",
+                border: h > 0 ? `1px solid ${barColor}44` : "none",
+                opacity: h === 0 ? 0.3 : 1,
+                transition: "height 0.4s ease",
+                boxShadow: h > 0 ? `0 0 8px ${barColor}33` : "none",
               }} />
             </div>
-            <span style={{
-              fontSize: 8,
-              color: isToday ? "#fff" : "rgba(240,240,240,0.25)",
-              fontWeight: isToday ? 700 : 400,
-            }}>{label}</span>
+            <span style={{ fontSize: 8, color: isToday ? "#fff" : "rgba(240,240,240,0.25)", fontWeight: isToday ? 700 : 400 }}>{label}</span>
           </div>
         );
       })}
@@ -331,9 +410,8 @@ function SleepBarChart({ logs }) {
 function StatCard({ label, value, color }) {
   return (
     <div style={{
-      background: "rgba(255,255,255,0.06)",
-      backdropFilter: "blur(40px)", WebkitBackdropFilter: "blur(40px)",
-      border: "1px solid rgba(255,255,255,0.10)",
+      background: "rgba(255,255,255,0.06)", backdropFilter: "blur(40px)",
+      WebkitBackdropFilter: "blur(40px)", border: "1px solid rgba(255,255,255,0.10)",
       borderRadius: 16, padding: "12px 8px", textAlign: "center",
     }}>
       <div className="mono" style={{ fontSize: 22, fontWeight: 900, color, letterSpacing: -0.5 }}>{value}</div>

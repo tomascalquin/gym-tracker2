@@ -1,46 +1,364 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { planMesocycle, saveMesocycle, loadMesocycle, clearMesocycle, GOALS, FREQUENCIES, LEVELS } from "../utils/mesocycle";
 import { MUSCLE_RANGES } from "../utils/intelligence";
 import { haptics } from "../utils/haptics";
 import ContextTooltip from "../components/ContextTooltip";
 
+// ─── Slider custom glassmorphism (mismo que SleepView) ────────────────────────
+function GlassSlider({ min, max, step, value, onChange, color = "#a78bfa" }) {
+  const trackRef   = useRef(null);
+  const isDragging = useRef(false);
+
+  function calcValue(clientX) {
+    const rect   = trackRef.current.getBoundingClientRect();
+    const pct    = Math.max(0, Math.min(1, (clientX - rect.left) / rect.width));
+    const raw    = min + pct * (max - min);
+    const stepped = Math.round(raw / step) * step;
+    return Math.max(min, Math.min(max, parseFloat(stepped.toFixed(4))));
+  }
+
+  function onPointerDown(e) {
+    e.preventDefault();
+    isDragging.current = true;
+    trackRef.current.setPointerCapture(e.pointerId);
+    onChange(calcValue(e.clientX));
+  }
+  function onPointerMove(e) { if (isDragging.current) onChange(calcValue(e.clientX)); }
+  function onPointerUp()    { isDragging.current = false; }
+
+  const pct = ((value - min) / (max - min)) * 100;
+
+  return (
+    <div
+      ref={trackRef}
+      onPointerDown={onPointerDown}
+      onPointerMove={onPointerMove}
+      onPointerUp={onPointerUp}
+      style={{
+        position: "relative", height: 36, display: "flex",
+        alignItems: "center", cursor: "pointer",
+        userSelect: "none", WebkitUserSelect: "none", touchAction: "none",
+      }}
+    >
+      <div style={{
+        position: "absolute", left: 0, right: 0, height: 6,
+        background: "rgba(255,255,255,0.08)", borderRadius: 99,
+      }}>
+        <div style={{
+          height: "100%", width: `${pct}%`,
+          background: `linear-gradient(90deg, ${color}88, ${color})`,
+          borderRadius: 99,
+        }} />
+      </div>
+      <div style={{
+        position: "absolute",
+        left: `calc(${pct}% - 13px)`,
+        width: 26, height: 26,
+        background: `radial-gradient(circle at 35% 35%, ${color}ff, ${color}aa)`,
+        border: `2px solid ${color}`,
+        borderRadius: "50%",
+        boxShadow: `0 0 14px ${color}55, 0 2px 8px rgba(0,0,0,0.5)`,
+      }} />
+    </div>
+  );
+}
+
+// ─── Modal de explicación del mesociclo ───────────────────────────────────────
+function MesocycleExplainerModal({ onClose }) {
+  return (
+    <div style={{
+      position: "fixed", inset: 0, zIndex: 9999,
+      background: "rgba(0,0,0,0.75)", backdropFilter: "blur(12px)",
+      display: "flex", alignItems: "flex-end", justifyContent: "center",
+      animation: "fadeIn 0.2s ease",
+    }} onClick={onClose}>
+      <div
+        onClick={e => e.stopPropagation()}
+        style={{
+          width: "100%", maxWidth: 460,
+          background: "rgba(18,14,36,0.97)",
+          backdropFilter: "blur(40px)", WebkitBackdropFilter: "blur(40px)",
+          border: "1px solid rgba(167,139,250,0.20)",
+          borderRadius: "24px 24px 0 0",
+          padding: "24px 20px 40px",
+          animation: "slideUp 0.3s cubic-bezier(0.34, 1.2, 0.64, 1)",
+        }}
+      >
+        {/* Handle */}
+        <div style={{ width: 36, height: 4, background: "rgba(255,255,255,0.15)", borderRadius: 99, margin: "0 auto 20px" }} />
+
+        <div style={{ fontSize: 9, letterSpacing: 3, color: "rgba(240,240,240,0.30)", fontWeight: 700, marginBottom: 6 }}>GUÍA</div>
+        <div style={{ fontSize: 20, fontWeight: 900, color: "#fff", marginBottom: 20, letterSpacing: -0.5 }}>
+          ¿Qué es un mesociclo? 📅
+        </div>
+
+        <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
+          <InfoBlock icon="📐" title="Definición" color="#a78bfa">
+            Un mesociclo es un bloque de entrenamiento de 4 a 8 semanas con progresión planificada. En lugar de entrenar siempre igual, cada semana sube el volumen o la intensidad hasta llegar a una semana de deload (descarga) que te permite recuperarte.
+          </InfoBlock>
+
+          <InfoBlock icon="📈" title="¿Por qué funciona?" color="#60a5fa">
+            Tu cuerpo se adapta al estrés en ciclos. Acumular estrés progresivo y luego reducirlo (deload) es el mecanismo base de la supercompensación — así es como progresas de verdad en fuerza e hipertrofia.
+          </InfoBlock>
+
+          <div style={{
+            background: "rgba(255,255,255,0.05)", borderRadius: 16,
+            padding: "14px", border: "1px solid rgba(255,255,255,0.08)",
+          }}>
+            <div style={{ fontSize: 9, letterSpacing: 2, fontWeight: 700, color: "rgba(240,240,240,0.30)", marginBottom: 12 }}>
+              ¿CUÁNTO TIEMPO?
+            </div>
+            <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+              {[
+                { weeks: "4 sem", label: "Corto", when: "Cuando querés cambiar de objetivo pronto, sos principiante, o tenés poca tolerancia al volumen.", color: "#4ade80" },
+                { weeks: "5–6 sem", label: "Intermedio", when: "El más común. Suficiente para acumular volumen y notar adaptaciones claras sin sobreentrenar.", color: "#a78bfa" },
+                { weeks: "7–8 sem", label: "Largo", when: "Para avanzados con buena tolerancia al volumen. Más tiempo acumulando = más potencial de adaptación.", color: "#fbbf24" },
+              ].map(({ weeks, label, when, color }) => (
+                <div key={weeks} style={{ display: "flex", gap: 12, alignItems: "flex-start" }}>
+                  <div style={{
+                    flexShrink: 0, background: `${color}22`,
+                    border: `1px solid ${color}44`, borderRadius: 10,
+                    padding: "4px 10px", minWidth: 52, textAlign: "center",
+                  }}>
+                    <div className="mono" style={{ fontSize: 11, fontWeight: 900, color }}>{weeks}</div>
+                    <div style={{ fontSize: 7, color: `${color}99`, letterSpacing: 1 }}>{label.toUpperCase()}</div>
+                  </div>
+                  <div style={{ fontSize: 11, color: "rgba(240,240,240,0.55)", lineHeight: 1.5 }}>{when}</div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <InfoBlock icon="🔄" title="Semana de deload" color="#fbbf24">
+            La última semana siempre es un deload: bajás volumen e intensidad al ~50–60%. Esto no es perder el tiempo — es cuando el cuerpo consolida las adaptaciones. Salís más fuerte para el siguiente mesociclo.
+          </InfoBlock>
+        </div>
+
+        <button onClick={onClose} style={{
+          marginTop: 20, width: "100%", padding: "14px",
+          background: "rgba(167,139,250,0.85)",
+          border: "1px solid rgba(167,139,250,0.95)",
+          color: "#fff", borderRadius: 16, cursor: "pointer",
+          fontSize: 11, fontWeight: 700, letterSpacing: 2, fontFamily: "inherit",
+          boxShadow: "0 4px 20px rgba(167,139,250,0.30)",
+        }}>
+          ENTENDIDO, CONFIGURAR
+        </button>
+      </div>
+    </div>
+  );
+}
+
+function InfoBlock({ icon, title, color, children }) {
+  return (
+    <div style={{
+      background: `${color}0a`, border: `1px solid ${color}25`,
+      borderRadius: 14, padding: "12px 14px",
+      display: "flex", gap: 12, alignItems: "flex-start",
+    }}>
+      <span style={{ fontSize: 18, flexShrink: 0 }}>{icon}</span>
+      <div>
+        <div style={{ fontSize: 11, fontWeight: 700, color, marginBottom: 4 }}>{title}</div>
+        <div style={{ fontSize: 11, color: "rgba(240,240,240,0.60)", lineHeight: 1.6 }}>{children}</div>
+      </div>
+    </div>
+  );
+}
+
+// ─── Modal de recomendación de rutina para nuevo mesociclo ───────────────────
+function RoutineRecommendationModal({ routine, onClose, onConfirm }) {
+  // Extrae ejercicios únicos de la rutina actual del usuario
+  const exercises = [];
+  if (routine) {
+    Object.values(routine).forEach(day => {
+      (day.exercises || []).forEach(ex => {
+        if (ex.name && !exercises.find(e => e.name === ex.name)) {
+          exercises.push(ex);
+        }
+      });
+    });
+  }
+
+  // Agrupa ejercicios por músculo aproximado según nombre
+  function guessGroup(name) {
+    const n = name.toLowerCase();
+    if (/sentadilla|squat|pierna|cuádr|femoral|prensa|búlgara|glúte|hip thrust|gemelo/.test(n)) return "Piernas";
+    if (/press banca|pecho|apertura|apert|inclinado/.test(n)) return "Pecho";
+    if (/press militar|hombro|lateral|frontal|arnold|deltoid/.test(n)) return "Hombros";
+    if (/remo|jalón|dominada|pull|espalda|polea/.test(n)) return "Espalda";
+    if (/bícep|curl/.test(n)) return "Bíceps";
+    if (/trícep|extensión|francés|press trícep/.test(n)) return "Tríceps";
+    if (/peso muerto|deadlift/.test(n)) return "Cadena posterior";
+    return "General";
+  }
+
+  const groups = {};
+  exercises.forEach(ex => {
+    const g = guessGroup(ex.name);
+    if (!groups[g]) groups[g] = [];
+    groups[g].push(ex.name);
+  });
+
+  // Recomendaciones basadas en los grupos musculares detectados
+  const hasLegs    = !!groups["Piernas"] || !!groups["Cadena posterior"];
+  const hasUpper   = !!(groups["Pecho"] || groups["Espalda"] || groups["Hombros"]);
+  const hasArms    = !!(groups["Bíceps"] || groups["Tríceps"]);
+
+  let recommendation = "";
+  let structureTip   = "";
+
+  if (hasLegs && hasUpper) {
+    if (exercises.length >= 16) {
+      recommendation = "PPL (Push/Pull/Legs)";
+      structureTip = "Tenés volumen alto y ejercicios variados. El split PPL te permite 6 días con máximo volumen por grupo muscular, ideal para el próximo mesociclo.";
+    } else {
+      recommendation = "Upper/Lower";
+      structureTip = "Tu rutina actual cubre tren superior e inferior. El split Upper/Lower (4 días) es perfecto para seguir progresando con buena frecuencia por grupo muscular.";
+    }
+  } else if (hasUpper && !hasLegs) {
+    recommendation = "Full Body";
+    structureTip = "Detecté que tu rutina actual no tiene mucho trabajo de piernas. Un Full Body 3 días te permitiría incorporarlas y balancear mejor tu desarrollo.";
+  } else {
+    recommendation = "Full Body";
+    structureTip = "Para el nuevo mesociclo te recomendamos empezar con Full Body 3 días, que es eficiente y permite alta frecuencia de entrenamiento.";
+  }
+
+  return (
+    <div style={{
+      position: "fixed", inset: 0, zIndex: 9999,
+      background: "rgba(0,0,0,0.75)", backdropFilter: "blur(12px)",
+      display: "flex", alignItems: "flex-end", justifyContent: "center",
+      animation: "fadeIn 0.2s ease",
+    }} onClick={onClose}>
+      <div
+        onClick={e => e.stopPropagation()}
+        style={{
+          width: "100%", maxWidth: 460,
+          background: "rgba(18,14,36,0.97)",
+          backdropFilter: "blur(40px)", WebkitBackdropFilter: "blur(40px)",
+          border: "1px solid rgba(167,139,250,0.20)",
+          borderRadius: "24px 24px 0 0",
+          padding: "24px 20px 40px",
+          animation: "slideUp 0.3s cubic-bezier(0.34, 1.2, 0.64, 1)",
+        }}
+      >
+        <div style={{ width: 36, height: 4, background: "rgba(255,255,255,0.15)", borderRadius: 99, margin: "0 auto 20px" }} />
+        <div style={{ fontSize: 9, letterSpacing: 3, color: "rgba(240,240,240,0.30)", fontWeight: 700, marginBottom: 6 }}>RECOMENDACIÓN</div>
+        <div style={{ fontSize: 20, fontWeight: 900, color: "#fff", marginBottom: 6, letterSpacing: -0.5 }}>
+          Nuevo mesociclo 🔄
+        </div>
+        <div style={{ fontSize: 12, color: "rgba(240,240,240,0.50)", marginBottom: 20, lineHeight: 1.5 }}>
+          Basado en tu rutina actual, esto es lo que te conviene
+        </div>
+
+        {/* Ejercicios detectados */}
+        {Object.keys(groups).length > 0 && (
+          <div style={{
+            background: "rgba(255,255,255,0.05)", borderRadius: 14,
+            padding: "12px 14px", marginBottom: 14,
+            border: "1px solid rgba(255,255,255,0.08)",
+          }}>
+            <div style={{ fontSize: 9, letterSpacing: 2, fontWeight: 700, color: "rgba(240,240,240,0.30)", marginBottom: 10 }}>
+              TU RUTINA ACTUAL — {exercises.length} EJERCICIOS
+            </div>
+            <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
+              {Object.entries(groups).map(([group, exs]) => (
+                <div key={group} style={{
+                  background: "rgba(167,139,250,0.10)", border: "1px solid rgba(167,139,250,0.20)",
+                  borderRadius: 99, padding: "4px 10px",
+                  fontSize: 10, color: "#a78bfa", fontWeight: 600,
+                }}>
+                  {group} ×{exs.length}
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Recomendación */}
+        <div style={{
+          background: "rgba(167,139,250,0.10)", border: "1px solid rgba(167,139,250,0.25)",
+          borderRadius: 16, padding: "16px", marginBottom: 20,
+        }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 8 }}>
+            <span style={{ fontSize: 24 }}>✨</span>
+            <div>
+              <div style={{ fontSize: 9, letterSpacing: 2, fontWeight: 700, color: "rgba(167,139,250,0.60)" }}>SPLIT RECOMENDADO</div>
+              <div style={{ fontSize: 17, fontWeight: 900, color: "#a78bfa" }}>{recommendation}</div>
+            </div>
+          </div>
+          <div style={{ fontSize: 12, color: "rgba(240,240,240,0.60)", lineHeight: 1.6 }}>
+            {structureTip}
+          </div>
+        </div>
+
+        <div style={{ fontSize: 11, color: "rgba(240,240,240,0.35)", textAlign: "center", marginBottom: 16, lineHeight: 1.5 }}>
+          Podés aceptar la recomendación o configurar el mesociclo manualmente con los parámetros que quieras.
+        </div>
+
+        <div style={{ display: "flex", gap: 8 }}>
+          <button onClick={onClose} style={{
+            flex: 1, padding: "13px",
+            background: "rgba(255,255,255,0.07)", border: "1px solid rgba(255,255,255,0.12)",
+            color: "rgba(240,240,240,0.60)", borderRadius: 14, cursor: "pointer",
+            fontSize: 10, fontWeight: 700, letterSpacing: 1.5, fontFamily: "inherit",
+          }}>CONFIGURAR YO</button>
+          <button onClick={onConfirm} style={{
+            flex: 1, padding: "13px",
+            background: "rgba(167,139,250,0.85)", border: "1px solid rgba(167,139,250,0.95)",
+            color: "#fff", borderRadius: 14, cursor: "pointer",
+            fontSize: 10, fontWeight: 700, letterSpacing: 1.5, fontFamily: "inherit",
+            boxShadow: "0 4px 20px rgba(167,139,250,0.30)",
+          }}>EMPEZAR NUEVO</button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export default function MesocycleView({ user, logs, routine, onBack }) {
-  const [step, setStep]         = useState("config"); // config | plan | week
+  const [step, setStep]         = useState("config");
   const [plan, setPlan]         = useState(null);
   const [activeWeek, setActiveWeek] = useState(1);
   const [generating, setGenerating] = useState(false);
+  const [showExplainer, setShowExplainer] = useState(false);
+  const [showResetModal, setShowResetModal] = useState(false);
 
-  // Config
   const [goal, setGoal]         = useState("hypertrophy");
   const [weeks, setWeeks]       = useState(5);
   const [daysPerWeek, setDays]  = useState(4);
   const [level, setLevel]       = useState("intermediate");
   const [bodyweight, setBW]     = useState("");
 
-  // Cargar plan existente
+  // Duración del mesociclo: color dinámico
+  const weeksColor = weeks <= 4 ? "#4ade80" : weeks <= 6 ? "#a78bfa" : "#fbbf24";
+
   useEffect(() => {
     const saved = loadMesocycle(user.uid);
     if (saved?.mesocycle) { setPlan(saved); setStep("plan"); }
+    else setShowExplainer(true); // Primera vez: mostrar explicación automáticamente
   }, [user.uid]);
 
   function handleGenerate() {
     setGenerating(true);
     haptics.light();
     setTimeout(() => {
-      const result = planMesocycle({
-        goal, weeks, daysPerWeek, level,
-        bodyweight: bodyweight ? parseFloat(bodyweight) : null,
-        logs, routine,
-      });
+      const result = planMesocycle({ goal, weeks, daysPerWeek, level,
+        bodyweight: bodyweight ? parseFloat(bodyweight) : null, logs, routine });
       saveMesocycle(user.uid, result);
       setPlan(result);
       setStep("plan");
       setActiveWeek(1);
       setGenerating(false);
-    }, 800); // dar sensación de que "calcula"
+    }, 800);
   }
 
   function handleReset() {
+    setShowResetModal(true);
+  }
+
+  function confirmReset() {
+    setShowResetModal(false);
     clearMesocycle(user.uid);
     setPlan(null);
     setStep("config");
@@ -48,6 +366,15 @@ export default function MesocycleView({ user, logs, routine, onBack }) {
 
   return (
     <div style={{ maxWidth: 460, margin: "0 auto", fontFamily: "inherit", animation: "fadeIn 0.25s ease" }}>
+
+      {showExplainer && <MesocycleExplainerModal onClose={() => setShowExplainer(false)} />}
+      {showResetModal && (
+        <RoutineRecommendationModal
+          routine={routine}
+          onClose={() => setShowResetModal(false)}
+          onConfirm={confirmReset}
+        />
+      )}
 
       {/* Header */}
       <div style={{ padding: "24px 20px 0", borderBottom: "1px solid rgba(255,255,255,0.08)" }}>
@@ -57,13 +384,18 @@ export default function MesocycleView({ user, logs, routine, onBack }) {
             <div style={{ fontSize: 9, letterSpacing: 3, color: "rgba(240,240,240,0.30)", fontWeight: 700 }}>PLANIFICACIÓN</div>
             <div style={{ fontSize: 22, fontWeight: 900, color: "#fff", letterSpacing: -0.8 }}>Mesociclo 📅</div>
           </div>
+          <button onClick={() => setShowExplainer(true)} style={{
+            background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.10)",
+            color: "rgba(240,240,240,0.40)", padding: "6px 10px", borderRadius: 10,
+            fontSize: 11, cursor: "pointer", fontFamily: "inherit", minHeight: 0,
+          }}>¿Qué es?</button>
           {step === "plan" && (
             <button onClick={handleReset} style={{
               background: "rgba(248,113,113,0.12)", border: "1px solid rgba(248,113,113,0.25)",
               color: "#f87171", padding: "6px 12px", borderRadius: 10,
               fontSize: 9, letterSpacing: 1.5, fontWeight: 700,
               cursor: "pointer", fontFamily: "inherit", minHeight: 0,
-            }}>NUEVO PLAN</button>
+            }}>NUEVO</button>
           )}
         </div>
 
@@ -77,8 +409,7 @@ export default function MesocycleView({ user, logs, routine, onBack }) {
                   ? (activeWeek === w.week ? "#fbbf24" : "rgba(251,191,36,0.40)")
                   : (activeWeek === w.week ? "#fff" : "rgba(240,240,240,0.30)"),
                 padding: "8px 2px", cursor: "pointer",
-                fontSize: 9, letterSpacing: 1, fontWeight: 700,
-                fontFamily: "inherit",
+                fontSize: 9, letterSpacing: 1, fontWeight: 700, fontFamily: "inherit",
               }}>
                 {w.isDeload ? "DLD" : `S${w.week}`}
               </button>
@@ -92,9 +423,6 @@ export default function MesocycleView({ user, logs, routine, onBack }) {
         {/* ── CONFIGURAR ── */}
         {step === "config" && (
           <div style={{ display: "flex", flexDirection: "column", gap: 18 }}>
-
-            <ContextTooltip uid={user.uid} hintId="mesocycle" icon="📅"
-              text="Un mesociclo planifica 4-8 semanas con progresión automática de volumen e intensidad, y deload incluido en la última semana." />
 
             {/* Objetivo */}
             <div>
@@ -122,25 +450,35 @@ export default function MesocycleView({ user, logs, routine, onBack }) {
               </div>
             </div>
 
-            {/* Duración */}
-            <div>
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginBottom: 10 }}>
+            {/* Duración — slider custom */}
+            <div style={{
+              background: "rgba(255,255,255,0.06)", backdropFilter: "blur(40px)",
+              WebkitBackdropFilter: "blur(40px)", border: "1px solid rgba(255,255,255,0.10)",
+              borderRadius: 18, padding: "16px",
+            }}>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginBottom: 16 }}>
                 <div style={S.label}>DURACIÓN DEL MESOCICLO</div>
-                <div className="mono" style={{ fontSize: 22, fontWeight: 900, color: "#fff" }}>{weeks} sem</div>
+                <div className="mono" style={{ fontSize: 30, fontWeight: 900, color: weeksColor, letterSpacing: -1, transition: "color 0.2s" }}>{weeks} sem</div>
               </div>
-              <input type="range" min={4} max={8} step={1} value={weeks}
-                onChange={e => setWeeks(Number(e.target.value))}
-                style={{ width: "100%", accentColor: "#a78bfa", cursor: "pointer" }} />
-              <div style={{ display: "flex", justifyContent: "space-between", marginTop: 4 }}>
+              <GlassSlider min={4} max={8} step={1} value={weeks} onChange={setWeeks} color={weeksColor} />
+              <div style={{ display: "flex", justifyContent: "space-between", marginTop: 6 }}>
                 <span style={{ fontSize: 9, color: "rgba(240,240,240,0.25)" }}>4 sem (corto)</span>
                 <span style={{ fontSize: 9, color: "rgba(240,240,240,0.25)" }}>8 sem (largo)</span>
               </div>
-              <div style={{ fontSize: 10, color: "rgba(240,240,240,0.35)", marginTop: 6, textAlign: "center" }}>
-                Incluye {1} semana de deload en la semana {weeks}
+              <div style={{
+                marginTop: 12, padding: "8px 14px", borderRadius: 12,
+                background: `${weeksColor}14`, border: `1px solid ${weeksColor}33`,
+                fontSize: 11, color: weeksColor, textAlign: "center", transition: "all 0.2s",
+              }}>
+                {weeks <= 4
+                  ? "Corto · Ideal para principiantes o cambio rápido de objetivo"
+                  : weeks <= 6
+                    ? `${weeks} semanas · La duración más recomendada · Deload en semana ${weeks}`
+                    : `Largo · Para avanzados con alta tolerancia al volumen · Deload en semana ${weeks}`}
               </div>
             </div>
 
-            {/* Días */}
+            {/* Días por semana */}
             <div>
               <div style={S.label}>DÍAS POR SEMANA</div>
               <div style={{ display: "flex", gap: 8 }}>
@@ -219,8 +557,6 @@ export default function MesocycleView({ user, logs, routine, onBack }) {
 
           return (
             <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
-
-              {/* Info de la semana */}
               <div style={{
                 background: week.isDeload ? "rgba(251,191,36,0.10)" : "rgba(167,139,250,0.10)",
                 backdropFilter: "blur(40px)", WebkitBackdropFilter: "blur(40px)",
@@ -249,7 +585,6 @@ export default function MesocycleView({ user, logs, routine, onBack }) {
                 </div>
               </div>
 
-              {/* Sesiones de la semana */}
               <div style={{ fontSize: 9, letterSpacing: 2.5, color: "rgba(240,240,240,0.30)", fontWeight: 700 }}>
                 SESIONES — {week.sessions.length} DÍAS
               </div>
@@ -277,16 +612,17 @@ export default function MesocycleView({ user, logs, routine, onBack }) {
                     {Object.entries(session.sets).map(([muscle, sets]) => {
                       const range = MUSCLE_RANGES[muscle];
                       const pct   = range ? Math.min(sets / range.mrv, 1) : 0;
+                      const barColor = pct > 0.85 ? "#f87171" : pct > 0.65 ? "#fbbf24" : "#a78bfa";
                       return (
                         <div key={muscle} style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 8 }}>
                           <div style={{ width: 80, fontSize: 10, color: "rgba(240,240,240,0.60)", flexShrink: 0 }}>
                             {range?.label || muscle}
                           </div>
-                          <div style={{ flex: 1, height: 4, background: "rgba(255,255,255,0.07)", borderRadius: 99, overflow: "hidden" }}>
+                          <div style={{ flex: 1, height: 6, background: "rgba(255,255,255,0.07)", borderRadius: 99, overflow: "hidden" }}>
                             <div style={{
                               height: "100%", borderRadius: 99,
                               width: `${pct * 100}%`,
-                              background: pct > 0.85 ? "#f87171" : pct > 0.65 ? "#fbbf24" : "#a78bfa",
+                              background: `linear-gradient(90deg, ${barColor}88, ${barColor})`,
                               transition: "width 0.5s ease",
                             }} />
                           </div>
@@ -300,7 +636,6 @@ export default function MesocycleView({ user, logs, routine, onBack }) {
                 </div>
               ))}
 
-              {/* Insights personalizados */}
               {plan.insights?.length > 0 && activeWeek === 1 && (
                 <>
                   <div style={{ fontSize: 9, letterSpacing: 2.5, color: "rgba(240,240,240,0.30)", fontWeight: 700, marginTop: 6 }}>

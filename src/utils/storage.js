@@ -109,8 +109,9 @@ export async function loadRoutine(uid) {
 }
 
 /**
- * Guarda la rutina completa de un usuario (onboarding).
+ * Guarda la rutina completa de un usuario (onboarding / aplicar plantilla).
  * routine = { "Upper A": { exercises: [...] }, ... }
+ * IMPORTANTE: borra primero los días viejos que ya no están en la nueva rutina.
  */
 export async function saveFullRoutine(uid, routine) {
   // Sanitizar keys con "/" antes de guardar
@@ -118,9 +119,25 @@ export async function saveFullRoutine(uid, routine) {
   Object.entries(routine).forEach(([day, data]) => {
     sanitized[sanitizeDayId(day)] = data;
   });
+
+  // 1. Leer días actuales en Firestore para borrar los que ya no existen
+  try {
+    const snap = await getDocs(collection(db, "users", uid, "gym_routine"));
+    const oldDays = [];
+    snap.forEach(d => oldDays.push(d.id));
+    const newDayIds = Object.keys(sanitized);
+    const toDelete = oldDays.filter(id => !newDayIds.includes(id));
+    await Promise.all(toDelete.map(id => deleteDoc(routineDoc(uid, id))));
+  } catch (err) {
+    console.warn("saveFullRoutine cleanup error:", err.message);
+  }
+
+  // 2. Escribir días nuevos
   await Promise.all(
     Object.entries(sanitized).map(([day, data]) => setDoc(routineDoc(uid, day), data))
   );
+
+  // 3. Actualizar cache local con SOLO los nuevos días
   localStorage.setItem(localRoutineKey(uid), JSON.stringify(sanitized));
 }
 
