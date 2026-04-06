@@ -9,7 +9,7 @@ import { onAuthChange, logout, checkRedirectResult } from "./utils/auth";
 import { initPublicProfile } from "./utils/friends";
 import { loadUserXP, addXP, calcSessionXP, getRank } from "./utils/ranks";
 import { calcStreak } from "./utils/streak";
-import { registerServiceWorker, showLocalNotification } from "./utils/notifications";
+import { showLocalNotification } from "./utils/notifications";
 import { applyTheme, getTheme } from "./utils/theme";
 import { checkInviteParam, processPendingInvite } from "./utils/invite";
 import { saveDraft, loadDraft, clearDraft, registerDraftGuard } from "./utils/sessionDraft";
@@ -30,7 +30,6 @@ import ShareCard from "./components/ShareCard";
 import { DAY_META } from "./data/routine";
 import { evaluateAchievements, getNewlyUnlocked, saveUnlockedAchievements, loadUnlockedAchievements } from "./utils/achievements";
 import { registerOnlineListener, getPendingCount } from "./utils/offlineQueue";
-import { getLang } from "./utils/i18n";
 
 // Vistas críticas (Cargan de inmediato)
 import HomeView from "./views/HomeView";
@@ -118,7 +117,7 @@ export default function App() {
       });
     })();
 
-    registerServiceWorker();
+    // SW registrado automáticamente por vite-plugin-pwa (inline en index.html)
     const saved = getTheme();
     applyTheme(saved);
     checkInviteParam();
@@ -266,18 +265,6 @@ export default function App() {
     const key     = getSessionKey(activeDay, sessionDate);
     const session = { day: activeDay, date: sessionDate, sets: sessionData, completed: completedSets, note: sessionNote };
 
-    // ── Anti-spam: cooldown de 90 minutos por misma sesión ────────────────
-    const COOLDOWN_MS = 90 * 60 * 1000;
-    const cooldownKey = `gymtracker_cooldown_${key}`;
-    const lastSaved   = parseInt(localStorage.getItem(cooldownKey) || "0");
-    if (lastSaved && Date.now() - lastSaved < COOLDOWN_MS) {
-      const minLeft = Math.ceil((COOLDOWN_MS - (Date.now() - lastSaved)) / 60000);
-      toast(`⏳ Espera ${minLeft} min antes de volver a registrar esta sesión`);
-      return;
-    }
-    localStorage.setItem(cooldownKey, String(Date.now()));
-    // ─────────────────────────────────────────────────────────────────────
-
     // Limpiar draft al guardar
     clearDraft();
 
@@ -301,12 +288,6 @@ export default function App() {
       setTimeout(() => toast(`${newAchs[0].icon} LOGRO: ${newAchs[0].title}`), 800);
     }
     // ──────────────────────────────────────────────────────────────────────
-
-    // Limpiar estado de sesión activa → el banner del home desaparece
-    setActiveDay(null);
-    setSessionData({});
-    setCompletedSets({});
-    setSessionNote("");
 
     setShowConfetti(true);
     haptics.celebrate();
@@ -503,7 +484,7 @@ export default function App() {
             {currentView === "sleep"         && <SleepView user={user} onBack={() => setView("home")} />}
             {currentView === "mesocycle"     && <MesocycleView user={user} logs={logs} routine={routine} onBack={() => setView("home")} />}
             {currentView === "photos"        && <ProgressPhotosView user={user} onBack={() => setView("home")} />}
-              {currentView === "tools"          && <ToolsView onBack={() => setView("home")} lang={getLang()} />}
+              {currentView === "tools"          && <ToolsView onBack={() => setView("home")} />}
               {currentView === "routinePresets" && (
                 <OnboardingView
                   user={user}

@@ -1,121 +1,74 @@
 /**
- * sw.js — Service Worker con soporte offline completo
+ * sw.js — Service Worker con soporte offline completo para iOS y Android
  *
- * Estrategia:
- * - Assets estáticos (JS/CSS/img con hash): Cache-first
- * - Navegación (HTML): Network-first con fallback a index.html cacheado
- * - Firebase/API: Network-only (no se cachea)
+ * Este archivo usa la estrategia "injectManifest" de vite-plugin-pwa:
+ * - En build, el plugin reemplaza self.__WB_MANIFEST con la lista exacta
+ *   de todos los assets generados por Vite (con sus hashes).
+ * - Eso garantiza que iOS cachee TODOS los JS/CSS antes de necesitarlos.
+ *
+ * Estrategias:
+ *   - Precache (todos los assets Vite): Cache-first, siempre disponible offline
+ *   - Navegación HTML: NetworkFirst con fallback al index.html en cache
+ *   - Firebase / APIs externas: Network-only, nunca se cachea
  */
 
-const CACHE_VERSION = "gymtracker-v3";
-const STATIC_CACHE  = `${CACHE_VERSION}-static`;
-const DYNAMIC_CACHE = `${CACHE_VERSION}-dynamic`;
+import { precacheAndRoute, cleanupOutdatedCaches, createHandlerBoundToURL } from "workbox-precaching";
+import { registerRoute, NavigationRoute }                                    from "workbox-routing";
+import { NetworkFirst, CacheFirst, NetworkOnly }                             from "workbox-strategies";
+import { ExpirationPlugin }                                                  from "workbox-expiration";
 
-const PRECACHE_ASSETS = [
-  "/",
-  "/index.html",
-  "/manifest.json",
-  "/icon-192.png",
-  "/icon-512.png",
-  "/muscle_front.png",
-  "/muscle_back.png",
+// ── 1. Precache de todos los assets de Vite ─────────────────────────────────
+// El plugin reemplaza self.__WB_MANIFEST en build time con algo como:
+// [{ url: "/assets/index-Bx3kL9mR.js", revision: null }, ...]
+// En dev, este array está vacío (el plugin lo omite).
+precacheAndRoute(self.__WB_MANIFEST || []);
+cleanupOutdatedCaches();
+
+// ── 2. Rutas SPA — sirve index.html para cualquier navegación ───────────────
+const navHandler = createHandlerBoundToURL("/index.html");
+const navRoute   = new NavigationRoute(navHandler, {
+  // No interceptar rutas que sean assets o auth callbacks
+  denylist: [/^\/_/, /\/[^/?]+\.[^/]+$/],
+});
+registerRoute(navRoute);
+
+// ── 3. Firebase y APIs — siempre online, nunca cachear ──────────────────────
+const NETWORK_ONLY_PATTERNS = [
+  /firebaseio\.com/,
+  /googleapis\.com/,
+  /identitytoolkit\.googleapis\.com/,
+  /securetoken\.googleapis\.com/,
+  /api\.anthropic\.com/,
+  /api\.groq\.com/,
+  /fonts\.googleapis\.com/,   // las fonts ya se precachean si están en build,
+  /fonts\.gstatic\.com/,      // pero si vienen de CDN en runtime → no cachear
 ];
 
-const SKIP_CACHE_ORIGINS = [
-  "firebaseio.com",
-  "googleapis.com",
-  "identitytoolkit.googleapis.com",
-  "securetoken.googleapis.com",
-  "api.anthropic.com",
-  "api.groq.com",
-];
-
-function shouldSkip(url) {
-  return SKIP_CACHE_ORIGINS.some(o => url.hostname.includes(o));
-}
-
-function isStaticAsset(url) {
-  return /\.(js|css|woff2?|ttf|otf|png|jpg|jpeg|svg|ico|webp)$/.test(url.pathname);
-}
-
-self.addEventListener("install", (event) => {
-  event.waitUntil(
-    caches.open(STATIC_CACHE).then(cache => cache.addAll(PRECACHE_ASSETS))
-  );
-  self.skipWaiting();
+NETWORK_ONLY_PATTERNS.forEach(pattern => {
+  registerRoute(({ url }) => pattern.test(url.href), new NetworkOnly());
 });
 
-self.addEventListener("activate", (event) => {
-  event.waitUntil(
-    caches.keys().then(keys =>
-      Promise.all(
-        keys.filter(k => !k.startsWith(CACHE_VERSION)).map(k => caches.delete(k))
-      )
-    )
-  );
-  self.clients.claim();
-});
+// ── 4. Imágenes runtime (no precacheadas) — CacheFirst 30 días ──────────────
+registerRoute(
+  ({ request, url }) =>
+    request.destination === "image" &&
+    url.origin === location.origin,
+  new CacheFirst({
+    cacheName: "gymtracker-images-v1",
+    plugins: [new ExpirationPlugin({ maxEntries: 50, maxAgeSeconds: 30 * 24 * 60 * 60 })],
+  })
+);
 
-self.addEventListener("fetch", (event) => {
-  if (event.request.method !== "GET") return;
-  const url = new URL(event.request.url);
-  if (shouldSkip(url)) return;
-  if (url.origin !== location.origin) return;
-
-  if (event.request.mode === "navigate") {
-    const hasAuthParams =
-      url.search.length > 1 ||
-      (url.hash && url.hash.length > 1) ||
-      /^(state|code|session_state|scope)=/.test(url.search.slice(1));
-    if (hasAuthParams) {
-      event.respondWith(fetch(event.request));
-      return;
-    }
-  }
-
-  if (isStaticAsset(url)) {
-    event.respondWith(
-      caches.match(event.request).then(cached => {
-        if (cached) return cached;
-        return fetch(event.request).then(response => {
-          if (response && response.status === 200) {
-            const clone = response.clone();
-            caches.open(DYNAMIC_CACHE).then(cache => cache.put(event.request, clone));
-          }
-          return response;
-        });
-      })
-    );
-    return;
-  }
-
-  event.respondWith(
-    fetch(event.request)
-      .then(response => {
-        if (response && response.status === 200) {
-          const clone = response.clone();
-          caches.open(DYNAMIC_CACHE).then(cache => cache.put(event.request, clone));
-        }
-        return response;
-      })
-      .catch(() =>
-        caches.match(event.request).then(cached => {
-          if (cached) return cached;
-          return caches.match("/index.html");
-        })
-      )
-  );
-});
-
+// ── 5. Push Notifications ────────────────────────────────────────────────────
 self.addEventListener("push", (event) => {
   if (!event.data) return;
   const data = event.data.json();
   event.waitUntil(
     self.registration.showNotification(data.title || "Gym Tracker", {
-      body: data.body || "",
-      icon: "/icon-192.png",
-      badge: "/icon-192.png",
-      data: data.url || "/",
+      body:    data.body  || "",
+      icon:    "/icon-192.png",
+      badge:   "/icon-192.png",
+      data:    data.url   || "/",
       vibrate: [100, 50, 100],
     })
   );
