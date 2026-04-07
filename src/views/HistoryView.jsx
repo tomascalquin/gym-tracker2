@@ -125,7 +125,7 @@ export default function HistoryView({ logs, user, onBack, onViewSession, onDelet
 
                     <div style={{ display: "flex", gap: 6, alignItems: "center", flexShrink: 0, marginLeft: 10 }}>
                       <button onClick={() => setExpandedKey(isExpanded ? null : key)} style={{
-                        background: isExpanded ? "rgba(255,255,255,0.88)" : "rgba(255,255,255,0.08)",
+                        background: isExpanded ? "rgba(167,139,250,0.14)" : "rgba(255,255,255,0.08)",
                         border: "1px solid rgba(255,255,255,0.15)",
                         color: isExpanded ? "#080810" : "rgba(240,240,240,0.40)",
                         width: 32, height: 32, borderRadius: 8,
@@ -133,9 +133,9 @@ export default function HistoryView({ logs, user, onBack, onViewSession, onDelet
                         display: "flex", alignItems: "center", justifyContent: "center",
                       }}>💬</button>
                       <button onClick={() => onViewSession(s.day, s.date)} style={{
-                        background: "rgba(255,255,255,0.88)", border: "1px solid rgba(255,255,255,0.95)",
+                        background: "rgba(167,139,250,0.14)", border: "1px solid rgba(167,139,250,0.35)",
                         backdropFilter: "blur(20px)", WebkitBackdropFilter: "blur(20px)",
-                        color: "#080810", padding: "6px 12px", borderRadius: 8,
+                        color: "#f0f0f0", padding: "6px 12px", borderRadius: 8,
                         cursor: "pointer", fontSize: 9, letterSpacing: 2, fontWeight: 700,
                         fontFamily: "inherit", minHeight: 32,
                       }}>VER</button>

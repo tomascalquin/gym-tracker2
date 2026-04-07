@@ -1,5 +1,5 @@
 import { initializeApp } from "firebase/app";
-import { initializeFirestore, persistentLocalCache, persistentMultipleTabManager } from "firebase/firestore";
+import { getFirestore } from "firebase/firestore";
 import { getAuth, GoogleAuthProvider } from "firebase/auth";
 
 const firebaseConfig = {
@@ -13,24 +13,9 @@ const firebaseConfig = {
 };
 
 const app = initializeApp(firebaseConfig);
+export const db = getFirestore(app);
 
-/**
- * initializeFirestore con persistentLocalCache activa el cache IndexedDB de
- * Firestore. Esto permite:
- *  - Leer datos offline (desde cache local) sin lanzar errores de red.
- *  - Escribir offline: las escrituras quedan en cola y se sincronizan
- *    automáticamente cuando vuelve la conexión.
- *  - persistentMultipleTabManager: comparte el cache entre tabs/ventanas.
- *
- * NOTA: esto reemplaza enableIndexedDbPersistence() que está deprecated
- * desde Firebase 9.x modular SDK.
- */
-export const db = initializeFirestore(app, {
-  localCache: persistentLocalCache({
-    tabManager: persistentMultipleTabManager(),
-  }),
-});
-
+// Forma estándar: garantizamos que el objeto auth sea 100% válido
 export const auth = getAuth(app);
 
 export const googleProvider = new GoogleAuthProvider();

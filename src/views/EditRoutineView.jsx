@@ -126,7 +126,7 @@ export default function EditRoutineView({ user, routine, onBack, onRoutineUpdate
         </div>
         <button onClick={handleSave} disabled={saving} style={{
           background: saved ? "#22c55e" : saving ? "var(--bg2)" : "#60a5fa",
-          border: "none", color: saved || (!saving) ? "#000" : "var(--text3)",
+          border: "none", color: saved || (!saving) ? "#f0f0f0" : "var(--text3)",
           padding: "8px 16px", borderRadius: 10, cursor: saving ? "default" : "pointer",
           fontSize: 10, fontWeight: 700, letterSpacing: 1, fontFamily: "inherit",
           minHeight: 38, transition: "all 0.2s",
@@ -170,7 +170,7 @@ export default function EditRoutineView({ user, routine, onBack, onRoutineUpdate
                   }}
                 />
                 <button onClick={addDay} style={{
-                  background: "#60a5fa", border: "none", color: "#000",
+                  background: "#60a5fa", border: "none", color: "#f0f0f0",
                   padding: "7px 12px", borderRadius: 99, cursor: "pointer",
                   fontSize: 10, fontWeight: 700, fontFamily: "inherit",
                 }}>OK</button>
@@ -299,7 +299,7 @@ export default function EditRoutineView({ user, routine, onBack, onRoutineUpdate
         <button onClick={handleSave} disabled={saving} style={{
           width: "100%", padding: "14px",
           background: saved ? "#22c55e" : saving ? "var(--bg2)" : "#60a5fa",
-          border: "none", borderRadius: 14, color: "#000",
+          border: "none", borderRadius: 14, color: "#f0f0f0",
           fontWeight: 700, fontSize: 11, letterSpacing: 2, fontFamily: "inherit",
           cursor: saving ? "default" : "pointer", minHeight: 52,
           boxShadow: saved ? "0 4px 20px #22c55e44" : saving ? "none" : "0 4px 20px #60a5fa44",
@@ -338,7 +338,7 @@ function DayNameEditor({ name, onRename, accent }) {
         }}
       />
       <button onClick={confirm} style={{
-        background: accent, border: "none", color: "#000",
+        background: accent, border: "none", color: "#f0f0f0",
         padding: "6px 12px", borderRadius: 8, cursor: "pointer",
         fontSize: 10, fontWeight: 700, fontFamily: "inherit",
       }}>OK</button>

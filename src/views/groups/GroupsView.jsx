@@ -160,7 +160,7 @@ export default function GroupsView({ user, onBack, onOpenChat }) {
               width: "100%", padding: "14px",
               background: creating ? "var(--bg2)" : "#a78bfa",
               border: creating ? "1px solid var(--border)" : "none",
-              color: creating ? "var(--text3)" : "#000",
+              color: creating ? "var(--text3)" : "#f0f0f0",
               borderRadius: 12, cursor: creating ? "default" : "pointer",
               fontSize: 11, fontWeight: 700, letterSpacing: 2, fontFamily: "inherit",
               minHeight: 48, boxShadow: creating ? "none" : "0 4px 16px #a78bfa44",
@@ -192,7 +192,7 @@ export default function GroupsView({ user, onBack, onOpenChat }) {
               <button onClick={handleJoin} disabled={joining} style={{
                 background: joining ? "var(--bg2)" : "#a78bfa",
                 border: joining ? "1px solid var(--border)" : "none",
-                color: joining ? "var(--text3)" : "#000",
+                color: joining ? "var(--text3)" : "#f0f0f0",
                 padding: "12px 18px", borderRadius: 12, cursor: "pointer",
                 fontSize: 11, fontWeight: 700, fontFamily: "inherit", minHeight: 48,
               }}>{joining ? "..." : "UNIRSE"}</button>

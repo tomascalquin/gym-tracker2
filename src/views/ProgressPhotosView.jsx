@@ -105,7 +105,7 @@ export default function ProgressPhotosView({ user, onBack }) {
           {[["gallery","Galería"],["add","Nueva"],["compare","Comparar"]].map(([k,l]) => (
             <button key={k} onClick={() => setTab(k)} style={{
               flex: 1, background: "none", border: "none",
-              borderBottom: `2px solid ${tab === k ? "rgba(255,255,255,0.80)" : "transparent"}`,
+              borderBottom: `2px solid ${tab === k ? "rgba(167,139,250,0.80)" : "transparent"}`,
               color: tab === k ? "#fff" : "rgba(240,240,240,0.35)",
               padding: "10px 4px", cursor: "pointer",
               fontSize: 9, letterSpacing: 2, fontWeight: 700,
@@ -209,7 +209,7 @@ export default function ProgressPhotosView({ user, onBack }) {
 
             <button onClick={handleSave} disabled={!file || saving} style={{
               width: "100%", padding: "15px",
-              background: !file || saving ? "rgba(255,255,255,0.07)" : "rgba(255,255,255,0.92)",
+              background: !file || saving ? "rgba(255,255,255,0.07)" : "rgba(167,139,250,0.18)",
               border: "1px solid rgba(255,255,255,0.30)",
               color: !file || saving ? "rgba(240,240,240,0.30)" : "#080810",
               borderRadius: 18, cursor: !file || saving ? "default" : "pointer",

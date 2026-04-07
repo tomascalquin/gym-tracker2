@@ -123,7 +123,7 @@ export default function ProfileView({ user, myProfile, userXP, logs, onBack, onP
                 fontSize: 9, fontWeight: 700, letterSpacing: 2,
                 background: "rgba(255,255,255,0.15)", backdropFilter: "blur(10px)", WebkitBackdropFilter: "blur(10px)",
                 border: "1px solid rgba(255,255,255,0.25)",
-                color: "rgba(255,255,255,0.9)",
+                color: "rgba(240,240,240,0.70)",
                 padding: "3px 10px", borderRadius: 99,
               }}>{rank.emoji} {rank.name.toUpperCase()}</span>
             </div>
@@ -143,7 +143,7 @@ export default function ProfileView({ user, myProfile, userXP, logs, onBack, onP
           </div>
           <div style={{ height: 2, background: "rgba(255,255,255,0.12)", borderRadius: 2, overflow: "hidden" }}>
             <div style={{
-              height: "100%", background: "rgba(255,255,255,0.90)",
+              height: "100%", background: "rgba(167,139,250,0.18)",
               width: `${progress?.pct || 0}%`, transition: "width 0.6s ease",
               borderRadius: 2,
             }} />
@@ -172,13 +172,13 @@ export default function ProfileView({ user, myProfile, userXP, logs, onBack, onP
         {/* ── Accesos ── */}
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8, marginTop: 20, marginBottom: 20 }}>
           <button onClick={() => { haptics.light(); onNavigate("achievements"); }} style={{
-            background: "rgba(255,255,255,0.90)", border: "none",
+            background: "rgba(167,139,250,0.18)", border: "none",
             borderRadius: 18, padding: "16px 14px",
             cursor: "pointer", fontFamily: "inherit", textAlign: "left",
             WebkitTapHighlightColor: "transparent",
           }}>
             <div style={{ fontSize: 20, marginBottom: 8 }}>🏆</div>
-            <div style={{ fontSize: 11, fontWeight: 700, color: "#080810", letterSpacing: 1 }}>LOGROS</div>
+            <div style={{ fontSize: 11, fontWeight: 700, color: "#f0f0f0", letterSpacing: 1 }}>LOGROS</div>
             <div style={{ fontSize: 9, color: "rgba(255,255,255,0.45)", marginTop: 2 }}>Achievements</div>
           </button>
 

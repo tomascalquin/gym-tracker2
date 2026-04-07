@@ -18,7 +18,7 @@
   /* Glass surfaces */
   --glass-bg:       rgba(255,255,255,0.08);
   --glass-bg-hover: rgba(255,255,255,0.12);
-  --glass-bg-done:  rgba(255,255,255,0.88);
+  --glass-bg-done:  rgba(74,222,128,0.12);
   --glass-border:   rgba(255,255,255,0.14);
   --glass-border2:  rgba(255,255,255,0.22);
   --glass-blur:     blur(40px) saturate(180%);

@@ -50,7 +50,7 @@ export default function SessionTransition({ onDone }) {
         animation: "fadeIn 0.2s ease 0.15s both",
       }}>
         <div style={{
-          fontSize: 28, color: "rgba(255,255,255,0.90)",
+          fontSize: 28, color: "rgba(167,139,250,0.18)",
           fontWeight: 900, letterSpacing: -1,
           fontFamily: "-apple-system, BlinkMacSystemFont, sans-serif",
         }}>◆</div>

@@ -89,7 +89,7 @@ export default function ChallengesView({ user, myLogs, myRoutine, onBack }) {
           <button onClick={() => setShowCreate(v => !v)} style={{
             background: showCreate ? "transparent" : ACCENT,
             border: showCreate ? `1px solid ${ACCENT}44` : "none",
-            color: showCreate ? ACCENT : "#000",
+            color: showCreate ? ACCENT : "#f0f0f0",
             padding: "8px 16px", borderRadius: 10, cursor: "pointer",
             fontSize: 10, fontWeight: 700, letterSpacing: 1, fontFamily: "inherit",
             minHeight: 38, boxShadow: showCreate ? "none" : `0 4px 14px ${ACCENT}44`,
@@ -177,7 +177,7 @@ export default function ChallengesView({ user, myLogs, myRoutine, onBack }) {
               width: "100%", padding: "13px",
               background: creating ? "var(--bg3)" : ACCENT,
               border: creating ? "1px solid var(--border)" : "none",
-              color: creating ? "var(--text3)" : "#000",
+              color: creating ? "var(--text3)" : "#f0f0f0",
               borderRadius: 12, cursor: creating ? "default" : "pointer",
               fontSize: 11, fontWeight: 700, letterSpacing: 2, fontFamily: "inherit",
               minHeight: 48, boxShadow: creating ? "none" : `0 4px 16px ${ACCENT}44`,

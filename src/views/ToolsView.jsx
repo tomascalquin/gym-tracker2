@@ -87,7 +87,7 @@ export default function ToolsView({ onBack, lang = "es" }) {
           {TABS.map(t => (
             <button key={t.key} onClick={() => setTab(t.key)} style={{
               padding: "7px 14px", borderRadius: 99, flexShrink: 0,
-              background: tab === t.key ? "rgba(255,255,255,0.90)" : "transparent",
+              background: tab === t.key ? "rgba(167,139,250,0.18)" : "transparent",
               border: `1px solid ${tab === t.key ? "var(--text)" : "var(--border)"}`,
               color: tab === t.key ? "#080810" : "var(--text2)",
               fontSize: 11, fontWeight: 700, letterSpacing: 0.5,
@@ -228,7 +228,7 @@ function OneRMCalc({ lang = "es" }) {
           {["kg", "lb"].map(u => (
             <button key={u} onClick={() => setUnit(u)} style={{
               flex: 1, padding: "8px", borderRadius: 10,
-              background: unit === u ? "rgba(255,255,255,0.90)" : "var(--bg3)",
+              background: unit === u ? "rgba(167,139,250,0.18)" : "var(--bg3)",
               border: "none", color: unit === u ? "#080810" : "var(--text2)",
               fontSize: 12, fontWeight: 700, cursor: "pointer",
               fontFamily: "inherit", WebkitTapHighlightColor: "transparent",
@@ -249,7 +249,7 @@ function OneRMCalc({ lang = "es" }) {
             {Object.keys(ONE_RM_FORMULAS).map(f => (
               <button key={f} onClick={() => setFormula(f)} style={{
                 padding: "5px 10px", borderRadius: 8,
-                background: formula === f ? "rgba(255,255,255,0.90)" : "var(--bg3)",
+                background: formula === f ? "rgba(167,139,250,0.18)" : "var(--bg3)",
                 border: "none", fontSize: 11,
                 color: formula === f ? "#080810" : "rgba(240,240,240,0.55)",
                 cursor: "pointer", fontFamily: "inherit",
@@ -262,13 +262,13 @@ function OneRMCalc({ lang = "es" }) {
         {/* Resultado */}
         {ormDisplay && (
           <div style={{
-            background: "rgba(255,255,255,0.90)", borderRadius: 12, padding: "16px",
+            background: "rgba(167,139,250,0.18)", borderRadius: 12, padding: "16px",
             textAlign: "center", marginTop: 14,
           }}>
-            <div style={{ fontSize: 9, letterSpacing: 3, color: "#080810", opacity: 0.5, marginBottom: 4 }}>
+            <div style={{ fontSize: 9, letterSpacing: 3, color: "#f0f0f0", opacity: 0.5, marginBottom: 4 }}>
               {lang === "en" ? "ESTIMATED 1RM" : "1RM ESTIMADO"}
             </div>
-            <div className="mono" style={{ fontSize: 40, fontWeight: 900, color: "#080810", letterSpacing: -2 }}>
+            <div className="mono" style={{ fontSize: 40, fontWeight: 900, color: "#f0f0f0", letterSpacing: -2 }}>
               {ormDisplay.toFixed(1)}
               <span style={{ fontSize: 16, fontWeight: 400, opacity: 0.6, marginLeft: 6 }}>{unit}</span>
             </div>
@@ -359,7 +359,7 @@ function StrengthPoints({ lang = "es" }) {
           {sexLabels.map(([s, l]) => (
             <button key={s} onClick={() => setSex(s)} style={{
               flex: 1, padding: "8px", borderRadius: 10,
-              background: sex === s ? "rgba(255,255,255,0.90)" : "var(--bg3)",
+              background: sex === s ? "rgba(167,139,250,0.18)" : "var(--bg3)",
               border: "none", color: sex === s ? "#080810" : "var(--text2)",
               fontSize: 12, fontWeight: 700, cursor: "pointer",
               fontFamily: "inherit", WebkitTapHighlightColor: "transparent",
@@ -372,7 +372,7 @@ function StrengthPoints({ lang = "es" }) {
           {["kg", "lb"].map(u => (
             <button key={u} onClick={() => setUnit(u)} style={{
               padding: "5px 12px", borderRadius: 8,
-              background: unit === u ? "rgba(255,255,255,0.90)" : "var(--bg3)",
+              background: unit === u ? "rgba(167,139,250,0.18)" : "var(--bg3)",
               border: "none", color: unit === u ? "#080810" : "var(--text2)",
               fontSize: 11, fontWeight: 700, cursor: "pointer",
               fontFamily: "inherit", WebkitTapHighlightColor: "transparent",
@@ -486,7 +486,7 @@ function RPERIRTool({ lang = "es" }) {
         {modeTabs.map(([k, l]) => (
           <button key={k} onClick={() => setMode(k)} style={{
             flex: 1, padding: "9px", borderRadius: 10,
-            background: mode === k ? "rgba(255,255,255,0.90)" : "var(--bg3)",
+            background: mode === k ? "rgba(167,139,250,0.18)" : "var(--bg3)",
             border: "none", color: mode === k ? "#080810" : "var(--text2)",
             fontSize: 12, fontWeight: 700, cursor: "pointer",
             fontFamily: "inherit", WebkitTapHighlightColor: "transparent",
@@ -558,7 +558,7 @@ function RPERIRTool({ lang = "es" }) {
             {["kg", "lb"].map(u => (
               <button key={u} onClick={() => setUnit(u)} style={{
                 padding: "5px 12px", borderRadius: 8,
-                background: unit === u ? "rgba(255,255,255,0.90)" : "var(--bg3)",
+                background: unit === u ? "rgba(167,139,250,0.18)" : "var(--bg3)",
                 border: "none", color: unit === u ? "#080810" : "var(--text2)",
                 fontSize: 11, fontWeight: 700, cursor: "pointer",
                 fontFamily: "inherit", WebkitTapHighlightColor: "transparent",
@@ -618,13 +618,13 @@ function RPERIRTool({ lang = "es" }) {
           {/* Resultado 1RM */}
           {orm && (
             <div style={{
-              background: "rgba(255,255,255,0.90)", borderRadius: 12, padding: "16px",
+              background: "rgba(167,139,250,0.18)", borderRadius: 12, padding: "16px",
               textAlign: "center",
             }}>
-              <div style={{ fontSize: 9, letterSpacing: 3, color: "#080810", opacity: 0.5, marginBottom: 4 }}>
+              <div style={{ fontSize: 9, letterSpacing: 3, color: "#f0f0f0", opacity: 0.5, marginBottom: 4 }}>
                 {lang === "en" ? "ESTIMATED 1RM" : "1RM ESTIMADO"}
               </div>
-              <div className="mono" style={{ fontSize: 40, fontWeight: 900, color: "#080810", letterSpacing: -2 }}>
+              <div className="mono" style={{ fontSize: 40, fontWeight: 900, color: "#f0f0f0", letterSpacing: -2 }}>
                 {orm.toFixed(1)}
                 <span style={{ fontSize: 16, fontWeight: 400, opacity: 0.6, marginLeft: 6 }}>{unit}</span>
               </div>
@@ -702,13 +702,13 @@ function Td({ children, className, style }) {
 function ScoreBox({ label, value }) {
   return (
     <div style={{
-      flex: 1, background: "rgba(255,255,255,0.90)", borderRadius: 12,
+      flex: 1, background: "rgba(167,139,250,0.18)", borderRadius: 12,
       padding: "14px", textAlign: "center",
     }}>
-      <div style={{ fontSize: 9, letterSpacing: 2, color: "#080810", opacity: 0.5, marginBottom: 4 }}>
+      <div style={{ fontSize: 9, letterSpacing: 2, color: "#f0f0f0", opacity: 0.5, marginBottom: 4 }}>
         {label}
       </div>
-      <div className="mono" style={{ fontSize: 30, fontWeight: 900, color: "#080810", letterSpacing: -1 }}>
+      <div className="mono" style={{ fontSize: 30, fontWeight: 900, color: "#f0f0f0", letterSpacing: -1 }}>
         {value}
       </div>
     </div>

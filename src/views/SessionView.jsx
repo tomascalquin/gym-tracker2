@@ -240,8 +240,8 @@ function SaveButton({ onClick, saving, accent, full, allDone }) {
   const [pressed, setPressed] = useState(false);
 
   const bgActive = allDone
-    ? `linear-gradient(135deg, ${accent}cc, ${accent}88)`
-    : "rgba(255,255,255,0.09)";
+    ? `linear-gradient(135deg, ${accent}dd, ${accent}aa)`
+    : "rgba(167,139,250,0.18)";
 
   return (
     <button
@@ -255,17 +255,17 @@ function SaveButton({ onClick, saving, accent, full, allDone }) {
       style={{
         width: full ? "100%" : "auto",
         background: saving
-          ? "rgba(255,255,255,0.05)"
+          ? "rgba(255,255,255,0.07)"
           : pressed
-            ? (allDone ? `${accent}99` : "rgba(255,255,255,0.14)")
-            : full ? bgActive : "rgba(255,255,255,0.09)",
+            ? "rgba(255,255,255,0.75)"
+            : full ? bgActive : "rgba(167,139,250,0.18)",
         backdropFilter: "blur(20px)", WebkitBackdropFilter: "blur(20px)",
         border: saving
-          ? "1px solid rgba(255,255,255,0.08)"
+          ? "1px solid rgba(255,255,255,0.10)"
           : full && allDone
-            ? `1px solid ${accent}66`
-            : "1px solid rgba(255,255,255,0.14)",
-        color: saving ? "rgba(240,240,240,0.25)" : "#f0f0f0",
+            ? `1px solid ${accent}88`
+            : "1px solid rgba(255,255,255,0.30)",
+        color: saving ? "rgba(240,240,240,0.30)" : full && allDone ? "#fff" : "#080810",
         padding: full ? "15px" : "8px 14px",
         borderRadius: full ? 18 : 12,
         cursor: saving ? "default" : "pointer",

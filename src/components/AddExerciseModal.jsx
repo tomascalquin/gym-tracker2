@@ -150,7 +150,7 @@ export default function AddExerciseModal({ accent, onAdd, onClose }) {
         {/* Confirmar */}
         <button onClick={handleSubmit} style={{
           width: "100%", padding: "13px", background: accent, border: "none",
-          borderRadius: 10, color: "#000", fontWeight: 700, fontSize: 15,
+          borderRadius: 10, color: "#f0f0f0", fontWeight: 700, fontSize: 15,
           letterSpacing: 2, cursor: "pointer", fontFamily: "inherit",
         }}>AGREGAR A LA RUTINA</button>
       </div>

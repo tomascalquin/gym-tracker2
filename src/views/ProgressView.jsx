@@ -41,7 +41,7 @@ export default function ProgressView({ logs, routine, onBack, user }) {
           ].map(t => (
             <button key={t.key} onClick={() => setSection(t.key)} style={{
               flex: 1, background: "none", border: "none",
-              borderBottom: `2px solid ${section === t.key ? "rgba(255,255,255,0.8)" : "transparent"}`,
+              borderBottom: `2px solid ${section === t.key ? "rgba(167,139,250,0.80)" : "transparent"}`,
               color: section === t.key ? "var(--text)" : "var(--text3)",
               padding: "10px 4px", cursor: "pointer",
               fontSize: 8, letterSpacing: 2, fontWeight: 700,
@@ -166,7 +166,7 @@ function EjerciciosSection({ logs, routine, routineDays }) {
               <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
                 <div style={{
                   width: 6, height: 6, borderRadius: "50%",
-                  background: selectedEx === ex.name ? "rgba(255,255,255,0.90)" : (ex.trend > 0 ? "var(--green)" : ex.trend < 0 ? "var(--red)" : "rgba(240,240,240,0.25)"),
+                  background: selectedEx === ex.name ? "rgba(167,139,250,0.35)" : (ex.trend > 0 ? "var(--green)" : ex.trend < 0 ? "var(--red)" : "rgba(240,240,240,0.10)"),
                   flexShrink: 0,
                 }} />
                 <div style={{ textAlign: "left" }}>

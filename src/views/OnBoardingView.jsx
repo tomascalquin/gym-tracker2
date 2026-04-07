@@ -346,7 +346,7 @@ export default function OnboardingView({ user, onRoutineReady, onBack = null, al
                 display: "flex", alignItems: "center", justifyContent: "center",
                 transition: "all 0.15s",
               }}>
-                {isSelected && <span style={{ fontSize: 12, color: "#000" }}>✓</span>}
+                {isSelected && <span style={{ fontSize: 12, color: "#f0f0f0" }}>✓</span>}
               </div>
             </button>
           );
@@ -368,7 +368,7 @@ export default function OnboardingView({ user, onRoutineReady, onBack = null, al
           <button onClick={handleUsePreset} disabled={saving} style={{
             width: "100%", padding: "14px",
             background: saving ? "var(--bg2)" : ACCENT,
-            border: "none", color: saving ? "var(--text3)" : "#000",
+            border: "none", color: saving ? "var(--text3)" : "#f0f0f0",
             borderRadius: 14, cursor: saving ? "default" : "pointer",
             fontSize: 11, fontWeight: 700, letterSpacing: 2, fontFamily: "inherit",
             minHeight: 50, boxShadow: saving ? "none" : `0 4px 20px ${ACCENT}44`,

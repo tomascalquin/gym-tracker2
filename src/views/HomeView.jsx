@@ -16,7 +16,6 @@ import {
   loadOnboarding, dismissOnboarding, markVisited,
   evaluateChecklist, claimBonus, BONUS_XP,
 } from "../utils/onboarding";
-import { loadMesocycle } from "../utils/mesocycle";
 
 export default function HomeView({
   logs, user, myProfile, routine, userXP,
@@ -34,7 +33,6 @@ export default function HomeView({
   const [toolsOpen, setToolsOpen]   = useState(false);
   const [onboarding, setOnboarding] = useState(null);
   const [hasFriend, setHasFriend]   = useState(false);
-  const [mesoData, setMesoData]     = useState(null);
 
   const weekSessions = Object.values(logs).filter(s => {
     const mon = new Date();
@@ -43,71 +41,54 @@ export default function HomeView({
     return new Date(s.date) >= mon;
   }).length;
 
-  // Cargar amigos + mesociclo + evaluar checklist en un solo efecto
-  // (antes eran dos useEffects separados, lo que causaba race condition:
-  //  el checklist se evaluaba con hasFriend=false antes de que loadFriends resolviera)
+  // Cargar estado de onboarding + amigos
   useEffect(() => {
-    if (!user?.uid) return;
-    let cancelled = false;
-
     async function load() {
-      // Cargar mesociclo activo
-      const meso = loadMesocycle(user.uid);
-      if (!cancelled) setMesoData(meso);
-
-      // Cargar estado de onboarding
       const ob = loadOnboarding(user.uid);
-      if (ob.dismissed) {
-        if (!cancelled) setOnboarding({ dismissed: true });
-        return;
-      }
+      if (ob.dismissed) { setOnboarding(null); return; }
 
-      // Cargar amigos ANTES de evaluar checklist para que hasFriend sea correcto
-      let friendCount = 0;
+      // Chequear si tiene amigos (para item "add_friend")
       try {
         const friends = await loadFriends(user.uid);
-        if (cancelled) return;
-        friendCount = friends.length;
-        setHasFriend(friendCount > 0);
+        setHasFriend(friends.length > 0);
         const recent = await loadFriendActivity(friends.map(f => f.uid));
-        if (!cancelled && recent.length > 0) { setActivity(recent); setShowFeed(true); }
+        if (recent.length > 0) { setActivity(recent); setShowFeed(true); }
       } catch {}
-      finally { if (!cancelled) saveLastVisit(); }
-
-      // Evaluar checklist con hasFriend ya resuelto
-      if (!cancelled) {
-        const result = evaluateChecklist(user.uid, { logs, hasFriend: friendCount > 0 });
-        setOnboarding({
-          dismissed:    false,
-          completed:    result.allCompleted,
-          allDone:      result.allDone,
-          bonusClaimed: result.bonusClaimed,
-        });
-      }
+      finally { saveLastVisit(); }
     }
-
     load();
-    return () => { cancelled = true; };
-  }, [user.uid, logs]);  // logs aquí para re-evaluar cuando cambian (sin hasFriend como dep)
+  }, [user.uid]);
+
+  // Evaluar checklist cuando cambian los logs
+  useEffect(() => {
+    if (!user?.uid) return;
+    const ob = loadOnboarding(user.uid);
+    if (ob.dismissed) return;
+    const result = evaluateChecklist(user.uid, { logs, hasFriend });
+    setOnboarding({
+      ...ob,
+      completed:   result.allCompleted,
+      allDone:     result.allDone,
+      bonusClaimed: result.bonusClaimed,
+    });
+  }, [logs, hasFriend, user.uid]);
 
   // Navegar y registrar visita
   const handleNavigate = useCallback((view) => {
     markVisited(user.uid, view);
-    // Re-evaluar para marcar items de "visita" como completados
-    // hasFriend se lee del estado actual, no del closure
+    // Re-evaluar para marcar items como completados
     const result = evaluateChecklist(user.uid, { logs, hasFriend });
-    setOnboarding(prev => prev && prev.dismissed !== true ? {
+    setOnboarding(prev => prev ? {
       ...prev,
-      completed:    result.allCompleted,
-      allDone:      result.allDone,
-      bonusClaimed: result.bonusClaimed,
+      completed:   result.allCompleted,
+      allDone:     result.allDone,
     } : prev);
     onNavigate(view);
   }, [user.uid, logs, hasFriend, onNavigate]);
 
   async function handleClaimBonus() {
     claimBonus(user.uid);
-    setOnboarding(prev => prev ? { ...prev, bonusClaimed: true, dismissed: false } : prev);
+    setOnboarding(prev => prev ? { ...prev, bonusClaimed: true } : prev);
     if (onClaimBonusXP) await onClaimBonusXP(BONUS_XP);
   }
 
@@ -117,7 +98,7 @@ export default function HomeView({
       handleClaimBonus();
     } else {
       dismissOnboarding(user.uid);
-      setOnboarding({ dismissed: true });
+      setOnboarding(null);
     }
   }
 
@@ -141,7 +122,7 @@ export default function HomeView({
   const recExCount = recommendedDay ? (routine[recommendedDay]?.exercises?.length || 0) : 0;
 
   const showChecklist = onboarding &&
-    onboarding.dismissed !== true &&
+    !onboarding.dismissed &&
     !(onboarding.allDone && onboarding.bonusClaimed);
 
   const TOOLS = [
@@ -220,56 +201,6 @@ export default function HomeView({
             onDismiss={handleDismissOnboarding}
           />
         )}
-
-        {/* ── Banner mesociclo activo ── */}
-        {mesoData?.mesocycle && (() => {
-          // Calcular semana actual comparando savedAt con ahora
-          const savedAt    = mesoData.savedAt || Date.now();
-          const weeksSince = Math.floor((Date.now() - savedAt) / (7 * 24 * 60 * 60 * 1000));
-          const totalWeeks = mesoData.mesocycle.length;
-          const weekIdx    = Math.min(weeksSince, totalWeeks - 1);
-          const week       = mesoData.mesocycle[weekIdx];
-          if (!week) return null;
-          const isDeload   = week.isDeload;
-          const accent     = isDeload ? "#60a5fa" : "#a78bfa";
-          return (
-            <button
-              onClick={() => handleNavigate("mesocycle")}
-              style={{
-                width: "100%", textAlign: "left", fontFamily: "inherit",
-                background: `linear-gradient(135deg, ${accent}18, ${accent}08)`,
-                backdropFilter: "blur(40px)", WebkitBackdropFilter: "blur(40px)",
-                border: `1px solid ${accent}33`,
-                borderRadius: 16, padding: "13px 16px", marginBottom: 16,
-                cursor: "pointer", display: "flex", alignItems: "center", gap: 12,
-                WebkitTapHighlightColor: "transparent",
-              }}
-            >
-              <div style={{
-                width: 38, height: 38, borderRadius: 11, flexShrink: 0,
-                background: `${accent}22`, border: `1px solid ${accent}44`,
-                display: "flex", alignItems: "center", justifyContent: "center",
-                fontSize: 18,
-              }}>
-                {isDeload ? "😴" : "📅"}
-              </div>
-              <div style={{ flex: 1 }}>
-                <div style={{ fontSize: 9, letterSpacing: 2.5, color: accent, fontWeight: 700, marginBottom: 3 }}>
-                  MESOCICLO · SEMANA {weekIdx + 1}/{totalWeeks}
-                </div>
-                <div style={{ fontSize: 12, fontWeight: 700, color: "#fff", marginBottom: 1 }}>
-                  {isDeload ? "Semana de deload 🧘" : week.focus}
-                </div>
-                <div style={{ fontSize: 10, color: "rgba(240,240,240,0.40)" }}>
-                  {isDeload
-                    ? "Baja el volumen 40-50% · mantén la técnica"
-                    : `RIR objetivo: ${week.rir} · deja ${week.rir} rep${week.rir === 1 ? "" : "s"} en el tanque`}
-                </div>
-              </div>
-              <div style={{ fontSize: 16, color: `${accent}88`, flexShrink: 0 }}>›</div>
-            </button>
-          );
-        })()}
 
         {/* ── Hero: DÍA RECOMENDADO ── */}
         {recommendedDay && !activeDay && (
@@ -448,11 +379,11 @@ function DayRow({ day, hasLog, exCount, lastLabel, index, onClick, isRecommended
       style={{
         width: "100%", textAlign: "left", fontFamily: "inherit",
         background: hasLog
-          ? "rgba(255,255,255,0.90)"
+          ? "rgba(167,139,250,0.18)"
           : pressed ? "rgba(255,255,255,0.12)" : "var(--glass-bg)",
         backdropFilter: "var(--glass-blur)",
         WebkitBackdropFilter: "var(--glass-blur)",
-        border: `1px solid ${hasLog ? "rgba(255,255,255,0.95)" : "var(--glass-border)"}`,
+        border: `1px solid ${hasLog ? "rgba(74,222,128,0.28)" : "var(--glass-border)"}`,
         borderRadius: 16, padding: "12px 16px", cursor: "pointer",
         display: "flex", alignItems: "center", justifyContent: "space-between",
         transform: pressed ? "scale(0.98)" : "scale(1)",

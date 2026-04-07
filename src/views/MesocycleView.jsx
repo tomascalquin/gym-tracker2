@@ -405,7 +405,7 @@ export default function MesocycleView({ user, logs, routine, onBack }) {
             {plan.mesocycle.map(w => (
               <button key={w.week} onClick={() => setActiveWeek(w.week)} style={{
                 flex: 1, background: "none", border: "none",
-                borderBottom: `2px solid ${activeWeek === w.week ? "rgba(255,255,255,0.80)" : "transparent"}`,
+                borderBottom: `2px solid ${activeWeek === w.week ? "rgba(167,139,250,0.80)" : "transparent"}`,
                 color: w.isDeload
                   ? (activeWeek === w.week ? "#fbbf24" : "rgba(251,191,36,0.40)")
                   : (activeWeek === w.week ? "#fff" : "rgba(240,240,240,0.30)"),

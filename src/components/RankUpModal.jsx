@@ -89,7 +89,7 @@ export default function RankUpModal({ oldRank, newRank, xpGained, prs, onClose }
         <button onClick={handleClose} style={{
           width: "100%", padding: "14px",
           background: `linear-gradient(135deg, ${newRank.color} 0%, ${newRank.color}cc 100%)`,
-          border: "none", borderRadius: 12, color: "#000",
+          border: "none", borderRadius: 12, color: "#f0f0f0",
           fontWeight: 700, fontSize: 12, letterSpacing: 2,
           cursor: "pointer", fontFamily: "inherit",
           boxShadow: `0 4px 20px ${newRank.color}44`,

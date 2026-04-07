@@ -21,7 +21,7 @@ export const tokens = {
   glass: {
     bg:      "rgba(255,255,255,0.08)",
     bgHover: "rgba(255,255,255,0.12)",
-    bgDone:  "rgba(255,255,255,0.90)",
+    bgDone:  "rgba(167,139,250,0.18)",
     border:  "rgba(255,255,255,0.14)",
     border2: "rgba(255,255,255,0.22)",
     blur:    "blur(40px) saturate(180%)",
@@ -45,20 +45,20 @@ export const GLASS = {
     borderRadius:        14,
   },
   cardDone: {
-    background:          "rgba(255,255,255,0.90)",
+    background:          "rgba(167,139,250,0.18)",
     backdropFilter:      "var(--glass-blur)",
     WebkitBackdropFilter:"var(--glass-blur)",
-    border:              "1px solid rgba(255,255,255,0.95)",
+    border:              "1px solid rgba(167,139,250,0.35)",
     borderRadius:        18,
   },
 };
 
 export function btnPrimary(disabled = false) {
   return {
-    background:          disabled ? "rgba(255,255,255,0.10)" : "rgba(255,255,255,0.92)",
+    background:          disabled ? "rgba(255,255,255,0.10)" : "rgba(167,139,250,0.18)",
     backdropFilter:      "var(--glass-blur-sm)",
     WebkitBackdropFilter:"var(--glass-blur-sm)",
-    border:              "1px solid rgba(255,255,255,0.95)",
+    border:              "1px solid rgba(167,139,250,0.35)",
     color:               disabled ? "rgba(255,255,255,0.30)" : "#080810",
     padding:             "14px 20px",
     borderRadius: 18,

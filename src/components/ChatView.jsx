@@ -190,7 +190,7 @@ export default function ChatView({ chatId, currentUser, title, onBack, accentCol
                   {msg.text && (
                     <div style={{
                       fontSize: 14, lineHeight: 1.45,
-                      color: isMe ? "#000" : "var(--text)",
+                      color: "var(--text)",
                       wordBreak: "break-word",
                     }}>{msg.text}</div>
                   )}
@@ -268,7 +268,7 @@ export default function ChatView({ chatId, currentUser, title, onBack, accentCol
           width: 44, height: 44, borderRadius: "50%", flexShrink: 0,
           background: text.trim() ? accentColor : "var(--bg2)",
           border: `1.5px solid ${text.trim() ? accentColor : "var(--border)"}`,
-          color: text.trim() ? "#000" : "var(--text3)",
+          color: "#f0f0f0",
           cursor: text.trim() ? "pointer" : "default",
           display: "flex", alignItems: "center", justifyContent: "center",
           fontSize: 18, transition: "all 0.2s",

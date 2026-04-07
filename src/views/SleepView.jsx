@@ -178,7 +178,7 @@ export default function SleepView({ user, onBack }) {
           {[["log","Registrar"],["history","Historial"],["stats","Stats"]].map(([k,l]) => (
             <button key={k} onClick={() => setTab(k)} style={{
               flex: 1, background: "none", border: "none",
-              borderBottom: `2px solid ${tab === k ? "rgba(255,255,255,0.80)" : "transparent"}`,
+              borderBottom: `2px solid ${tab === k ? "rgba(167,139,250,0.80)" : "transparent"}`,
               color: tab === k ? "#fff" : "rgba(240,240,240,0.35)",
               padding: "10px 4px", cursor: "pointer",
               fontSize: 9, letterSpacing: 2, fontWeight: 700,

@@ -209,7 +209,7 @@ export default function FriendsView({ user, myProfile, onBack, onOpenChat }) {
               />
               <button onClick={handleSearch} disabled={searching} style={{
                 background: searching ? "var(--bg2)" : "#60a5fa",
-                border: "none", color: searching ? "var(--text3)" : "#000",
+                border: "none", color: searching ? "var(--text3)" : "#f0f0f0",
                 padding: "11px 16px", borderRadius: 12, cursor: "pointer",
                 fontSize: 11, fontWeight: 700, fontFamily: "inherit", minHeight: 44,
                 transition: "all 0.15s",
@@ -242,7 +242,7 @@ export default function FriendsView({ user, myProfile, onBack, onOpenChat }) {
                 </div>
                 <button onClick={handleSendRequest} disabled={sendingReq} style={{
                   background: sendingReq ? "#14532d" : "#22c55e",
-                  border: "none", color: "#000", padding: "9px 16px",
+                  border: "none", color: "#f0f0f0", padding: "9px 16px",
                   borderRadius: 10, cursor: "pointer", fontSize: 11,
                   fontWeight: 700, fontFamily: "inherit", minHeight: 40,
                 }}>{sendingReq ? "✓" : "AGREGAR"}</button>
@@ -284,7 +284,7 @@ export default function FriendsView({ user, myProfile, onBack, onOpenChat }) {
                 </div>
                 <div style={{ display: "flex", gap: 6 }}>
                   <button onClick={() => handleAccept(r.uid)} style={{
-                    background: "#22c55e", border: "none", color: "#000",
+                    background: "#22c55e", border: "none", color: "#f0f0f0",
                     padding: "8px 14px", borderRadius: 10, cursor: "pointer",
                     fontSize: 11, fontWeight: 700, fontFamily: "inherit", minHeight: 38,
                   }}>✓</button>

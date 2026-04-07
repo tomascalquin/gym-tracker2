@@ -49,16 +49,16 @@ export default function Toast({ message, type = "success", duration = 2400 }) {
         }}
       >
         <div style={{
-          background: "rgba(255,255,255,0.90)",
+          background: "rgba(167,139,250,0.18)",
           borderRadius: 12, padding: "11px 18px",
           display: "flex", alignItems: "center", gap: 10,
           boxShadow: "0 8px 32px rgba(0,0,0,0.2)",
           fontFamily: "inherit",
         }}>
-          <span style={{ fontSize: 13, color: "#080810", flexShrink: 0 }}>
+          <span style={{ fontSize: 13, color: "#f0f0f0", flexShrink: 0 }}>
             {type === "error" ? "✕" : type === "pr" ? "🏆" : "✓"}
           </span>
-          <span style={{ fontSize: 12, fontWeight: 600, color: "#080810", letterSpacing: 0.3 }}>{message}</span>
+          <span style={{ fontSize: 12, fontWeight: 600, color: "#f0f0f0", letterSpacing: 0.3 }}>{message}</span>
         </div>
       </div>
     </>

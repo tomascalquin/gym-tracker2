@@ -292,7 +292,7 @@ export default function AIRoutineBuilder({ onRoutineReady, onBack }) {
           <button onClick={handleSave} disabled={saving} style={{
             width: "100%", padding: "14px",
             background: saving ? "#14532d" : "#22c55e",
-            border: "none", borderRadius: 10, color: "#000",
+            border: "none", borderRadius: 10, color: "#f0f0f0",
             fontWeight: 700, fontSize: 13, letterSpacing: 2,
             cursor: saving ? "default" : "pointer", fontFamily: "inherit",
             marginTop: 4,

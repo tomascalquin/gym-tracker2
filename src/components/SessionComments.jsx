@@ -122,7 +122,7 @@ export default function SessionComments({ ownerUid, sessionKey, currentUser, can
             />
             <button onClick={() => handleSend("", text)} disabled={sending || !text.trim()} style={{
               background: text.trim() ? "#60a5fa" : "#1a1a2e",
-              border: "none", color: text.trim() ? "#000" : "#334155",
+              border: "none", color: text.trim() ? "#f0f0f0" : "rgba(240,240,240,0.25)",
               padding: "7px 12px", borderRadius: 7, cursor: text.trim() ? "pointer" : "default",
               fontSize: 11, fontWeight: 700, fontFamily: "inherit",
             }}>→</button>

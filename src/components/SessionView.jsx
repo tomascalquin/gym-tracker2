@@ -159,7 +159,7 @@ function SaveButton({ onClick, saving, accent, full }) {
         width: full ? "100%" : "auto",
         background: saving ? "var(--bg2)" : pressed ? accent + "dd" : accent,
         border: saving ? "1px solid var(--border)" : "none",
-        color: saving ? "var(--text3)" : "#000",
+        color: saving ? "var(--text3)" : "#f0f0f0",
         padding: full ? "14px" : "8px 16px",
         borderRadius: full ? tokens.radius.lg : tokens.radius.md,
         cursor: saving ? "default" : "pointer",

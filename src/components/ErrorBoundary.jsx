@@ -47,7 +47,7 @@ export default class ErrorBoundary extends Component {
                 cursor: "pointer",
                 fontWeight: 700,
                 background: "#60a5fa",
-                color: "#000",
+                color: "#f0f0f0",
                 fontFamily: "inherit",
               }}
             >
