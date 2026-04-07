@@ -63,7 +63,7 @@ export default function ExerciseCardCompact({
                   width: 22, height: 22, borderRadius: "50%",
                   background: done ? accent : "var(--bg3)",
                   border: `1px solid ${done ? accent : "var(--border)"}`,
-                  color: done ? "#000" : "var(--text3)",
+                  color: done ? "#fff" : "var(--text3)",
                   fontSize: 10, cursor: "pointer",
                   display: "flex", alignItems: "center", justifyContent: "center",
                   transition: "all 0.15s",

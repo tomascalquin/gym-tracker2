@@ -128,10 +128,10 @@ textarea { resize: none; }
 
 /* Invert card (done state) */
 .card-done {
-  background: rgba(255,255,255,0.90);
+  background: rgba(74,222,128,0.10);
   backdrop-filter: var(--glass-blur);
   -webkit-backdrop-filter: var(--glass-blur);
-  border: 1px solid rgba(255,255,255,0.95);
+  border: 1px solid rgba(74,222,128,0.22);
   border-radius: 20px;
 }
 
@@ -246,14 +246,16 @@ select option { background: #111122; color: #f0f0f0; }
 .glass-btn:active { transform: scale(0.97); background: rgba(255,255,255,0.14); }
 
 .glass-btn-primary {
-  background: rgba(255,255,255,0.92);
-  border: 1px solid rgba(255,255,255,0.95);
+  background: rgba(167,139,250,0.18);
+  backdrop-filter: var(--glass-blur-sm);
+  -webkit-backdrop-filter: var(--glass-blur-sm);
+  border: 1px solid rgba(167,139,250,0.35);
   border-radius: 14px;
-  color: #080810;
+  color: #f0f0f0;
   font-weight: 700;
   cursor: pointer;
   font-family: inherit;
   transition: all 0.15s;
   -webkit-tap-highlight-color: transparent;
 }
-.glass-btn-primary:active { transform: scale(0.97); background: rgba(255,255,255,0.80); }
+.glass-btn-primary:active { transform: scale(0.97); background: rgba(167,139,250,0.28); }
